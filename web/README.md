@@ -5,14 +5,14 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## Environment
 ```
-npm run serve
+copy .env.example .env
 ```
 
-### Compiles and minifies for production
+### Run in local development
 ```
-npm run build
+npm run dev
 ```
 
 ### Lints and fixes files
@@ -20,5 +20,7 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Optional local preview
+```
+npm run preview
+```

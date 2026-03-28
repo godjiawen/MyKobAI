@@ -1,16 +1,15 @@
-import $ from 'jquery'
+﻿import { API_PATHS } from "@/config/env";
+import { apiRequest } from "@/utils/http";
 
 export default {
-  state: {
+  state: () => ({
     id: "",
     username: "",
     photo: "",
     token: "",
-    id_login: false,
-    pulling_info: true, //是否正在从云端拉取信息
-  },
-  getters: {
-  },
+    is_login: false,
+    pulling_info: true,
+  }),
   mutations: {
     updateUser(state, user) {
       state.id = user.id;
@@ -28,61 +27,65 @@ export default {
       state.token = "";
       state.is_login = false;
     },
-    updatePullingInfo(state, pulling_info) {
-      state.pulling_info = pulling_info;
-    }
+    updatePullingInfo(state, pullingInfo) {
+      state.pulling_info = pullingInfo;
+    },
   },
   actions: {
-    login(context, data) {
-      $.ajax({
-        url: "https://app6201.acapp.acwing.com.cn/api/user/account/token/",
-        type: "post",
-        data: {
-          username: data.username,
-          password: data.password,
-        },
-        success(resp) {
-          if (resp.error_message === "success") {
-            localStorage.setItem("jwt_token", resp.token);
-            context.commit("updateToken", resp.token);
-            data.success(resp);
-          } else {
-            data.error(resp);
-          }
-        },
-        error(resp) {
-          data.error(resp);
-        }
+    async login({ commit }, { username, password }) {
+      const resp = await apiRequest(API_PATHS.login, {
+        method: "POST",
+        data: { username, password },
       });
+
+      if (resp.error_message !== "success") {
+        throw new Error(resp.error_message || "Login failed");
+      }
+
+      localStorage.setItem("jwt_token", resp.token);
+      commit("updateToken", resp.token);
+      return resp;
     },
-    getinfo(context, data) {
-      $.ajax({
-        url: "https://app6201.acapp.acwing.com.cn/api/user/account/info/",
-        type: "get",
-        headers: {
-          Authorization: "Bearer " + context.state.token,
-        },
-        success(resp) {
-          if (resp.error_message === "success") {
-            context.commit("updateUser", {
-              ...resp,
-              is_login: true,
-            });
-            data.success(resp);
-          } else {
-            data.error(resp);
-          }
-        },
-        error(resp) {
-          data.error(resp);
-        }
-      })
+
+    async getinfo({ commit, state }) {
+      const resp = await apiRequest(API_PATHS.userInfo, {
+        token: state.token,
+      });
+
+      if (resp.error_message !== "success") {
+        throw new Error(resp.error_message || "Get info failed");
+      }
+
+      commit("updateUser", {
+        ...resp,
+        is_login: true,
+      });
+      return resp;
     },
-    logout(context) {
+
+    logout({ commit }) {
       localStorage.removeItem("jwt_token");
-      context.commit("logout");
-    }
+      commit("logout");
+    },
+
+    async initAuth({ commit, dispatch }) {
+      const token = localStorage.getItem("jwt_token");
+      if (!token) {
+        commit("updatePullingInfo", false);
+        return false;
+      }
+
+      commit("updateToken", token);
+      try {
+        await dispatch("getinfo");
+        return true;
+      } catch (error) {
+        localStorage.removeItem("jwt_token");
+        commit("logout");
+        return false;
+      } finally {
+        commit("updatePullingInfo", false);
+      }
+    },
   },
-  modules: {
-  }
-}
+};

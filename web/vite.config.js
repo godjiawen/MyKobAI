@@ -9,4 +9,19 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  server: {
+    host: true,
+  },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vue-vendor": ["vue", "vue-router", "vuex"],
+          "ui-vendor": ["bootstrap", "@popperjs/core"],
+          "editor-vendor": ["ace-builds", "vue3-ace-editor"],
+        },
+      },
+    },
+  },
 });

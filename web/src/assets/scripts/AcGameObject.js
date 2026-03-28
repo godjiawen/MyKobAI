@@ -24,7 +24,7 @@ export class AcGameObject {
         for (let i in AC_GAME_OBJECTS) {
             const obj = AC_GAME_OBJECTS[i];
             if (obj === this) {
-                AC_GAME_OBJECTS.splice(i);
+                AC_GAME_OBJECTS.splice(i, 1);
                 break;
             }
         }

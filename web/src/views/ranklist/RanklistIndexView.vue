@@ -1,117 +1,167 @@
-<template>
-    <ContentField>
-        <table class="table table-striped table-hover" style="text-align: center;">
-            <thead>
-                <tr>
-                    <th>玩家</th>
-                    <th>天梯分</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="user in users" :key="user.id">
-                    <td>
-                        <img :src="user.photo" alt="" class="record-user-photo">
-                        &nbsp;
-                        <span class="record-user-username">{{ user.username }}</span>
-                    </td>
-                    <td>{{ user.rating }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <nav aria-label="...">
-        <ul class="pagination" style="float: right;">
-            <li class="page-item" @click="click_page(-2)">
-                <a class="page-link" href="#">前一页</a>
-            </li>
-            <li :class="'page-item ' + page.is_active" v-for="page in pages" :key="page.number" @click="click_page(page.number)">
-                <a class="page-link" href="#">{{ page.number }}</a>
-            </li>
-            <li class="page-item" @click="click_page(-1)">
-                <a class="page-link" href="#">后一页</a>
-            </li>
+﻿<template>
+  <ContentField>
+    <section class="list-panel">
+      <div class="panel-header">
+        <h2>Ranklist</h2>
+        <p>Top players by rating.</p>
+      </div>
+      <table class="table table-striped table-hover" style="text-align: center;">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users" :key="user.id">
+            <td>
+              <img :src="user.photo || fallbackPhoto" alt="" class="record-user-photo" />
+              &nbsp;
+              <span class="record-user-username">{{ user.username || '-' }}</span>
+            </td>
+            <td>{{ user.rating ?? 0 }}</td>
+          </tr>
+          <tr v-if="!loading && !errorMessage && users.length === 0">
+            <td colspan="2" class="empty-row">暂无排行榜数据</td>
+          </tr>
+        </tbody>
+      </table>
+      <p v-if="loading" class="state-tip">排行榜加载中...</p>
+      <p v-if="errorMessage" class="state-tip state-error">{{ errorMessage }}</p>
+      <nav aria-label="pagination" class="pager-wrap">
+        <ul class="pagination">
+          <li class="page-item" @click.prevent="clickPage(-2)">
+            <a class="page-link" href="#">Prev</a>
+          </li>
+          <li :class="`page-item ${page.is_active}`" v-for="page in pages" :key="page.number" @click.prevent="clickPage(page.number)">
+            <a class="page-link" href="#">{{ page.number }}</a>
+          </li>
+          <li class="page-item" @click.prevent="clickPage(-1)">
+            <a class="page-link" href="#">Next</a>
+          </li>
         </ul>
-        </nav>
-    </ContentField>
+      </nav>
+    </section>
+  </ContentField>
 </template>
 
-<script>
-import ContentField from '../../components/ContentField.vue'
-import { useStore } from 'vuex';
-import { ref } from 'vue';
-import $ from 'jquery';
+<script setup>
+import { onMounted, ref } from "vue";
+import { useStore } from "vuex";
+import ContentField from "@/components/ContentField.vue";
+import { API_PATHS } from "@/config/env";
+import { apiRequest } from "@/utils/http";
 
-export default {
-    components: {
-        ContentField
-    },
-    setup() {
-        const store = useStore();
-        let users = ref([]);
-        let current_page = 1;
-        let total_users = 0;
-        let pages = ref([]);
+const store = useStore();
 
-        const click_page = page => {
-            if (page === -2) page = current_page - 1;
-            else if (page === -1) page = current_page + 1;
-            let max_pages = parseInt(Math.ceil(total_users / 10));
+const users = ref([]);
+const pages = ref([]);
+const loading = ref(false);
+const errorMessage = ref("");
+let currentPage = 1;
+let totalUsers = 0;
+const fallbackPhoto = "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png";
 
-            if (page >= 1 && page <= max_pages) {
-                pull_page(page);
-            }
-        }
+const updatePages = () => {
+  const maxPages = Math.ceil(totalUsers / 10);
+  const nextPages = [];
 
-        const udpate_pages = () => {
-            let max_pages = parseInt(Math.ceil(total_users / 10));
-            let new_pages = [];
-            for (let i = current_page - 2; i <= current_page + 2; i ++ ) {
-                if (i >= 1 && i <= max_pages) {
-                    new_pages.push({
-                        number: i,
-                        is_active: i === current_page ? "active" : "",
-                    });
-                }
-            }
-            pages.value = new_pages;
-        }
-
-        const pull_page = page => {
-            current_page = page;
-            $.ajax({
-                url: "https://app6201.acapp.acwing.com.cn/api/ranklist/getlist/",
-                data: {
-                    page,
-                },
-                type: "get",
-                headers: {
-                    Authorization: "Bearer " + store.state.user.token,
-                },
-                success(resp) {
-                    users.value = resp.users;
-                    console.log(users.value);
-                    total_users = resp.users_count;
-                    udpate_pages();
-                },
-                error(resp) {
-                    console.log(resp);
-                }
-            })
-        }
-
-        pull_page(current_page);
-
-        return {
-            users,
-            pages,
-            click_page
-        }
+  for (let i = currentPage - 2; i <= currentPage + 2; i += 1) {
+    if (i >= 1 && i <= maxPages) {
+      nextPages.push({
+        number: i,
+        is_active: i === currentPage ? "active" : "",
+      });
     }
-}
+  }
+
+  pages.value = nextPages;
+};
+
+const pullPage = async (page) => {
+  currentPage = page;
+  loading.value = true;
+  errorMessage.value = "";
+  try {
+    const resp = await apiRequest(API_PATHS.ranklist, {
+      data: { page },
+      token: store.state.user.token,
+    });
+    users.value = Array.isArray(resp.users) ? resp.users : [];
+    totalUsers = resp.users_count || 0;
+    updatePages();
+  } catch (error) {
+    console.error(error);
+    users.value = [];
+    totalUsers = 0;
+    pages.value = [];
+    errorMessage.value = "排行榜加载失败，请确认后端接口是否可用。";
+  } finally {
+    loading.value = false;
+  }
+};
+
+const clickPage = (page) => {
+  let target = page;
+  if (target === -2) target = currentPage - 1;
+  if (target === -1) target = currentPage + 1;
+
+  const maxPages = Math.ceil(totalUsers / 10);
+  if (target >= 1 && target <= maxPages) {
+    pullPage(target);
+  }
+};
+
+onMounted(() => {
+  pullPage(currentPage);
+});
 </script>
 
 <style scoped>
+.panel-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+}
+
+.panel-header p {
+  margin: 0;
+  color: #a9bfd3;
+}
+
+.pager-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
 img.record-user-photo {
-    width: 4vh;
-    border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(145, 210, 255, 0.45);
+}
+
+.record-user-username {
+  font-weight: 600;
+}
+
+.state-tip {
+  margin: 10px 0 0;
+  color: #a9bfd3;
+}
+
+.state-error {
+  color: #ff8f8f;
+}
+
+.empty-row {
+  color: #a9bfd3;
 }
 </style>

@@ -17,6 +17,8 @@ export class GameMap extends AcGameObject {
         
         this.inner_walls_count = 20;
         this.walls = [];
+        this.keydownHandler = null;
+        this.replayIntervalId = null;
 
         this.snakes = [
             new Snake({id: 0, color: "#4876EC", r: this.rows - 2, c: 1}, this),
@@ -45,7 +47,7 @@ export class GameMap extends AcGameObject {
             const b_steps = this.store.state.record.b_steps;
             const loser = this.store.state.record.record_loser;
             const [snake0, snake1] = this.snakes;
-            const interval_id = setInterval(() => {
+            this.replayIntervalId = setInterval(() => {
                 if (k >= a_steps.length - 1) {
                     if (loser === "all" || loser === "A") {
                         snake0.status = "die";
@@ -53,7 +55,8 @@ export class GameMap extends AcGameObject {
                     if (loser === "all" || loser === "B") {
                         snake1.status = "die";
                     }
-                    clearInterval(interval_id);
+                    clearInterval(this.replayIntervalId);
+                    this.replayIntervalId = null;
                 } else {
                     snake0.set_direction(parseInt(a_steps[k]));
                     snake1.set_direction(parseInt(b_steps[k]));
@@ -63,7 +66,7 @@ export class GameMap extends AcGameObject {
         } else {
             this.ctx.canvas.focus();
 
-            this.ctx.canvas.addEventListener("keydown", e => {
+            this.keydownHandler = e => {
                 let d = -1;
                 if (e.key === 'w') d = 0;
                 else if (e.key === 'd') d = 1;
@@ -76,7 +79,8 @@ export class GameMap extends AcGameObject {
                         direction: d,
                     }))
                 }
-            });
+            };
+            this.ctx.canvas.addEventListener("keydown", this.keydownHandler);
         }
        
     }
@@ -149,5 +153,22 @@ export class GameMap extends AcGameObject {
                 this.ctx.fillRect(c * this.L, r * this.L, this.L, this.L);
             }
         }
+    }
+
+    on_destroy() {
+        if (this.replayIntervalId) {
+            clearInterval(this.replayIntervalId);
+            this.replayIntervalId = null;
+        }
+
+        if (this.keydownHandler && this.ctx?.canvas) {
+            this.ctx.canvas.removeEventListener("keydown", this.keydownHandler);
+            this.keydownHandler = null;
+        }
+
+        this.snakes.forEach((snake) => snake.destroy());
+        this.walls.forEach((wall) => wall.destroy());
+        this.snakes = [];
+        this.walls = [];
     }
 }

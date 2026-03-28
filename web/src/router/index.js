@@ -1,104 +1,82 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import PkIndexView from '../views/pk/PkIndexView.vue'
-import RecordIndexView from '../views/record/RecordIndexView.vue'
-import RecordContentView from '../views/record/RecordContentView.vue'
-import RanklistIndexView from '../views/ranklist/RanklistIndexView.vue'
-import UserBotIndexView from '../views/user/bot/UserBotIndexView.vue'
-import NotFound from '../views/error/NotFound.vue'
-import UserAccountLoginView from '../views/user/account/UserAccountLoginView.vue'
-import UserAccountRegisterView from '../views/user/account/UserAccountRegisterView.vue'
-import store from '../store/index'
+﻿import { createRouter, createWebHistory } from "vue-router";
+import store from "@/store";
 
 const routes = [
   {
     path: "/",
     name: "home",
     redirect: "/pk/",
-    meta: {
-      requestAuth: true,
-    }
+    meta: { requiresAuth: true },
   },
   {
     path: "/pk/",
     name: "pk_index",
-    component: PkIndexView,
-    meta: {
-      requestAuth: true,
-    }
+    component: () => import("@/views/pk/PkIndexView.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/record/",
     name: "record_index",
-    component: RecordIndexView,
-    meta: {
-      requestAuth: true,
-    }
+    component: () => import("@/views/record/RecordIndexView.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/record/:recordId/",
     name: "record_content",
-    component: RecordContentView,
-    meta: {
-      requestAuth: true,
-    }
+    component: () => import("@/views/record/RecordContentView.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/ranklist/",
     name: "ranklist_index",
-    component: RanklistIndexView,
-    meta: {
-      requestAuth: true,
-    }
+    component: () => import("@/views/ranklist/RanklistIndexView.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/user/account/login/",
     name: "user_account_login",
-    component: UserAccountLoginView,
-    meta: {
-      requestAuth: false,
-    }
+    component: () => import("@/views/user/account/UserAccountLoginView.vue"),
   },
   {
     path: "/user/account/register/",
     name: "user_account_register",
-    component: UserAccountRegisterView,
-    meta: {
-      requestAuth: false,
-    }
+    component: () => import("@/views/user/account/UserAccountRegisterView.vue"),
   },
   {
     path: "/user/bot/",
     name: "user_bot_index",
-    component: UserBotIndexView,
-    meta: {
-      requestAuth: true,
-    }
+    component: () => import("@/views/user/bot/UserBotIndexView.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/404/",
     name: "404",
-    component: NotFound,
-    meta: {
-      requestAuth: false,
-    }
+    component: () => import("@/views/error/NotFound.vue"),
   },
   {
     path: "/:catchAll(.*)",
     redirect: "/404/",
-  }
-]
+  },
+];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+});
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requestAuth && !store.state.user.is_login) {
-    next({name: "user_account_login"});
-  } else {
-    next();
+let authInitialized = false;
+
+router.beforeEach(async (to) => {
+  if (!authInitialized) {
+    await store.dispatch("initAuth");
+    authInitialized = true;
   }
-})
 
-export default router
+  if (to.meta.requiresAuth && !store.state.user.is_login) {
+    return { name: "user_account_login" };
+  }
+
+  return true;
+});
+
+export default router;

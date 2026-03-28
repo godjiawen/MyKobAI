@@ -1,24 +1,23 @@
-<template>
-    <div class="playground">
-        <GameMap />
-    </div>
-
+﻿<template>
+  <div class="playground">
+    <GameMap />
+  </div>
 </template>
 
-<script>
-import GameMap from './GameMap.vue'
-
-export default {
-    components: {
-        GameMap
-    }
-}
+<script setup>
+import GameMap from "@/components/GameMap.vue";
 </script>
 
 <style scoped>
 div.playground {
-    width: 60vw;
-    height: 70vh;
-    margin: 40px auto;
+  width: min(1000px, 92vw);
+  height: clamp(420px, 70vh, 760px);
+  margin: 22px auto 40px;
+  border: 1px solid rgba(145, 210, 255, 0.24);
+  border-radius: 22px;
+  background: linear-gradient(165deg, rgba(8, 26, 40, 0.86), rgba(8, 20, 34, 0.72));
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  padding: 14px;
 }
 </style>

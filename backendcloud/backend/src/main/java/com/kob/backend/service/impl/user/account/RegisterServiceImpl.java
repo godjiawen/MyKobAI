@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
-public class RegisterServiceImpl implements RegisterService{
+public class RegisterServiceImpl implements RegisterService {
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{6,12}$");
+
     @Autowired
     private UserMapper userMapper;
 
@@ -23,6 +26,7 @@ public class RegisterServiceImpl implements RegisterService{
     @Override
     public Map<String, String> register(String username, String password, String confirmePassword) {
         Map<String, String> map = new HashMap<>();
+
         if (username == null) {
             map.put("error_message", "用户名不能为空");
             return map;
@@ -33,23 +37,32 @@ public class RegisterServiceImpl implements RegisterService{
         }
 
         username = username.trim();
-        if (username.length() == 0) { //username.isEmpty()同理
+        if (username.isEmpty()) {
             map.put("error_message", "用户名不能为空");
             return map;
         }
-
-        if (password.length() == 0 || confirmePassword.length() == 0) {
+        if (password.isEmpty() || confirmePassword.isEmpty()) {
             map.put("error_message", "密码不能为空");
             return map;
         }
 
-        if (username.length() > 100) {
-            map.put("error_message", "用户名不能长度大于100");
+        if (!USERNAME_PATTERN.matcher(username).matches()) {
+            map.put("error_message", "用户名需为6-12位，只能包含字母、数字和下划线");
             return map;
         }
 
-        if (password.length() > 100 || confirmePassword.length() > 100) {
-            map.put("error_message", "密码长度不能大于100");
+        if (password.length() < 8 || password.length() > 16) {
+            map.put("error_message", "密码长度需为8-16位");
+            return map;
+        }
+
+        if (containsWhitespace(password)) {
+            map.put("error_message", "密码不能包含空白字符");
+            return map;
+        }
+
+        if (passwordComplexityScore(password) < 3) {
+            map.put("error_message", "密码至少包含大写字母、小写字母、数字、特殊字符中的三项");
             return map;
         }
 
@@ -73,5 +86,18 @@ public class RegisterServiceImpl implements RegisterService{
 
         map.put("error_message", "success");
         return map;
+    }
+
+    private int passwordComplexityScore(String password) {
+        int score = 0;
+        if (password.chars().anyMatch(Character::isUpperCase)) score++;
+        if (password.chars().anyMatch(Character::isLowerCase)) score++;
+        if (password.chars().anyMatch(Character::isDigit)) score++;
+        if (password.chars().anyMatch(ch -> !Character.isLetterOrDigit(ch))) score++;
+        return score;
+    }
+
+    private boolean containsWhitespace(String text) {
+        return text.chars().anyMatch(Character::isWhitespace);
     }
 }

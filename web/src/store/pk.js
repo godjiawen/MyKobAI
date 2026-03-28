@@ -1,6 +1,6 @@
-export default {
-  state: {
-    status: "matching", //matching表示匹配界面，playing表示对对战界面
+﻿export default {
+  state: () => ({
+    status: "matching",
     socket: null,
     opponent_username: "",
     opponent_photo: "",
@@ -12,20 +12,18 @@ export default {
     b_sx: 0,
     b_sy: 0,
     gameObject: null,
-    loser: "none", // all A B
-  },
-  getters: {
-  },
+    loser: "none",
+  }),
   mutations: {
     updateSocket(state, socket) {
-        state.socket = socket;
+      state.socket = socket;
     },
     updateOpponent(state, opponent) {
-        state.opponent_username = opponent.username;
-        state.opponent_photo = opponent.photo;
+      state.opponent_username = opponent.username;
+      state.opponent_photo = opponent.photo;
     },
     updateStatus(state, status) {
-        state.status = status;
+      state.status = status;
     },
     updateGame(state, game) {
       state.gamemap = game.map;
@@ -41,11 +39,6 @@ export default {
     },
     updateLoser(state, loser) {
       state.loser = loser;
-    }
+    },
   },
-  actions: {
-    
-  },
-  modules: {
-  }
-}
+};
