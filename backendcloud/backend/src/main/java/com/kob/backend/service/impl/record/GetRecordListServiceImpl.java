@@ -35,10 +35,10 @@ public class GetRecordListServiceImpl implements GetRecordListService {
             User userA = userMapper.selectById(record.getAId());
             User userB = userMapper.selectById(record.getBId());
             JSONObject item = new JSONObject();
-            item.put("a_photo", userA.getPhoto());
-            item.put("a_username", userA.getUsername());
-            item.put("b_photo", userB.getPhoto());
-            item.put("b_username", userB.getUsername());
+            item.put("a_photo", userA != null ? userA.getPhoto() : "");
+            item.put("a_username", userA != null ? userA.getUsername() : "(已注销)");
+            item.put("b_photo", userB != null ? userB.getPhoto() : "");
+            item.put("b_username", userB != null ? userB.getUsername() : "(已注销)");
             String result = "平局";
             if ("A".equals(record.getLoser())) result = "B胜";
             else if ("B".equals(record.getLoser())) result = "A胜";

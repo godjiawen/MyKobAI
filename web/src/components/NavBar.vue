@@ -27,9 +27,6 @@
           <li class="nav-item">
             <router-link :class="routeName === 'ranklist_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'ranklist_index' }">Ranklist</router-link>
           </li>
-          <li class="nav-item" v-if="store.state.user.is_login">
-            <router-link :class="routeName === 'user_bot_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'user_bot_index' }">My Bot</router-link>
-          </li>
         </ul>
         <ul class="navbar-nav" v-if="store.state.user.is_login">
           <li ref="userMenuRef" class="nav-item user-menu">
@@ -120,52 +117,53 @@ onBeforeUnmount(() => {
   z-index: 2100;
   margin: 16px 14px 0;
   padding: 10px 6px;
-  border: 1px solid rgba(145, 210, 255, 0.18);
+  border: 1px solid rgba(90, 180, 255, 0.3);
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(7, 22, 36, 0.86), rgba(12, 30, 45, 0.8));
-  backdrop-filter: blur(10px);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.85));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 50, 100, 0.05);
 }
 
 .kob-brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #e6f4ff;
+  color: var(--kob-text);
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
   letter-spacing: 0.4px;
 }
 
 .kob-brand:hover {
-  color: #ffffff;
+  color: var(--kob-accent-strong);
 }
 
 .brand-dot {
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #5ad1ff, #ffd05d);
-  box-shadow: 0 0 14px rgba(90, 209, 255, 0.75);
+  background: linear-gradient(135deg, #3daeff, #ffd05d);
+  box-shadow: 0 0 10px rgba(61, 174, 255, 0.6);
 }
 
 .kob-link {
   margin-right: 6px;
   border-radius: 999px;
-  color: #d4e8f8;
+  color: var(--kob-muted);
   transition: all 180ms ease;
 }
 
 .kob-link:hover,
 .kob-link.active {
-  color: #ffffff;
-  background: rgba(90, 209, 255, 0.2);
+  color: var(--kob-accent-strong);
+  background: rgba(61, 174, 255, 0.1);
 }
 
 .kob-user-chip {
-  border: 1px solid rgba(90, 209, 255, 0.32);
+  border: 1px solid rgba(90, 180, 255, 0.5);
   border-radius: 999px;
   padding: 6px 12px;
-  color: #e6f4ff;
+  color: var(--kob-text);
   background: transparent;
 }
 
@@ -191,9 +189,9 @@ onBeforeUnmount(() => {
   margin: 0;
   list-style: none;
   border-radius: 12px;
-  border: 1px solid rgba(145, 210, 255, 0.24);
-  background: rgba(12, 30, 45, 0.98);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  border: 1px solid rgba(90, 180, 255, 0.3);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 28px rgba(0, 50, 100, 0.1);
 }
 
 .kob-dropdown-menu .dropdown-item {
@@ -202,11 +200,12 @@ onBeforeUnmount(() => {
   border: 0;
   text-align: left;
   background: transparent;
-  color: #d8ecfc;
+  color: var(--kob-text);
   padding: 8px 14px;
 }
 
 .kob-dropdown-menu .dropdown-item:hover {
-  background: rgba(90, 209, 255, 0.18);
+  background: rgba(61, 174, 255, 0.1);
+  color: var(--kob-accent-strong);
 }
 </style>

@@ -123,18 +123,19 @@ const register = async () => {
   margin: 0;
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
+  color: var(--kob-text);
 }
 
 .auth-head p {
   margin: 8px 0 0;
-  color: #a9bfd3;
+  color: var(--kob-muted);
 }
 
 .auth-form {
   padding: 20px;
-  border: 1px solid rgba(145, 210, 255, 0.2);
+  border: 1px solid rgba(90, 180, 255, 0.3);
   border-radius: 16px;
-  background: rgba(8, 30, 44, 0.34);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .auth-btn {
@@ -143,16 +144,17 @@ const register = async () => {
   border-radius: 12px;
   padding: 10px 0;
   font-weight: 600;
+  color: #ffffff;
 }
 
 div.error-message {
   min-height: 22px;
-  color: #ff8f8f;
+  color: #e74c3c;
 }
 
 .rule-tip {
   margin-top: 6px;
-  color: #a9bfd3;
+  color: var(--kob-muted);
   font-size: 12px;
 }
 </style>

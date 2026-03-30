@@ -8,6 +8,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { useStore } from "vuex";
 import { GameMap } from "@/assets/scripts/GameMap";
+import { startGameLoop, stopGameLoop } from "@/assets/scripts/AcGameObject";
 
 const store = useStore();
 const parent = ref(null);
@@ -18,6 +19,7 @@ onMounted(() => {
   if (!ctx || !parent.value) return;
 
   store.commit("updateGameObject", new GameMap(ctx, parent.value, store));
+  startGameLoop();
 });
 
 onUnmounted(() => {
@@ -29,6 +31,7 @@ onUnmounted(() => {
   } catch (error) {
     console.error("game map cleanup error:", error);
   } finally {
+    stopGameLoop();
     store.commit("updateGameObject", null);
   }
 });
@@ -43,13 +46,13 @@ div.gamemap {
   align-items: center;
   border-radius: 16px;
   background:
-    radial-gradient(500px 200px at 50% -10%, rgba(90, 209, 255, 0.08), transparent 70%),
-    rgba(6, 17, 29, 0.54);
+    radial-gradient(500px 200px at 50% -10%, rgba(90, 180, 255, 0.15), transparent 70%),
+    rgba(220, 235, 250, 0.6);
 }
 
 canvas {
   border-radius: 10px;
-  outline: 1px solid rgba(145, 210, 255, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(145, 210, 255, 0.08), 0 14px 26px rgba(0, 0, 0, 0.28);
+  outline: 1px solid rgba(90, 180, 255, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(90, 180, 255, 0.15), 0 14px 26px rgba(0, 50, 100, 0.12);
 }
 </style>

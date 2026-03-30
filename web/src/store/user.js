@@ -20,6 +20,12 @@ export default {
     updateToken(state, token) {
       state.token = token;
     },
+    updatePhoto(state, photoUrl) {
+      state.photo = photoUrl;
+    },
+    updateUsername(state, newUsername) {
+      state.username = newUsername;
+    },
     logout(state) {
       state.id = "";
       state.photo = "";

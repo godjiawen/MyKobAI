@@ -41,15 +41,15 @@ onErrorCaptured((error) => {
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
 
 :root {
-  --kob-bg: #08141f;
-  --kob-bg-soft: #102338;
-  --kob-panel: rgba(7, 22, 36, 0.72);
-  --kob-panel-border: rgba(145, 210, 255, 0.2);
-  --kob-text: #e8f4ff;
-  --kob-muted: #a9bfd3;
-  --kob-accent: #5ad1ff;
-  --kob-accent-strong: #23b0ff;
-  --kob-warn: #ffbf47;
+  --kob-bg: #f5f9ff;
+  --kob-bg-soft: #eaf3fb;
+  --kob-panel: rgba(255, 255, 255, 0.85);
+  --kob-panel-border: rgba(90, 180, 255, 0.3);
+  --kob-text: #2c3e50;
+  --kob-muted: #6b839b;
+  --kob-accent: #3daeff;
+  --kob-accent-strong: #0088e8;
+  --kob-warn: #ffb732;
 }
 
 * {
@@ -83,16 +83,16 @@ body {
 
 .bg-gradient {
   background:
-    radial-gradient(900px 500px at 12% 6%, rgba(39, 186, 255, 0.22), transparent 60%),
-    radial-gradient(800px 450px at 88% 84%, rgba(255, 191, 71, 0.18), transparent 62%),
-    linear-gradient(180deg, #0a1726 0%, #070f18 100%);
+    radial-gradient(900px 500px at 12% 6%, rgba(135, 206, 250, 0.4), transparent 60%),
+    radial-gradient(800px 450px at 88% 84%, rgba(255, 218, 117, 0.35), transparent 62%),
+    linear-gradient(180deg, #f0f7ff 0%, #e2f0fc 100%);
   z-index: -3;
 }
 
 .bg-grid {
   background-image:
-    linear-gradient(rgba(90, 209, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 209, 255, 0.07) 1px, transparent 1px);
+    linear-gradient(rgba(90, 180, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 180, 255, 0.15) 1px, transparent 1px);
   background-size: 38px 38px;
   mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
   z-index: -2;
@@ -108,24 +108,34 @@ body {
   padding: 18px;
   border-radius: 14px;
   border: 1px solid rgba(255, 143, 143, 0.45);
-  background: rgba(55, 16, 22, 0.5);
+  background: rgba(255, 230, 230, 0.8);
 }
 
 .app-error-panel h3 {
   margin: 0 0 8px;
   font-size: 1.1rem;
+  color: #c0392b;
 }
 
 .app-error-panel p {
   margin: 0 0 12px;
-  color: #ffd7d7;
+  color: #e74c3c;
+}
+
+/* Ensure modals appear above the custom navigation bar */
+.modal-backdrop {
+  z-index: 3000 !important;
+}
+
+.modal {
+  z-index: 3010 !important;
 }
 
 .content-field .card {
   background: var(--kob-panel);
   border: 1px solid var(--kob-panel-border);
   border-radius: 18px;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 14px 40px rgba(0, 50, 100, 0.08); /* light shadow */
   backdrop-filter: blur(8px);
 }
 
@@ -136,23 +146,23 @@ body {
 .content-field .table {
   color: var(--kob-text);
   --bs-table-bg: transparent;
-  --bs-table-striped-bg: rgba(255, 255, 255, 0.04);
-  --bs-table-hover-bg: rgba(90, 209, 255, 0.08);
-  border-color: rgba(170, 205, 232, 0.16);
+  --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
+  --bs-table-hover-bg: rgba(90, 180, 255, 0.1);
+  border-color: rgba(90, 180, 255, 0.2);
 }
 
 .content-field .form-control,
 .content-field .form-select {
   border-radius: 12px;
-  border: 1px solid rgba(139, 198, 237, 0.22);
-  background: rgba(12, 26, 42, 0.82);
+  border: 1px solid rgba(90, 180, 255, 0.3);
+  background: #ffffff;
   color: var(--kob-text);
 }
 
 .content-field .form-control:focus,
 .content-field .form-select:focus {
-  box-shadow: 0 0 0 0.2rem rgba(90, 209, 255, 0.22);
-  border-color: rgba(90, 209, 255, 0.45);
+  box-shadow: 0 0 0 0.2rem rgba(90, 180, 255, 0.22);
+  border-color: rgba(90, 180, 255, 0.45);
 }
 
 .content-field .btn-primary {
@@ -167,14 +177,15 @@ body {
 }
 
 .content-field .pagination .page-link {
-  border-color: rgba(90, 209, 255, 0.24);
-  background: rgba(10, 31, 48, 0.76);
+  border-color: rgba(90, 180, 255, 0.3);
+  background: #ffffff;
   color: var(--kob-text);
 }
 
 .content-field .pagination .page-item.active .page-link {
   background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
   border-color: transparent;
+  color: #ffffff;
 }
 
 </style>

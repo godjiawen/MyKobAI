@@ -73,11 +73,14 @@ export class GameMap extends AcGameObject {
                 else if (e.key === 's') d = 2;
                 else if (e.key === 'a') d = 3;
     
-                if(d >= 0) {
-                    this.store.state.pk.socket.send(JSON.stringify({
-                        event: "move",
-                        direction: d,
-                    }))
+                if (d >= 0) {
+                    const socket = this.store.state.pk.socket;
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({
+                            event: "move",
+                            direction: d,
+                        }));
+                    }
                 }
             };
             this.ctx.canvas.addEventListener("keydown", this.keydownHandler);

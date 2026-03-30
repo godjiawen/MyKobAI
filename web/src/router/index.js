@@ -65,11 +65,17 @@ const router = createRouter({
 });
 
 let authInitialized = false;
+let authInitPromise = null;
 
 router.beforeEach(async (to) => {
   if (!authInitialized) {
-    await store.dispatch("initAuth");
-    authInitialized = true;
+    if (!authInitPromise) {
+      authInitPromise = store.dispatch("initAuth").finally(() => {
+        authInitialized = true;
+        authInitPromise = null;
+      });
+    }
+    await authInitPromise;
   }
 
   if (to.meta.requiresAuth && !store.state.user.is_login) {

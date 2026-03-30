@@ -3,12 +3,79 @@
     <div class="row g-3">
       <div class="col-lg-3 col-md-4">
         <div class="card bot-profile-card">
-          <div class="card-body">
-            <img :src="store.state.user.photo" alt="avatar" class="profile-avatar" />
+          <div class="card-body photo-section">
+            <div class="avatar-wrap" @click="triggerUpload">
+              <img :src="store.state.user.photo" alt="avatar" class="profile-avatar" />
+              <div class="avatar-overlay">
+                <span v-if="!uploading">Click to change</span>
+                <span v-else>Uploading...</span>
+              </div>
+            </div>
             <p class="profile-name">{{ store.state.user.username }}</p>
+            <div class="profile-actions mt-3">
+              <button class="btn btn-sm btn-outline-primary mb-2 w-100" data-bs-toggle="modal" data-bs-target="#update-username-modal">Modify Username</button>
+              <button class="btn btn-sm btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#update-password-modal">Modify Password</button>
+            </div>
+            <input type="file" ref="fileInput" @change="uploadAvatar" accept="image/png, image/jpeg, image/jpg" style="display: none;" />
           </div>
         </div>
       </div>
+
+      <!-- Update Username Modal -->
+      <div class="modal fade" id="update-username-modal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modify Username</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="new-username" class="form-label">New Username</label>
+                <input v-model="accountDraft.new_username" type="text" class="form-control" id="new-username" placeholder="6-12 characters, letters/numbers/underscores" />
+              </div>
+              <div class="error-message" v-if="accountDraft.username_error">{{ accountDraft.username_error }}</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" @click="updateUsername">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Password Modal -->
+      <div class="modal fade" id="update-password-modal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modify Password</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="old-password" class="form-label">Current Password</label>
+                <input v-model="accountDraft.old_password" type="password" class="form-control" id="old-password" placeholder="Enter current password" />
+              </div>
+              <div class="mb-3">
+                <label for="new-password" class="form-label">New Password</label>
+                <input v-model="accountDraft.new_password" type="password" class="form-control" id="new-password" placeholder="Enter new password" />
+                <div class="form-text">8-16 chars, include at least 3: Uppercase, Lowercase, Number, Symbol.</div>
+              </div>
+              <div class="mb-3">
+                <label for="confirmed-password" class="form-label">Confirm New Password</label>
+                <input v-model="accountDraft.confirmed_password" type="password" class="form-control" id="confirmed-password" placeholder="Confirm new password" />
+              </div>
+              <div class="error-message" v-if="accountDraft.password_error">{{ accountDraft.password_error }}</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" @click="updatePassword">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="col-lg-9 col-md-8">
         <div class="card bot-main-card">
           <div class="card-header bot-main-header">
@@ -141,10 +208,12 @@
 import { onMounted, reactive, ref } from "vue";
 import Modal from "bootstrap/js/dist/modal";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
 const store = useStore();
+const router = useRouter();
 const bots = ref([]);
 
 const botDraft = reactive({
@@ -154,7 +223,125 @@ const botDraft = reactive({
   error_message: "",
 });
 
+const accountDraft = reactive({
+  new_username: "",
+  username_error: "",
+  old_password: "",
+  new_password: "",
+  confirmed_password: "",
+  password_error: "",
+});
+
+const fileInput = ref(null);
+const uploading = ref(false);
+
 const authToken = () => store.state.user.token;
+
+const triggerUpload = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+const uploadAvatar = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+  if (!validTypes.includes(file.type)) {
+    alert("只能上传 JPG/PNG 格式的图片");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert("图片大小不能超过 5MB");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  uploading.value = true;
+  try {
+    const resp = await apiRequest(API_PATHS.uploadAvatar, {
+      method: "POST",
+      token: authToken(),
+      data: formData,
+    });
+
+
+    if (resp.error_message === "success") {
+      store.commit("updatePhoto", resp.photo);
+      alert("头像上传成功！");
+    } else {
+      alert(resp.error_message || "上传失败");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("头像上传失败");
+  } finally {
+    uploading.value = false;
+    if (fileInput.value) fileInput.value.value = ""; // reset input
+  }
+};
+
+const updateUsername = async () => {
+  accountDraft.username_error = "";
+  try {
+    const resp = await apiRequest(API_PATHS.updateUsername, {
+      method: "POST",
+      token: authToken(),
+      data: {
+        new_username: accountDraft.new_username,
+      },
+    });
+
+    if (resp.error_message === "success") {
+      store.commit("updateUsername", accountDraft.new_username);
+      const modalElement = document.getElementById("update-username-modal");
+      if (modalElement) {
+        Modal.getInstance(modalElement)?.hide();
+      }
+      accountDraft.new_username = "";
+      alert("Username updated successfully!");
+    } else {
+      accountDraft.username_error = resp.error_message;
+    }
+  } catch (error) {
+    accountDraft.username_error = error.message || "Failed to update username";
+  }
+};
+
+const updatePassword = async () => {
+  accountDraft.password_error = "";
+  try {
+    const resp = await apiRequest(API_PATHS.updatePassword, {
+      method: "POST",
+      token: authToken(),
+      data: {
+        old_password: accountDraft.old_password,
+        new_password: accountDraft.new_password,
+        confirmed_password: accountDraft.confirmed_password,
+      },
+    });
+
+    if (resp.error_message === "success") {
+      const modalElement = document.getElementById("update-password-modal");
+      if (modalElement) {
+        Modal.getInstance(modalElement)?.hide();
+      }
+      accountDraft.old_password = "";
+      accountDraft.new_password = "";
+      accountDraft.confirmed_password = "";
+      alert("Password updated successfully! Please login again.");
+      store.dispatch("logout");
+      router.push({ name: "user_account_login" });
+    } else {
+      accountDraft.password_error = resp.error_message;
+    }
+  } catch (error) {
+    accountDraft.password_error = error.message || "Failed to update password";
+  }
+};
 
 const refreshBots = async () => {
   try {
@@ -255,20 +442,63 @@ onMounted(refreshBots);
 
 .bot-profile-card,
 .bot-main-card {
-  background: rgba(8, 24, 38, 0.74);
-  border: 1px solid rgba(145, 210, 255, 0.2);
+  background: var(--kob-panel);
+  border: 1px solid var(--kob-panel-border);
+  box-shadow: 0 10px 30px rgba(0, 50, 100, 0.08); /* light shadow */
+  backdrop-filter: blur(12px);
+}
+
+.photo-section {
+  text-align: center;
+}
+
+.avatar-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .profile-avatar {
   width: 100%;
+  display: block;
   border-radius: 14px;
-  border: 1px solid rgba(145, 210, 255, 0.28);
+  border: 2px solid rgba(90, 180, 255, 0.3);
+  transition: filter 0.3s;
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.avatar-wrap:hover .profile-avatar {
+  filter: brightness(0.8);
+}
+
+.avatar-wrap:hover .avatar-overlay {
+  opacity: 1;
 }
 
 .profile-name {
   margin: 14px 0 0;
   font-weight: 600;
   text-align: center;
+  color: var(--kob-text);
 }
 
 .bot-main-header {
@@ -281,16 +511,21 @@ onMounted(refreshBots);
   font-family: "Space Grotesk", sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
+  color: var(--kob-text);
 }
 
 .modal-content {
-  background: #0f2133;
-  border: 1px solid rgba(145, 210, 255, 0.24);
-  color: #e8f4ff;
+  background: #ffffff;
+  border: 1px solid rgba(90, 180, 255, 0.3);
+  color: var(--kob-text);
+}
+
+.modal-header .btn-close {
+  filter: none;
 }
 
 .error-message {
-  color: #ff8f8f;
+  color: #e74c3c;
   margin-right: auto;
 }
 

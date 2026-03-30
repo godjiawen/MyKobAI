@@ -188,11 +188,12 @@ onMounted(() => {
   margin: 0;
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
+  color: var(--kob-text);
 }
 
 .panel-header p {
   margin: 0;
-  color: #a9bfd3;
+  color: var(--kob-muted);
 }
 
 .pager-wrap {
@@ -202,29 +203,37 @@ onMounted(() => {
 
 .replay-btn {
   border-radius: 999px;
+  background-color: var(--kob-accent);
+  border: none;
+  color: #fff;
+}
+
+.replay-btn:hover {
+  background-color: var(--kob-accent-strong);
 }
 
 img.record-user-photo {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(145, 210, 255, 0.45);
+  border: 1px solid rgba(90, 180, 255, 0.45);
 }
 
 .record-user-username {
   font-weight: 600;
+  color: var(--kob-text);
 }
 
 .state-tip {
   margin: 10px 0 0;
-  color: #a9bfd3;
+  color: var(--kob-muted);
 }
 
 .state-error {
-  color: #ff8f8f;
+  color: #e74c3c;
 }
 
 .empty-row {
-  color: #a9bfd3;
+  color: var(--kob-muted);
 }
 </style>

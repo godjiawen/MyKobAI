@@ -64,7 +64,16 @@ public class WebSocketServer {
         // 建立连接
         this.session = session;
         System.out.println("connected!");
-        Integer userId = JwtAuthentication.getUserId(token);
+
+        Integer userId;
+        try {
+            userId = JwtAuthentication.getUserId(token);
+        } catch (Exception e) {
+            // token 无效或过期，拒绝连接
+            this.session.close();
+            return;
+        }
+
         this.user = userMapper.selectById(userId);
 
         if (this.user != null) {
@@ -146,6 +155,7 @@ public class WebSocketServer {
     }
 
     private void move(int direction) {
+        if (game == null) return;  // 游戏已结束或尚未开始，忽略操作
         if (game.getPlayerA().getId().equals(user.getId())) {
             if (game.getPlayerA().getBotId().equals(-1)) //亲自出马
                 game.setNextStepA(direction);

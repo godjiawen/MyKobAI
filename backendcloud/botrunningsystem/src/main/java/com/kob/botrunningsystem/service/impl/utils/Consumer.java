@@ -54,7 +54,8 @@ public class Consumer extends Thread{
                 addUid(bot.getBotCode(), uid)
         ).create().get();
 
-        File file = new File("input.txt");
+        // 每次执行使用独立的临时文件，避免并发 Bot 线程互相覆盖输入
+        File file = new File("input_" + uuid + ".txt");
         try (PrintWriter fout = new PrintWriter(file)) {
             fout.println(bot.getInput());
             fout.flush();
@@ -62,10 +63,11 @@ public class Consumer extends Thread{
             throw new RuntimeException(e);
         }
 
-
-
         Integer direction = botInterface.get();
         System.out.println("move-direction: " + bot.getUserId() + " " + direction);
+
+        // 执行完毕后删除临时文件
+        file.delete();
 
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", bot.getUserId().toString());

@@ -36,8 +36,12 @@ export const apiRequest = async (path, options = {}) => {
 
   let body;
   if (upperMethod !== "GET" && data) {
-    body = toQueryString(data);
-    requestHeaders["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+    if (data instanceof FormData) {
+      body = data;
+    } else {
+      body = toQueryString(data);
+      requestHeaders["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+    }
   }
 
   if (token) {

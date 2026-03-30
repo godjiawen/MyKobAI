@@ -110,16 +110,17 @@ onUnmounted(() => {
 <style scoped>
 div.user-color {
   text-align: center;
-  color: #f2f8ff;
+  color: var(--kob-text);
   font-size: 24px;
   font-weight: 600;
   width: fit-content;
   margin: 12px auto 0;
-  border: 1px solid rgba(145, 210, 255, 0.3);
+  border: 1px solid rgba(90, 180, 255, 0.4);
   border-radius: 999px;
   padding: 6px 16px;
-  background: rgba(8, 26, 40, 0.7);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
+  background: var(--kob-panel);
+  box-shadow: 0 10px 20px rgba(0, 50, 100, 0.1);
+  backdrop-filter: blur(8px);
   animation: tag-in 240ms ease;
 }
 

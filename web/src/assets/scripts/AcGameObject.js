@@ -32,6 +32,8 @@ export class AcGameObject {
 }
 
 let last_timestamp;  // 上一次执行的时刻
+let animFrameId = null;
+
 const step = timestamp => {
     for (let obj of AC_GAME_OBJECTS) {
         if (!obj.has_called_start) {
@@ -44,7 +46,19 @@ const step = timestamp => {
     }
 
     last_timestamp = timestamp;
-    requestAnimationFrame(step)
+    animFrameId = requestAnimationFrame(step);
 }
 
-requestAnimationFrame(step)
+// 启动全局游戏循环
+export const startGameLoop = () => {
+    if (animFrameId !== null) return; // 已在运行，不重复启动
+    animFrameId = requestAnimationFrame(step);
+};
+
+// 停止全局游戏循环（离开游戏相关页面时调用）
+export const stopGameLoop = () => {
+    if (animFrameId !== null) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+    }
+};

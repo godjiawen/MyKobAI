@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/account/token/", "/api/user/account/register/").permitAll()
+                        .requestMatchers("/avatars/**").permitAll()
                         .requestMatchers("/pk/start/game/", "/pk/receive/bot/move/")
                         .access(new WebExpressionAuthorizationManager("hasIpAddress('127.0.0.1')"))
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

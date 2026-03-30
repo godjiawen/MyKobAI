@@ -80,10 +80,10 @@ div.matchground {
   height: 70vh;
   margin: 34px auto;
   border-radius: 24px;
-  border: 1px solid rgba(145, 210, 255, 0.24);
-  background: linear-gradient(165deg, rgba(8, 26, 40, 0.88), rgba(8, 20, 34, 0.78));
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--kob-panel-border);
+  background: var(--kob-panel);
+  box-shadow: 0 24px 50px rgba(0, 50, 100, 0.08); /* light shadow */
+  backdrop-filter: blur(12px);
   animation: panel-enter 280ms ease;
 }
 
@@ -95,15 +95,15 @@ div.user-photo {
 div.user-photo > img {
   border-radius: 50%;
   width: 20vh;
-  border: 2px solid rgba(145, 210, 255, 0.42);
-  box-shadow: 0 0 24px rgba(90, 209, 255, 0.24);
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 24px rgba(90, 180, 255, 0.4);
 }
 
 div.user-username {
   text-align: center;
   font-size: 24px;
   font-weight: 600;
-  color: #f2f8ff;
+  color: var(--kob-text);
   padding-top: 2vh;
 }
 
@@ -115,6 +115,9 @@ div.user-select-bot > select {
   width: 80%;
   margin: 0 auto;
   border-radius: 999px;
+  background-color: #ffffff;
+  border: 1px solid rgba(90, 180, 255, 0.4);
+  color: var(--kob-text);
 }
 
 .btn.btn-warning {
@@ -122,12 +125,15 @@ div.user-select-bot > select {
   padding: 11px 36px;
   font-weight: 700;
   letter-spacing: 0.3px;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
+  border: none;
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .btn.btn-warning:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 191, 71, 0.28);
+  box-shadow: 0 10px 20px rgba(61, 174, 255, 0.4);
 }
 
 @keyframes panel-enter {

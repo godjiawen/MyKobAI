@@ -28,20 +28,21 @@ public class BotPool extends Thread {
     @Override
     public void run() {
         while (true) {
+            Bot bot;
             lock.lock();
-            if (bots.isEmpty()) {
-                try {
+            try {
+                // 用 while 防止虚假唤醒
+                while (bots.isEmpty()) {
                     condition.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    lock.unlock();
-                    break;
                 }
-            } else {
-                Bot bot = bots.remove();
-                lock.unlock();
-                consume(bot);  // 比较耗时，可能会执行几秒钟
+                bot = bots.remove();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            } finally {
+                lock.unlock(); // 无论正常还是异常，都保证锁被完整释放
             }
+            consume(bot);  // 比较耗时，可能会执行几秒钟，在锁外执行
         }
     }
 }
