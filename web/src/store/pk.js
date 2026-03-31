@@ -13,6 +13,9 @@
     b_sy: 0,
     gameObject: null,
     loser: "none",
+    roomId: "",
+    isPaused: false,
+    pausedByUserId: null,
   }),
   mutations: {
     updateSocket(state, socket) {
@@ -39,6 +42,13 @@
     },
     updateLoser(state, loser) {
       state.loser = loser;
+    },
+    updateRoomId(state, roomId) {
+      state.roomId = roomId;
+    },
+    updatePaused(state, { isPaused, pausedByUserId }) {
+      state.isPaused = isPaused;
+      state.pausedByUserId = pausedByUserId ?? null;
     },
   },
 };

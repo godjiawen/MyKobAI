@@ -11,6 +11,7 @@
         <module>botrunningsystem</module>
         <module>backend</module>
         <module>matchingsystem</module>
+        <module>chatsystem</module>
     </modules>
     <packaging>pom</packaging>
 

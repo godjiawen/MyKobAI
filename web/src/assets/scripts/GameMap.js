@@ -64,9 +64,13 @@ export class GameMap extends AcGameObject {
                 k ++ ;
             }, 300) 
         } else {
-            this.ctx.canvas.focus();
-
             this.keydownHandler = e => {
+                // 当焦点在输入框（如聊天框）时，不处理游戏按键
+                const tag = document.activeElement?.tagName?.toUpperCase();
+                if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+                // 暂停中不处理移动
+                if (this.store.state.pk.isPaused) return;
+
                 let d = -1;
                 if (e.key === 'w') d = 0;
                 else if (e.key === 'd') d = 1;
@@ -74,6 +78,7 @@ export class GameMap extends AcGameObject {
                 else if (e.key === 'a') d = 3;
     
                 if (d >= 0) {
+                    e.preventDefault(); // 阻止浏览器默认行为（Edge 滚动/速度覆盖层等）
                     const socket = this.store.state.pk.socket;
                     if (socket && socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({
@@ -83,7 +88,8 @@ export class GameMap extends AcGameObject {
                     }
                 }
             };
-            this.ctx.canvas.addEventListener("keydown", this.keydownHandler);
+            // 监听在 document 上，不依赖 canvas 焦点，点击聊天框后依然有效
+            document.addEventListener("keydown", this.keydownHandler);
         }
        
     }
@@ -164,8 +170,8 @@ export class GameMap extends AcGameObject {
             this.replayIntervalId = null;
         }
 
-        if (this.keydownHandler && this.ctx?.canvas) {
-            this.ctx.canvas.removeEventListener("keydown", this.keydownHandler);
+        if (this.keydownHandler) {
+            document.removeEventListener("keydown", this.keydownHandler);
             this.keydownHandler = null;
         }
 

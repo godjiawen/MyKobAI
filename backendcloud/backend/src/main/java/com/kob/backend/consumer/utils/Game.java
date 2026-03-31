@@ -27,6 +27,8 @@ public class Game extends Thread {
     private ReentrantLock lock = new ReentrantLock();
     private String status = "playing"; //playing -> finished
     private String loser = ""; //all: 平局 A: A输 B: B输
+    private volatile boolean paused = false;   // 暂离标志
+    private volatile String pausedBy = "";     // "A" 或 "B"
     private final static String addBotUrl = "http://127.0.0.1:3002/bot/add/";
 
     public Game(Integer rows,
@@ -44,17 +46,20 @@ public class Game extends Thread {
 
         Integer botIdA = -1, botIdB = -1;
         String botCodeA = "", botCodeB = "";
+        String botLanguageA = "java", botLanguageB = "java";
         if (botA != null) {
             botIdA = botA.getId();
             botCodeA = botA.getContent();
+            botLanguageA = botA.getLanguage() != null ? botA.getLanguage() : "java";
         }
         if (botB != null) {
             botIdB = botB.getId();
             botCodeB = botB.getContent();
+            botLanguageB = botB.getLanguage() != null ? botB.getLanguage() : "java";
         }
 
-        playerA = new Player(idA, botIdA, botCodeA, rows - 2, 1, new ArrayList<>());
-        playerB = new Player(idB, botIdB, botCodeB,1, cols - 2, new ArrayList<>());
+        playerA = new Player(idA, botIdA, botCodeA, botLanguageA, rows - 2, 1, new ArrayList<>());
+        playerB = new Player(idB, botIdB, botCodeB, botLanguageB, 1, cols - 2, new ArrayList<>());
     }
 
     public Player getPlayerA() {
@@ -63,6 +68,24 @@ public class Game extends Thread {
 
     public Player getPlayerB() {
         return playerB;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public String getPausedBy() {
+        return pausedBy;
+    }
+
+    public void setPaused(boolean paused, String by) {
+        lock.lock();
+        try {
+            this.paused = paused;
+            this.pausedBy = by;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setNextStepA(Integer nextStepA) {
@@ -172,7 +195,7 @@ public class Game extends Thread {
         data.add("user_id", player.getId().toString());
         data.add("bot_code", player.getBotCode());
         data.add("input", getInput(player));
-
+        data.add("language", player.getBotLanguage());
         WebSocketServer.restTemplate.postForObject(addBotUrl, data, String.class);
     }
 
@@ -189,18 +212,19 @@ public class Game extends Thread {
         for (int i = 0; i < 50; i++) {
             try {
                 Thread.sleep(100);
-                lock.lock();
-                try {
-                    if (nextStepA != null && nextStepB != null) {
-                        playerA.getSteps().add(nextStepA);
-                        playerB.getSteps().add(nextStepB);
-                        return true;
-                    }
-                } finally {
-                    lock.unlock();
-                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+            lock.lock();
+            try {
+                // 暂停中：跳过此轮检测，但计数器照常推进（最多等待5秒/次）
+                if (!paused && nextStepA != null && nextStepB != null) {
+                    playerA.getSteps().add(nextStepA);
+                    playerB.getSteps().add(nextStepB);
+                    return true;
+                }
+            } finally {
+                lock.unlock();
             }
         }
 
@@ -339,21 +363,22 @@ public class Game extends Thread {
                     break;
                 }
             } else {
-                status = "finished";
-                lock.lock();
-                try {
-                    if (nextStepA == null && nextStepB == null) {
-                        loser = "all";
-                    } else if (nextStepA == null) {
-                        loser = "A";
-                    } else {
-                        loser = "B";
-                    }
-                } finally {
-                    lock.unlock();
-                }
-                sendResult();
-                break;
+                // 超时判负功能暂时关闭
+                // status = "finished";
+                // lock.lock();
+                // try {
+                //     if (nextStepA == null && nextStepB == null) {
+                //         loser = "all";
+                //     } else if (nextStepA == null) {
+                //         loser = "A";
+                //     } else {
+                //         loser = "B";
+                //     }
+                // } finally {
+                //     lock.unlock();
+                // }
+                // sendResult();
+                // break;
             }
         }
     }

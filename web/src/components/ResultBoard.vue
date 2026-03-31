@@ -24,6 +24,7 @@ const isLose = computed(() => {
 });
 
 const restart = () => {
+  store.commit("updateRoomId", "");
   store.commit("updateStatus", "matching");
   store.commit("updateLoser", "none");
   store.commit("updateOpponent", {

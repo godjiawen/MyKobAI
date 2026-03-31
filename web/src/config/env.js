@@ -2,10 +2,15 @@
 
 const apiBaseFromEnv = import.meta.env.VITE_API_BASE_URL;
 const wsBaseFromEnv = import.meta.env.VITE_WS_BASE_URL;
+const chatWsBaseFromEnv = import.meta.env.VITE_CHAT_WS_BASE_URL;
 
 export const API_BASE_URL = trimTrailingSlash(apiBaseFromEnv || "http://127.0.0.1:3000");
 export const WS_BASE_URL = trimTrailingSlash(
   wsBaseFromEnv || API_BASE_URL.replace(/^http/i, "ws")
+);
+// Chat system runs on port 3003 by default
+export const CHAT_WS_BASE_URL = trimTrailingSlash(
+  chatWsBaseFromEnv || WS_BASE_URL.replace(/:(\d+)$/, ":3003")
 );
 
 export const API_PATHS = {
@@ -24,3 +29,4 @@ export const API_PATHS = {
 };
 
 export const buildWebSocketUrl = (token) => `${WS_BASE_URL}/websocket/${token}/`;
+export const buildChatWebSocketUrl = (token, roomId) => `${CHAT_WS_BASE_URL}/chat/${token}/${roomId}`;

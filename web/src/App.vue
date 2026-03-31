@@ -122,6 +122,7 @@ body {
   color: #e74c3c;
 }
 
+
 /* Ensure modals appear above the custom navigation bar */
 .modal-backdrop {
   z-index: 3000 !important;

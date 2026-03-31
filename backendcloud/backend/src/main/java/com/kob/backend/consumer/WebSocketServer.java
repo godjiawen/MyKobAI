@@ -120,11 +120,15 @@ public class WebSocketServer {
         respGame.put("b_sy", game.getPlayerB().getSy());
         respGame.put("map", game.getG());
 
+        // Chat room id: sorted player ids so both sides compute the same key
+        String roomId = Math.min(aId, bId) + "_" + Math.max(aId, bId);
+
         JSONObject respA = new JSONObject();
         respA.put("event", "start-matching");
         respA.put("opponent_username", b.getUsername());
         respA.put("opponent_photo", b.getPhoto());
         respA.put("game", respGame);
+        respA.put("room_id", roomId);
 
         if (users.get(a.getId()) != null)
             users.get(a.getId()).sendMessage(respA.toJSONString());
@@ -134,6 +138,7 @@ public class WebSocketServer {
         respB.put("opponent_username", a.getUsername());
         respB.put("opponent_photo", a.getPhoto());
         respB.put("game", respGame);
+        respB.put("room_id", roomId);
         if (users.get(b.getId()) != null)
             users.get(b.getId()).sendMessage(respB.toJSONString());
     }
@@ -156,6 +161,7 @@ public class WebSocketServer {
 
     private void move(int direction) {
         if (game == null) return;  // 游戏已结束或尚未开始，忽略操作
+        if (game.isPaused()) return; // 暂停中，忽略移动
         if (game.getPlayerA().getId().equals(user.getId())) {
             if (game.getPlayerA().getBotId().equals(-1)) //亲自出马
                 game.setNextStepA(direction);
@@ -163,6 +169,41 @@ public class WebSocketServer {
             if (game.getPlayerB().getBotId().equals(-1)) //亲自出马
                 game.setNextStepB(direction);
         }
+    }
+
+    private void broadcastToGame(String message) {
+        Integer aId = game.getPlayerA().getId();
+        Integer bId = game.getPlayerB().getId();
+        if (users.get(aId) != null) users.get(aId).sendMessage(message);
+        if (users.get(bId) != null) users.get(bId).sendMessage(message);
+    }
+
+    private void pause() {
+        if (game == null) return;
+        if (game.isPaused()) return; // 已暂停，忽略重复请求
+
+        String by = game.getPlayerA().getId().equals(user.getId()) ? "A" : "B";
+        game.setPaused(true, by);
+
+        JSONObject resp = new JSONObject();
+        resp.put("event", "game-paused");
+        resp.put("paused_by", user.getId()); // 告知双方是谁暂离的
+        broadcastToGame(resp.toJSONString());
+    }
+
+    private void resume() {
+        if (game == null) return;
+        if (!game.isPaused()) return;
+
+        // 只有暂离的玩家自己可以恢复
+        String by = game.getPlayerA().getId().equals(user.getId()) ? "A" : "B";
+        if (!by.equals(game.getPausedBy())) return;
+
+        game.setPaused(false, "");
+
+        JSONObject resp = new JSONObject();
+        resp.put("event", "game-resumed");
+        broadcastToGame(resp.toJSONString());
     }
 
     @OnMessage
@@ -176,6 +217,10 @@ public class WebSocketServer {
             stopMatching();
         } else if ("move".equals(event)) {
             move(data.getInteger("direction"));
+        } else if ("pause".equals(event)) {
+            pause();
+        } else if ("resume".equals(event)) {
+            resume();
         }
     }
 

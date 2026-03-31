@@ -89,6 +89,7 @@
               <thead>
                 <tr>
                   <th>Title</th>
+                  <th>Language</th>
                   <th>Created At</th>
                   <th>Actions</th>
                 </tr>
@@ -96,6 +97,11 @@
               <tbody>
                 <tr v-for="bot in bots" :key="bot.id">
                   <td class="align-middle">{{ bot.title }}</td>
+                  <td class="align-middle">
+                    <span :class="['lang-badge', 'lang-' + (bot.language || 'java')]">
+                      {{ (bot.language || 'java').toUpperCase() }}
+                    </span>
+                  </td>
                   <td class="align-middle">{{ bot.createtime }}</td>
                   <td>
                     <button
@@ -127,6 +133,15 @@
                               <input v-model="bot.title" type="text" class="form-control" placeholder="Bot title" />
                             </div>
                             <div class="mb-3">
+                              <label class="form-label">Language</label>
+                              <select v-model="bot.language" class="form-select">
+                                <option value="java">Java</option>
+                                <option value="python">Python</option>
+                                <option value="cpp">C++</option>
+                                <option value="javascript">JavaScript</option>
+                              </select>
+                            </div>
+                            <div class="mb-3">
                               <label class="form-label">Description</label>
                               <textarea
                                 v-model="bot.description"
@@ -141,7 +156,7 @@
                                 v-model="bot.content"
                                 class="form-control bot-code-input"
                                 rows="12"
-                                placeholder="Bot code"
+                                :placeholder="codePlaceholder(bot.language)"
                               ></textarea>
                             </div>
                           </div>
@@ -175,6 +190,15 @@
               <input v-model="botDraft.title" type="text" class="form-control" placeholder="Bot title" />
             </div>
             <div class="mb-3">
+              <label class="form-label">Language</label>
+              <select v-model="botDraft.language" class="form-select">
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="javascript">JavaScript</option>
+              </select>
+            </div>
+            <div class="mb-3">
               <label class="form-label">Description</label>
               <textarea
                 v-model="botDraft.description"
@@ -189,7 +213,7 @@
                 v-model="botDraft.content"
                 class="form-control bot-code-input"
                 rows="12"
-                placeholder="Bot code"
+                :placeholder="codePlaceholder(botDraft.language)"
               ></textarea>
             </div>
           </div>
@@ -220,6 +244,7 @@ const botDraft = reactive({
   title: "",
   description: "",
   content: "",
+  language: "java",
   error_message: "",
 });
 
@@ -362,6 +387,7 @@ const addBot = async () => {
         title: botDraft.title,
         description: botDraft.description,
         content: botDraft.content,
+        language: botDraft.language,
       },
     });
 
@@ -373,6 +399,7 @@ const addBot = async () => {
     botDraft.title = "";
     botDraft.description = "";
     botDraft.content = "";
+    botDraft.language = "java";
 
     const modalElement = document.getElementById("add-bot-btn");
     if (modalElement) {
@@ -397,6 +424,7 @@ const updateBot = async (bot) => {
         title: bot.title,
         description: bot.description,
         content: bot.content,
+        language: bot.language || "java",
       },
     });
 
@@ -430,6 +458,16 @@ const removeBot = async (bot) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const codePlaceholder = (lang) => {
+  const map = {
+    java:       "public class Bot implements java.util.function.Supplier<Integer> {\n    @Override\n    public Integer get() {\n        // read input.txt, return 0/1/2/3\n        return 0;\n    }\n}",
+    python:     "with open('input.txt') as f:\n    data = f.read().strip()\n# parse data, compute direction (0-3)\ndirection = 0\nprint(direction)",
+    cpp:        "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ifstream fin(\"input.txt\");\n    string s; fin >> s; fin.close();\n    // compute direction (0-3)\n    cout << 0 << endl;\n}",
+    javascript: "const fs = require('fs');\nconst input = fs.readFileSync('input.txt','utf8').trim();\n// compute direction (0-3)\nconsole.log(0);",
+  };
+  return map[lang] || map.java;
 };
 
 onMounted(refreshBots);
@@ -534,4 +572,18 @@ onMounted(refreshBots);
   font-family: "JetBrains Mono", "Consolas", monospace;
   resize: vertical;
 }
+
+/* 语言徽章 */
+.lang-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.lang-java       { background: rgba(237, 129, 50, 0.15); color: #c25a00; }
+.lang-python     { background: rgba(55, 118, 171, 0.15); color: #1e6fa6; }
+.lang-cpp        { background: rgba(100, 54, 180, 0.15); color: #5c2eab; }
+.lang-javascript { background: rgba(202, 163,  10, 0.15); color: #8a6800; }
 </style>

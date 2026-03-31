@@ -31,6 +31,7 @@ public class UpdateServiceImpl implements UpdateService {
         String title = data.get("title");
         String description = data.get("description");
         String content = data.get("content");
+        String language = data.getOrDefault("language", "java");
 
         Map<String, String> map = new HashMap<>();
 
@@ -81,6 +82,7 @@ public class UpdateServiceImpl implements UpdateService {
                 title,
                 description,
                 content,
+                language,
                 bot.getCreatetime(),
                 new Date()
         );

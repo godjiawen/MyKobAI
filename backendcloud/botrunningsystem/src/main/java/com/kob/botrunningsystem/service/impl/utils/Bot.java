@@ -12,4 +12,5 @@ public class Bot {
     Integer userId;
     String botCode;
     String input;
+    String language;   // java | python | cpp | javascript
 }

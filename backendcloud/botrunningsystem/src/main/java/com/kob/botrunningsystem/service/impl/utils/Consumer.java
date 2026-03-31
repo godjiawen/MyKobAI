@@ -1,25 +1,18 @@
 package com.kob.botrunningsystem.service.impl.utils;
 
-import com.kob.botrunningsystem.utils.BotInterface;
-import org.joor.Reflect;
+import com.kob.botrunningsystem.service.impl.utils.runners.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.util.UUID;
-import java.util.function.Supplier;
-
 @Component
-public class Consumer extends Thread{
+public class Consumer extends Thread {
+
     private Bot bot;
     private static RestTemplate restTemplate;
-    private final static  String receiveBotMoveUrl = "http://127.0.0.1:3000/pk/receive/bot/move/";
+    private static final String RECEIVE_BOT_MOVE_URL = "http://127.0.0.1:3000/pk/receive/bot/move/";
 
     @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
@@ -29,7 +22,6 @@ public class Consumer extends Thread{
     public void startTimeout(long timeout, Bot bot) {
         this.bot = bot;
         this.start();
-
         try {
             this.join(timeout);
         } catch (InterruptedException e) {
@@ -39,40 +31,34 @@ public class Consumer extends Thread{
         }
     }
 
-    private String addUid(String code, String uid) { //在Code中的Bot类名后加UID
-        int k = code.indexOf(" implements java.util.function.Supplier<Integer>");
-        return code.substring(0,k) + uid + code.substring(k);
+    /** 根据语言获取对应 Runner */
+    private static LanguageRunner getRunner(String language) {
+        if (language == null) return new JavaRunner();
+        return switch (language.toLowerCase()) {
+            case "python"     -> new PythonRunner();
+            case "cpp"        -> new CppRunner();
+            case "javascript" -> new JsRunner();
+            default           -> new JavaRunner();
+        };
     }
 
     @Override
     public void run() {
-        UUID uuid = UUID.randomUUID();
-        String uid = uuid.toString().substring(0, 8);
-
-        Supplier<Integer> botInterface = Reflect.compile(
-                "com.kob.botrunningsystem.utils.Bot" + uid,
-                addUid(bot.getBotCode(), uid)
-        ).create().get();
-
-        // 每次执行使用独立的临时文件，避免并发 Bot 线程互相覆盖输入
-        File file = new File("input_" + uuid + ".txt");
-        try (PrintWriter fout = new PrintWriter(file)) {
-            fout.println(bot.getInput());
-            fout.flush();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+        LanguageRunner runner = getRunner(bot.getLanguage());
+        Integer direction;
+        try {
+            direction = runner.run(bot.getBotCode(), bot.getInput(), 2000);
+        } catch (Exception e) {
+            System.err.println("[Consumer] Runner 异常: " + e.getMessage());
+            direction = 0;
         }
 
-        Integer direction = botInterface.get();
-        System.out.println("move-direction: " + bot.getUserId() + " " + direction);
-
-        // 执行完毕后删除临时文件
-        file.delete();
+        System.out.println("[Consumer] userId=" + bot.getUserId()
+                + " lang=" + bot.getLanguage() + " direction=" + direction);
 
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", bot.getUserId().toString());
         data.add("direction", direction.toString());
-
-        restTemplate.postForObject(receiveBotMoveUrl, data, String.class);
+        restTemplate.postForObject(RECEIVE_BOT_MOVE_URL, data, String.class);
     }
 }
