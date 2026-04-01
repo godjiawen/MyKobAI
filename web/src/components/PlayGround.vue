@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <ChatBox :roomId="store.state.pk.roomId" />
+    <ChatBox :roomId="store.state.pk.roomId" @activity-change="handleChatActivityChange" />
   </div>
 </template>
 
@@ -40,6 +40,22 @@ const isPausedByMe = computed(
 const resumeGame = () => {
   const socket = store.state.pk.socket;
   if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ event: "resume" }));
+  }
+};
+
+const handleChatActivityChange = (active) => {
+  const socket = store.state.pk.socket;
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  if (active) {
+    if (!store.state.pk.isPaused && store.state.pk.loser === "none") {
+      socket.send(JSON.stringify({ event: "pause" }));
+    }
+    return;
+  }
+
+  if (isPausedByMe.value && store.state.pk.loser === "none") {
     socket.send(JSON.stringify({ event: "resume" }));
   }
 };

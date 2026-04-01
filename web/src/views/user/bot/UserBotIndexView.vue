@@ -109,6 +109,7 @@
                       class="btn btn-secondary me-2"
                       data-bs-toggle="modal"
                       :data-bs-target="`#update-bot-modal${bot.id}`"
+                      @click="startEditBot(bot)"
                     >
                       Edit
                     </button>
@@ -124,17 +125,22 @@
                               class="btn-close"
                               data-bs-dismiss="modal"
                               aria-label="Close"
-                              @click="refreshBots"
+                              @click="discardEditBot(bot.id)"
                             ></button>
                           </div>
                           <div class="modal-body">
                             <div class="mb-3">
                               <label class="form-label">Title</label>
-                              <input v-model="bot.title" type="text" class="form-control" placeholder="Bot title" />
+                              <input
+                                v-model="botEditDrafts[bot.id].title"
+                                type="text"
+                                class="form-control"
+                                placeholder="Bot title"
+                              />
                             </div>
                             <div class="mb-3">
                               <label class="form-label">Language</label>
-                              <select v-model="bot.language" class="form-select">
+                              <select v-model="botEditDrafts[bot.id].language" class="form-select">
                                 <option value="java">Java</option>
                                 <option value="python">Python</option>
                                 <option value="cpp">C++</option>
@@ -144,7 +150,7 @@
                             <div class="mb-3">
                               <label class="form-label">Description</label>
                               <textarea
-                                v-model="bot.description"
+                                v-model="botEditDrafts[bot.id].description"
                                 class="form-control"
                                 rows="3"
                                 placeholder="Bot description"
@@ -153,17 +159,17 @@
                             <div class="mb-3">
                               <label class="form-label">Code</label>
                               <textarea
-                                v-model="bot.content"
+                                v-model="botEditDrafts[bot.id].content"
                                 class="form-control bot-code-input"
                                 rows="12"
-                                :placeholder="codePlaceholder(bot.language)"
+                                :placeholder="codePlaceholder(botEditDrafts[bot.id].language)"
                               ></textarea>
                             </div>
                           </div>
                           <div class="modal-footer">
-                            <div class="error-message">{{ bot.error_message }}</div>
-                            <button type="button" class="btn btn-primary" @click="updateBot(bot)">Save</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="refreshBots">Cancel</button>
+                            <div class="error-message">{{ botEditDrafts[bot.id].error_message }}</div>
+                            <button type="button" class="btn btn-primary" @click="updateBot(bot.id)">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="discardEditBot(bot.id)">Cancel</button>
                           </div>
                         </div>
                       </div>
@@ -247,6 +253,7 @@ const botDraft = reactive({
   language: "java",
   error_message: "",
 });
+const botEditDrafts = reactive({});
 
 const accountDraft = reactive({
   new_username: "",
@@ -261,6 +268,79 @@ const fileInput = ref(null);
 const uploading = ref(false);
 
 const authToken = () => store.state.user.token;
+
+const createBotEditDraft = (bot) => ({
+  id: bot.id,
+  title: bot.title,
+  description: bot.description,
+  content: bot.content,
+  language: bot.language || "java",
+  error_message: "",
+});
+
+const syncBotEditDrafts = (list) => {
+  const validIds = new Set(list.map((bot) => String(bot.id)));
+  Object.keys(botEditDrafts).forEach((botId) => {
+    if (!validIds.has(botId)) {
+      delete botEditDrafts[botId];
+    }
+  });
+
+  list.forEach((bot) => {
+    botEditDrafts[bot.id] = createBotEditDraft(bot);
+  });
+};
+
+/**
+ * 可靠地关闭 Bootstrap 5 Modal。
+ * 在 hidden.bs.modal 事件中清理残留的 backdrop / body.modal-open，
+ * 再执行回调（例如 refreshBots），避免 Vue 重渲染与 Bootstrap 动画冲突。
+ */
+const closeModal = (id, afterHidden) => {
+  const el = document.getElementById(id);
+  if (!el) {
+    afterHidden?.();
+    return;
+  }
+  const instance = Modal.getInstance(el) || Modal.getOrCreateInstance(el);
+  el.addEventListener(
+    "hidden.bs.modal",
+    () => {
+      // 清除可能残留的遮罩层与 body 样式，防止重复打开失败
+      document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("padding-right");
+      afterHidden?.();
+    },
+    { once: true }
+  );
+  instance.hide();
+};
+
+const discardEditBot = (botId) => {
+  const bot = bots.value.find((item) => item.id === botId);
+  if (!bot) {
+    delete botEditDrafts[botId];
+    return;
+  }
+  botEditDrafts[botId] = createBotEditDraft(bot);
+};
+
+const ensureEditModalCleanup = (botId) => {
+  const el = document.getElementById(`update-bot-modal${botId}`);
+  if (!el || el.dataset.cleanupBound === "true") return;
+
+  el.addEventListener("hidden.bs.modal", () => {
+    discardEditBot(botId);
+  });
+  el.dataset.cleanupBound = "true";
+};
+
+const startEditBot = (bot) => {
+  botEditDrafts[bot.id] = createBotEditDraft(bot);
+  ensureEditModalCleanup(bot.id);
+};
 
 const triggerUpload = () => {
   if (fileInput.value) {
@@ -322,11 +402,8 @@ const updateUsername = async () => {
 
     if (resp.error_message === "success") {
       store.commit("updateUsername", accountDraft.new_username);
-      const modalElement = document.getElementById("update-username-modal");
-      if (modalElement) {
-        Modal.getInstance(modalElement)?.hide();
-      }
       accountDraft.new_username = "";
+      closeModal("update-username-modal");
       alert("Username updated successfully!");
     } else {
       accountDraft.username_error = resp.error_message;
@@ -350,10 +427,7 @@ const updatePassword = async () => {
     });
 
     if (resp.error_message === "success") {
-      const modalElement = document.getElementById("update-password-modal");
-      if (modalElement) {
-        Modal.getInstance(modalElement)?.hide();
-      }
+      closeModal("update-password-modal");
       accountDraft.old_password = "";
       accountDraft.new_password = "";
       accountDraft.confirmed_password = "";
@@ -371,6 +445,7 @@ const updatePassword = async () => {
 const refreshBots = async () => {
   try {
     bots.value = await apiRequest(API_PATHS.botList, { token: authToken() });
+    syncBotEditDrafts(bots.value);
   } catch (error) {
     console.error(error);
   }
@@ -401,46 +476,42 @@ const addBot = async () => {
     botDraft.content = "";
     botDraft.language = "java";
 
-    const modalElement = document.getElementById("add-bot-btn");
-    if (modalElement) {
-      Modal.getOrCreateInstance(modalElement).hide();
-    }
-
-    await refreshBots();
+    // 等 Modal 完全关闭（backdrop 清理完毕）后再刷新列表，
+    // 否则 Vue 重渲染 v-for 会破坏 Bootstrap 正在操作的 DOM
+    closeModal("add-bot-btn", refreshBots);
   } catch (error) {
     botDraft.error_message = error.message || "Create failed";
   }
 };
 
-const updateBot = async (bot) => {
-  bot.error_message = "";
+const updateBot = async (botId) => {
+  const draft = botEditDrafts[botId];
+  if (!draft) return;
+
+  draft.error_message = "";
 
   try {
     const resp = await apiRequest(API_PATHS.botUpdate, {
       method: "POST",
       token: authToken(),
       data: {
-        bot_id: bot.id,
-        title: bot.title,
-        description: bot.description,
-        content: bot.content,
-        language: bot.language || "java",
+        bot_id: draft.id,
+        title: draft.title,
+        description: draft.description,
+        content: draft.content,
+        language: draft.language || "java",
       },
     });
 
     if (resp.error_message !== "success") {
-      bot.error_message = resp.error_message || "Update failed";
+      draft.error_message = resp.error_message || "Update failed";
       return;
     }
 
-    const modalElement = document.getElementById(`update-bot-modal${bot.id}`);
-    if (modalElement) {
-      Modal.getOrCreateInstance(modalElement).hide();
-    }
-
-    await refreshBots();
+    // 等 Modal 完全关闭后再刷新，避免 v-for 重渲染与 Bootstrap 动画冲突
+    closeModal(`update-bot-modal${draft.id}`, refreshBots);
   } catch (error) {
-    bot.error_message = error.message || "Update failed";
+    draft.error_message = error.message || "Update failed";
   }
 };
 
@@ -462,10 +533,82 @@ const removeBot = async (bot) => {
 
 const codePlaceholder = (lang) => {
   const map = {
-    java:       "public class Bot implements java.util.function.Supplier<Integer> {\n    @Override\n    public Integer get() {\n        // read input.txt, return 0/1/2/3\n        return 0;\n    }\n}",
-    python:     "with open('input.txt') as f:\n    data = f.read().strip()\n# parse data, compute direction (0-3)\ndirection = 0\nprint(direction)",
-    cpp:        "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ifstream fin(\"input.txt\");\n    string s; fin >> s; fin.close();\n    // compute direction (0-3)\n    cout << 0 << endl;\n}",
-    javascript: "const fs = require('fs');\nconst input = fs.readFileSync('input.txt','utf8').trim();\n// compute direction (0-3)\nconsole.log(0);",
+    java: `import java.util.Scanner;
+import java.io.File;
+
+// 类名必须为 Bot，无需 package 声明
+public class Bot implements java.util.function.Supplier<Integer> {
+
+    @Override
+    public Integer get() {
+        Scanner sc;
+        try {
+            sc = new Scanner(new File("input.txt"));
+        } catch (Exception e) { return 0; }
+        String input = sc.next();
+        sc.close();
+
+        // input 格式: {mapStr}#{meSx}#{meSy}#({meSteps})#{youSx}#{youSy}#({youSteps})
+        // 返回方向: 0=上, 1=右, 2=下, 3=左
+        return 0;
+    }
+}`,
+    python: `# 方向: 0=上, 1=右, 2=下, 3=左
+# 输入格式: {mapStr}#{meSx}#{meSy}#({meSteps})#{youSx}#{youSy}#({youSteps})
+
+with open('input.txt') as f:
+    data = f.read().strip()
+
+parts = data.split('#')
+map_str   = parts[0]          # 13*14 的 0/1 字符串
+me_sx,  me_sy  = int(parts[1]), int(parts[2])
+me_steps       = parts[3][1:-1]   # 去掉括号
+you_sx, you_sy = int(parts[4]), int(parts[5])
+you_steps      = parts[6][1:-1]
+
+# TODO: 根据地图和蛇身信息计算最优方向
+direction = 0
+print(direction)`,
+    cpp: `#include <bits/stdc++.h>
+using namespace std;
+// 方向: 0=上, 1=右, 2=下, 3=左
+// 输入格式: {mapStr}#{meSx}#{meSy}#({meSteps})#{youSx}#{youSy}#({youSteps})
+
+int main() {
+    ifstream fin("input.txt");
+    string data; fin >> data; fin.close();
+
+    // 按 '#' 分割
+    vector<string> parts;
+    stringstream ss(data);
+    string token;
+    while (getline(ss, token, '#')) parts.push_back(token);
+
+    string mapStr   = parts[0];   // 13*14 的 0/1 字符串
+    int meSx  = stoi(parts[1]), meSy  = stoi(parts[2]);
+    string meSteps  = parts[3].substr(1, parts[3].size()-2);  // 去括号
+    int youSx = stoi(parts[4]), youSy = stoi(parts[5]);
+    string youSteps = parts[6].substr(1, parts[6].size()-2);
+
+    // TODO: 根据地图和蛇身信息计算最优方向
+    cout << 0 << endl;
+    return 0;
+}`,
+    javascript: `// 方向: 0=上, 1=右, 2=下, 3=左
+// 输入格式: {mapStr}#{meSx}#{meSy}#({meSteps})#{youSx}#{youSy}#({youSteps})
+"use strict";
+const fs = require('fs');
+
+const data   = fs.readFileSync('input.txt', 'utf8').trim();
+const parts  = data.split('#');
+const mapStr = parts[0];          // 13*14 的 0/1 字符串
+const meSx   = parseInt(parts[1]), meSy   = parseInt(parts[2]);
+const meSteps  = parts[3].slice(1, -1);  // 去括号
+const youSx  = parseInt(parts[4]), youSy  = parseInt(parts[5]);
+const youSteps = parts[6].slice(1, -1);
+
+// TODO: 根据地图和蛇身信息计算最优方向
+console.log(0);`,
   };
   return map[lang] || map.java;
 };

@@ -47,7 +47,13 @@ public class UploadAvatarServiceImpl implements UploadAvatarService {
             return map;
         }
 
-        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+        int suffixIndex = originalFilename.lastIndexOf(".");
+        if (suffixIndex < 0 || suffixIndex == originalFilename.length() - 1) {
+            map.put("error_message", "Invalid file format");
+            return map;
+        }
+
+        String suffix = originalFilename.substring(suffixIndex);
         if (!suffix.equalsIgnoreCase(".jpg") && !suffix.equalsIgnoreCase(".png") && !suffix.equalsIgnoreCase(".jpeg")) {
             map.put("error_message", "只支持上传jpg/png格式图片");
             return map;

@@ -5,6 +5,7 @@ import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.User;
 import com.kob.backend.service.impl.utils.UserDetailsImpl;
 import com.kob.backend.service.user.bot.UpdateService;
+import com.kob.backend.utils.BotLanguageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +32,7 @@ public class UpdateServiceImpl implements UpdateService {
         String title = data.get("title");
         String description = data.get("description");
         String content = data.get("content");
-        String language = data.getOrDefault("language", "java");
+        String language = BotLanguageUtil.normalize(data.getOrDefault("language", "java"));
 
         Map<String, String> map = new HashMap<>();
 
@@ -61,6 +62,11 @@ public class UpdateServiceImpl implements UpdateService {
 
         if (content.length() > 10000) {
             map.put("error_message", "代码长度不能超过10000");
+            return map;
+        }
+
+        if (!BotLanguageUtil.isSupported(language)) {
+            map.put("error_message", "涓嶆敮鎸佺殑 Bot 璇█");
             return map;
         }
 

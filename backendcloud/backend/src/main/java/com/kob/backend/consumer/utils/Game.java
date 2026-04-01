@@ -16,6 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Game extends Thread {
     private final static int[] dx = {-1, 0, 1, 0}, dy = {0, 1, 0, -1};
+    private static final int STEP_TIMEOUT_MS = 15_000;
+    private static final int STEP_POLL_INTERVAL_MS = 100;
     private final Integer rows;
     private final Integer cols;
     private final Integer inner_walls_count;
@@ -27,8 +29,8 @@ public class Game extends Thread {
     private ReentrantLock lock = new ReentrantLock();
     private String status = "playing"; //playing -> finished
     private String loser = ""; //all: 平局 A: A输 B: B输
-    private volatile boolean paused = false;   // 暂离标志
-    private volatile String pausedBy = "";     // "A" 或 "B"
+    private volatile boolean paused = false;
+    private volatile String pausedBy = "";
     private final static String addBotUrl = "http://127.0.0.1:3002/bot/add/";
 
     public Game(Integer rows,
@@ -89,11 +91,11 @@ public class Game extends Thread {
     }
 
     public void setNextStepA(Integer nextStepA) {
-        lock.lock(); //加锁
+        lock.lock();
         try {
             this.nextStepA = nextStepA;
         } finally {
-            lock.unlock(); //报异常也会自动解锁，防止死锁。
+            lock.unlock();
         }
     }
 
@@ -150,10 +152,8 @@ public class Game extends Thread {
                 int r = random.nextInt(this.rows);
                 int c = random.nextInt(this.cols);
 
-                if (g[r][c] == 1 || g[this.rows - 1 - r][this.cols - 1 - c] == 1)
-                    continue;
-                if (r == this.rows - 2 && c == 1 || r == 1 && c == this.cols - 2)
-                    continue;
+                if (g[r][c] == 1 || g[this.rows - 1 - r][this.cols - 1 - c] == 1) continue;
+                if (r == this.rows - 2 && c == 1 || r == 1 && c == this.cols - 2) continue;
 
                 g[r][c] = g[this.rows - 1 - r][this.cols - 1 - c] = 1;
                 break;
@@ -165,12 +165,11 @@ public class Game extends Thread {
 
     public void createMap() {
         for (int i = 0; i < 1000; i++) {
-            if (draw())
-                break;
+            if (draw()) break;
         }
     }
 
-    private String getInput(Player player) { //将当前的页面信息编码为一个字符串
+    private String getInput(Player player) {
         Player me, you;
         if (playerA.getId().equals(player.getId())) {
             me = playerA;
@@ -190,7 +189,7 @@ public class Game extends Thread {
     }
 
     private void sendBotCode(Player player) {
-        if (player.getBotId().equals(-1)) return; //亲自出马，不需要执行代码。
+        if (player.getBotId().equals(-1)) return;
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", player.getId().toString());
         data.add("bot_code", player.getBotCode());
@@ -199,7 +198,7 @@ public class Game extends Thread {
         WebSocketServer.restTemplate.postForObject(addBotUrl, data, String.class);
     }
 
-    private boolean nextStep() { //等待玩家下一步操作
+    private boolean nextStep() {
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
@@ -209,16 +208,20 @@ public class Game extends Thread {
         sendBotCode(playerA);
         sendBotCode(playerB);
 
-        for (int i = 0; i < 50; i++) {
+        int waitedMs = 0;
+        while (waitedMs < STEP_TIMEOUT_MS) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(STEP_POLL_INTERVAL_MS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             lock.lock();
             try {
-                // 暂停中：跳过此轮检测，但计数器照常推进（最多等待5秒/次）
-                if (!paused && nextStepA != null && nextStepB != null) {
+                if (paused) {
+                    continue;
+                }
+                if (nextStepA != null && nextStepB != null) {
                     playerA.getSteps().add(nextStepA);
                     playerB.getSteps().add(nextStepB);
                     return true;
@@ -226,6 +229,8 @@ public class Game extends Thread {
             } finally {
                 lock.unlock();
             }
+
+            waitedMs += STEP_POLL_INTERVAL_MS;
         }
 
         return false;
@@ -237,31 +242,29 @@ public class Game extends Thread {
         if (g[cell.x][cell.y] == 1) return false;
 
         for (int i = 0; i < n - 1; i++) {
-            if (cellsA.get(i).x == cell.x && cellsA.get(i).y == cell.y)
-                return false;
+            if (cellsA.get(i).x == cell.x && cellsA.get(i).y == cell.y) return false;
         }
 
         for (int i = 0; i < n - 1; i++) {
-            if (cellsB.get(i).x == cell.x && cellsB.get(i).y == cell.y)
-                return false;
+            if (cellsB.get(i).x == cell.x && cellsB.get(i).y == cell.y) return false;
         }
 
         return true;
     }
 
-    private void judge() { //判断两名玩家下一步操作是否合法
+    private void judge() {
         List<Cell> cellsA = playerA.getCells();
         List<Cell> cellsB = playerB.getCells();
 
-        boolean vaildA = check_valid(cellsA, cellsB);
-        boolean vaildB = check_valid(cellsB, cellsA);
+        boolean validA = check_valid(cellsA, cellsB);
+        boolean validB = check_valid(cellsB, cellsA);
 
-        if (!vaildA || !vaildB) {
+        if (!validA || !validB) {
             status = "finished";
 
-            if (!vaildA && !vaildB) {
+            if (!validA && !validB) {
                 loser = "all";
-            } else if (!vaildA) {
+            } else if (!validA) {
                 loser = "A";
             } else {
                 loser = "B";
@@ -270,13 +273,15 @@ public class Game extends Thread {
     }
 
     private void sendAllMessage(String message) {
-        if (WebSocketServer.users.get(playerA.getId()) != null)
+        if (WebSocketServer.users.get(playerA.getId()) != null) {
             WebSocketServer.users.get(playerA.getId()).sendMessage(message);
-        if (WebSocketServer.users.get(playerB.getId()) != null)
+        }
+        if (WebSocketServer.users.get(playerB.getId()) != null) {
             WebSocketServer.users.get(playerB.getId()).sendMessage(message);
+        }
     }
 
-    private void sendMove() {  // 向两个Client传递移动信息
+    private void sendMove() {
         lock.lock();
         try {
             JSONObject resp = new JSONObject();
@@ -284,7 +289,8 @@ public class Game extends Thread {
             resp.put("a_direction", nextStepA);
             resp.put("b_direction", nextStepB);
             sendAllMessage(resp.toJSONString());
-            nextStepA = nextStepB = null;
+            nextStepA = null;
+            nextStepB = null;
         } finally {
             lock.unlock();
         }
@@ -342,7 +348,7 @@ public class Game extends Thread {
         WebSocketServer.recordMapper.insert(record);
     }
 
-    private void sendResult() {  // 向两个Client公布结果
+    private void sendResult() {
         JSONObject resp = new JSONObject();
         resp.put("event", "result");
         resp.put("loser", loser);
@@ -350,11 +356,10 @@ public class Game extends Thread {
         sendAllMessage(resp.toJSONString());
     }
 
-
     @Override
     public void run() {
         for (int i = 0; i < 1000; i++) {
-            if (nextStep()) { // 是否获取了两条蛇的下一步移动
+            if (nextStep()) {
                 judge();
                 if (status.equals("playing")) {
                     sendMove();
@@ -362,24 +367,24 @@ public class Game extends Thread {
                     sendResult();
                     break;
                 }
-            } else {
-                // 超时判负功能暂时关闭
-                // status = "finished";
-                // lock.lock();
-                // try {
-                //     if (nextStepA == null && nextStepB == null) {
-                //         loser = "all";
-                //     } else if (nextStepA == null) {
-                //         loser = "A";
-                //     } else {
-                //         loser = "B";
-                //     }
-                // } finally {
-                //     lock.unlock();
-                // }
-                // sendResult();
-                // break;
+                continue;
             }
+
+            status = "finished";
+            lock.lock();
+            try {
+                if (nextStepA == null && nextStepB == null) {
+                    loser = "all";
+                } else if (nextStepA == null) {
+                    loser = "A";
+                } else {
+                    loser = "B";
+                }
+            } finally {
+                lock.unlock();
+            }
+            sendResult();
+            break;
         }
     }
 }

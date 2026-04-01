@@ -26,17 +26,6 @@ const isBPlayer = computed(
   () => store.state.pk.status === "playing" && currentUserId.value === Number.parseInt(store.state.pk.b_id, 10)
 );
 
-// ---- 暂离：检测点击到 battle-area 外 ----
-const handleDocumentMousedown = () => {
-  if (store.state.pk.status !== "playing") return;
-  if (store.state.pk.isPaused) return;
-  if (store.state.pk.loser !== "none") return; // 游戏已结束
-  const s = store.state.pk.socket;
-  if (s && s.readyState === WebSocket.OPEN) {
-    s.send(JSON.stringify({ event: "pause" }));
-  }
-};
-
 onMounted(() => {
   store.commit("updateLoser", "none");
   store.commit("updateIsRecord", false);
@@ -45,8 +34,6 @@ onMounted(() => {
     username: "My Opponent",
     photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png",
   });
-
-  document.addEventListener("mousedown", handleDocumentMousedown);
 
   const token = store.state.user.token;
   if (!token) return;
@@ -112,7 +99,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener("mousedown", handleDocumentMousedown);
   try {
     if (socket) {
       socket.onopen = null;

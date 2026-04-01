@@ -1,5 +1,10 @@
 <template>
-  <div class="chat-box">
+  <div
+    ref="chatRoot"
+    class="chat-box"
+    @focusin="handleFocusIn"
+    @focusout="handleFocusOut"
+  >
     <!-- Header -->
     <div class="chat-header">
       <span class="chat-title">💬 Chat</span>
@@ -52,13 +57,16 @@ import { buildChatWebSocketUrl } from "@/config/env";
 const props = defineProps({
   roomId: { type: String, default: "" },
 });
+const emit = defineEmits(["activity-change"]);
 
 const store = useStore();
 const messages = ref([]);
 const inputText = ref("");
 const messagesEl = ref(null);
+const chatRoot = ref(null);
 const isConnected = ref(false);
 let socket = null;
+let blurTimer = null;
 
 const currentUserId = computed(() => Number.parseInt(store.state.user.id, 10));
 
@@ -67,6 +75,28 @@ const scrollToBottom = async () => {
   if (messagesEl.value) {
     messagesEl.value.scrollTop = messagesEl.value.scrollHeight;
   }
+};
+
+const emitActivity = (active) => {
+  emit("activity-change", active);
+};
+
+const handleFocusIn = () => {
+  if (blurTimer) {
+    clearTimeout(blurTimer);
+    blurTimer = null;
+  }
+  emitActivity(true);
+};
+
+const handleFocusOut = () => {
+  if (blurTimer) clearTimeout(blurTimer);
+  blurTimer = setTimeout(() => {
+    const root = chatRoot.value;
+    const activeElement = document.activeElement;
+    if (root && activeElement && root.contains(activeElement)) return;
+    emitActivity(false);
+  }, 0);
 };
 
 const disconnectChat = () => {
@@ -82,6 +112,7 @@ const disconnectChat = () => {
   }
   isConnected.value = false;
   messages.value = [];
+  emitActivity(false);
 };
 
 const connectChat = (roomId) => {
@@ -143,6 +174,10 @@ watch(
 );
 
 onUnmounted(disconnectChat);
+onUnmounted(() => {
+  if (blurTimer) clearTimeout(blurTimer);
+  emitActivity(false);
+});
 </script>
 
 <style scoped>
