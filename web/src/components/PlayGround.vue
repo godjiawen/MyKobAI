@@ -1,6 +1,6 @@
 ﻿<template>
   <!-- @mousedown.stop 阻止冒泡到 document，只有点到 battle-area 外才触发暂离 -->
-  <div class="battle-area" @mousedown.stop>
+  <div :class="['battle-area', { 'battle-area--record': store.state.record.is_record }]" @mousedown.stop>
     <div class="playground">
       <GameMap />
       <!-- 暂离遮罩 -->
@@ -19,7 +19,11 @@
         </div>
       </div>
     </div>
-    <ChatBox :roomId="store.state.pk.roomId" @activity-change="handleChatActivityChange" />
+    <ChatBox
+      v-if="!store.state.record.is_record"
+      :roomId="store.state.pk.roomId"
+      @activity-change="handleChatActivityChange"
+    />
   </div>
 </template>
 
@@ -70,6 +74,11 @@ const handleChatActivityChange = (active) => {
   margin: 22px auto 40px;
 }
 
+.battle-area--record {
+  width: min(820px, 96vw);
+  justify-content: center;
+}
+
 div.playground {
   position: relative; /* 让遮罩绝对定位在此 div 内 */
   flex: 1 1 0;
@@ -81,6 +90,13 @@ div.playground {
   box-shadow: 0 22px 48px rgba(0, 50, 100, 0.08);
   backdrop-filter: blur(12px);
   padding: 14px;
+}
+
+.battle-area--record div.playground {
+  flex: 0 0 auto;
+  width: min(96vw, calc(clamp(400px, 68vh, 720px) * 14 / 13));
+  height: auto;
+  aspect-ratio: 14 / 13;
 }
 
 /* 暂离遮罩 */

@@ -13,8 +13,8 @@
             </div>
             <p class="profile-name">{{ store.state.user.username }}</p>
             <div class="profile-actions mt-3">
-              <button class="btn btn-sm btn-outline-primary mb-2 w-100" data-bs-toggle="modal" data-bs-target="#update-username-modal">Modify Username</button>
-              <button class="btn btn-sm btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#update-password-modal">Modify Password</button>
+              <button class="btn btn-sm btn-outline-primary mb-2 w-100" @click="openUsernameModal">Modify Username</button>
+              <button class="btn btn-sm btn-outline-warning w-100" @click="openPasswordModal">Modify Password</button>
             </div>
             <input type="file" ref="fileInput" @change="uploadAvatar" accept="image/png, image/jpeg, image/jpg" style="display: none;" />
           </div>
@@ -80,7 +80,7 @@
         <div class="card bot-main-card">
           <div class="card-header bot-main-header">
             <span class="title">My Bots</span>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-bot-btn">
+            <button type="button" class="btn btn-primary" @click="openCreateBotModal">
               Create Bot
             </button>
           </div>
@@ -107,73 +107,11 @@
                     <button
                       type="button"
                       class="btn btn-secondary me-2"
-                      data-bs-toggle="modal"
-                      :data-bs-target="`#update-bot-modal${bot.id}`"
                       @click="startEditBot(bot)"
                     >
                       Edit
                     </button>
                     <button type="button" class="btn btn-danger" @click="removeBot(bot)">Delete</button>
-
-                    <div class="modal fade" :id="`update-bot-modal${bot.id}`" tabindex="-1">
-                      <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Edit Bot</h5>
-                            <button
-                              type="button"
-                              class="btn-close"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"
-                              @click="discardEditBot(bot.id)"
-                            ></button>
-                          </div>
-                          <div class="modal-body">
-                            <div class="mb-3">
-                              <label class="form-label">Title</label>
-                              <input
-                                v-model="botEditDrafts[bot.id].title"
-                                type="text"
-                                class="form-control"
-                                placeholder="Bot title"
-                              />
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Language</label>
-                              <select v-model="botEditDrafts[bot.id].language" class="form-select">
-                                <option value="java">Java</option>
-                                <option value="python">Python</option>
-                                <option value="cpp">C++</option>
-                                <option value="javascript">JavaScript</option>
-                              </select>
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Description</label>
-                              <textarea
-                                v-model="botEditDrafts[bot.id].description"
-                                class="form-control"
-                                rows="3"
-                                placeholder="Bot description"
-                              ></textarea>
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Code</label>
-                              <textarea
-                                v-model="botEditDrafts[bot.id].content"
-                                class="form-control bot-code-input"
-                                rows="12"
-                                :placeholder="codePlaceholder(botEditDrafts[bot.id].language)"
-                              ></textarea>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <div class="error-message">{{ botEditDrafts[bot.id].error_message }}</div>
-                            <button type="button" class="btn btn-primary" @click="updateBot(bot.id)">Save</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="discardEditBot(bot.id)">Cancel</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -231,11 +169,71 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="update-bot-modal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Bot</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="discardEditBot()"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input
+                v-model="editingDraft.title"
+                type="text"
+                class="form-control"
+                placeholder="Bot title"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Language</label>
+              <select v-model="editingDraft.language" class="form-select">
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="javascript">JavaScript</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea
+                v-model="editingDraft.description"
+                class="form-control"
+                rows="3"
+                placeholder="Bot description"
+              ></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Code</label>
+              <textarea
+                v-model="editingDraft.content"
+                class="form-control bot-code-input"
+                rows="12"
+                :placeholder="codePlaceholder(editingDraft.language)"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="error-message">{{ editingDraft.error_message }}</div>
+            <button type="button" class="btn btn-primary" @click="updateBot()">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="discardEditBot()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, reactive, ref } from "vue";
 import Modal from "bootstrap/js/dist/modal";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
@@ -254,6 +252,19 @@ const botDraft = reactive({
   error_message: "",
 });
 const botEditDrafts = reactive({});
+const currentEditingBotId = ref(null);
+const emptyEditingDraft = reactive({
+  id: null,
+  title: "",
+  description: "",
+  content: "",
+  language: "java",
+  error_message: "",
+});
+const editingDraft = computed(() => {
+  if (currentEditingBotId.value == null) return emptyEditingDraft;
+  return botEditDrafts[currentEditingBotId.value] || emptyEditingDraft;
+});
 
 const accountDraft = reactive({
   new_username: "",
@@ -291,10 +302,24 @@ const syncBotEditDrafts = (list) => {
   });
 };
 
+const cleanupModalArtifacts = () => {
+  document.querySelectorAll(".modal-backdrop").forEach((node) => node.remove());
+  document.body.classList.remove("modal-open");
+  document.body.style.removeProperty("overflow");
+  document.body.style.removeProperty("padding-right");
+};
+
+const forceHideModalElement = (el) => {
+  if (!el) return;
+  el.classList.remove("show");
+  el.setAttribute("aria-hidden", "true");
+  el.removeAttribute("aria-modal");
+  el.style.display = "none";
+};
+
 /**
  * 可靠地关闭 Bootstrap 5 Modal。
- * 在 hidden.bs.modal 事件中清理残留的 backdrop / body.modal-open，
- * 再执行回调（例如 refreshBots），避免 Vue 重渲染与 Bootstrap 动画冲突。
+ * 优先等待 hidden 事件；若事件未触发，使用超时兜底清理，避免灰色遮罩残留。
  */
 const closeModal = (id, afterHidden) => {
   const el = document.getElementById(id);
@@ -303,43 +328,78 @@ const closeModal = (id, afterHidden) => {
     return;
   }
   const instance = Modal.getInstance(el) || Modal.getOrCreateInstance(el);
-  el.addEventListener(
-    "hidden.bs.modal",
-    () => {
-      // 清除可能残留的遮罩层与 body 样式，防止重复打开失败
-      document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
-      document.body.classList.remove("modal-open");
-      document.body.style.removeProperty("overflow");
-      document.body.style.removeProperty("padding-right");
-      afterHidden?.();
-    },
-    { once: true }
-  );
+  let settled = false;
+  let fallbackTimer = null;
+
+  const finalize = () => {
+    if (settled) return;
+    settled = true;
+    if (fallbackTimer) {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
+    forceHideModalElement(el);
+    cleanupModalArtifacts();
+    instance.dispose();
+    afterHidden?.();
+  };
+
+  const handleHidden = () => {
+    el.removeEventListener("hidden.bs.modal", handleHidden);
+    finalize();
+  };
+  el.addEventListener("hidden.bs.modal", handleHidden);
   instance.hide();
+  fallbackTimer = setTimeout(() => {
+    el.removeEventListener("hidden.bs.modal", handleHidden);
+    finalize();
+  }, 450);
 };
 
-const discardEditBot = (botId) => {
+const openModal = (id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  cleanupModalArtifacts();
+  forceHideModalElement(el);
+  const instance = Modal.getOrCreateInstance(el);
+  instance.show();
+};
+
+const openUsernameModal = () => {
+  accountDraft.username_error = "";
+  openModal("update-username-modal");
+};
+
+const openPasswordModal = () => {
+  accountDraft.password_error = "";
+  openModal("update-password-modal");
+};
+
+const openCreateBotModal = () => {
+  botDraft.error_message = "";
+  openModal("add-bot-btn");
+};
+
+const discardEditBot = (botId = currentEditingBotId.value) => {
+  if (botId == null) return;
   const bot = bots.value.find((item) => item.id === botId);
   if (!bot) {
     delete botEditDrafts[botId];
+    currentEditingBotId.value = null;
     return;
   }
   botEditDrafts[botId] = createBotEditDraft(bot);
+  currentEditingBotId.value = null;
 };
 
-const ensureEditModalCleanup = (botId) => {
-  const el = document.getElementById(`update-bot-modal${botId}`);
-  if (!el || el.dataset.cleanupBound === "true") return;
-
-  el.addEventListener("hidden.bs.modal", () => {
-    discardEditBot(botId);
-  });
-  el.dataset.cleanupBound = "true";
-};
-
-const startEditBot = (bot) => {
+const startEditBot = async (bot) => {
   botEditDrafts[bot.id] = createBotEditDraft(bot);
-  ensureEditModalCleanup(bot.id);
+  currentEditingBotId.value = bot.id;
+  await nextTick();
+  const el = document.getElementById("update-bot-modal");
+  if (!el) return;
+  const instance = Modal.getOrCreateInstance(el);
+  instance.show();
 };
 
 const triggerUpload = () => {
@@ -403,8 +463,9 @@ const updateUsername = async () => {
     if (resp.error_message === "success") {
       store.commit("updateUsername", accountDraft.new_username);
       accountDraft.new_username = "";
-      closeModal("update-username-modal");
-      alert("Username updated successfully!");
+      closeModal("update-username-modal", () => {
+        alert("Username updated successfully!");
+      });
     } else {
       accountDraft.username_error = resp.error_message;
     }
@@ -427,13 +488,14 @@ const updatePassword = async () => {
     });
 
     if (resp.error_message === "success") {
-      closeModal("update-password-modal");
-      accountDraft.old_password = "";
-      accountDraft.new_password = "";
-      accountDraft.confirmed_password = "";
-      alert("Password updated successfully! Please login again.");
-      store.dispatch("logout");
-      router.push({ name: "user_account_login" });
+      closeModal("update-password-modal", async () => {
+        accountDraft.old_password = "";
+        accountDraft.new_password = "";
+        accountDraft.confirmed_password = "";
+        alert("Password updated successfully! Please login again.");
+        store.dispatch("logout");
+        await router.push({ name: "user_account_login" });
+      });
     } else {
       accountDraft.password_error = resp.error_message;
     }
@@ -484,9 +546,9 @@ const addBot = async () => {
   }
 };
 
-const updateBot = async (botId) => {
-  const draft = botEditDrafts[botId];
-  if (!draft) return;
+const updateBot = async () => {
+  const draft = editingDraft.value;
+  if (!draft || draft.id == null) return;
 
   draft.error_message = "";
 
@@ -509,7 +571,7 @@ const updateBot = async (botId) => {
     }
 
     // 等 Modal 完全关闭后再刷新，避免 v-for 重渲染与 Bootstrap 动画冲突
-    closeModal(`update-bot-modal${draft.id}`, refreshBots);
+    closeModal("update-bot-modal", refreshBots);
   } catch (error) {
     draft.error_message = error.message || "Update failed";
   }
@@ -613,7 +675,15 @@ console.log(0);`,
   return map[lang] || map.java;
 };
 
-onMounted(refreshBots);
+onMounted(() => {
+  refreshBots();
+  const editModal = document.getElementById("update-bot-modal");
+  if (!editModal || editModal.dataset.cleanupBound === "true") return;
+  editModal.addEventListener("hidden.bs.modal", () => {
+    discardEditBot();
+  });
+  editModal.dataset.cleanupBound = "true";
+});
 </script>
 
 <style scoped>
