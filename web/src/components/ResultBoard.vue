@@ -1,6 +1,6 @@
-﻿<template>
+<template>
   <div class="result-board">
-    <div class="result-board-text" v-if="store.state.pk.loser === 'all'">Draw!</div>
+    <div class="result-board-text" v-if="pkStore.loser === 'all'">Draw!</div>
     <div class="result-board-text" v-else-if="isLose">You Lose!</div>
     <div class="result-board-text" v-else>You Win!</div>
     <div class="result-board-btn">
@@ -11,23 +11,25 @@
 
 <script setup>
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
+import { usePkStore } from "@/store/pk";
 
-const store = useStore();
+const userStore = useUserStore();
+const pkStore = usePkStore();
 
 const isLose = computed(() => {
-  const userId = Number.parseInt(store.state.user.id, 10);
+  const userId = Number.parseInt(userStore.id, 10);
   return (
-    (store.state.pk.loser === "A" && Number.parseInt(store.state.pk.a_id, 10) === userId) ||
-    (store.state.pk.loser === "B" && Number.parseInt(store.state.pk.b_id, 10) === userId)
+    (pkStore.loser === "A" && Number.parseInt(pkStore.a_id, 10) === userId) ||
+    (pkStore.loser === "B" && Number.parseInt(pkStore.b_id, 10) === userId)
   );
 });
 
 const restart = () => {
-  store.commit("updateRoomId", "");
-  store.commit("updateStatus", "matching");
-  store.commit("updateLoser", "none");
-  store.commit("updateOpponent", {
+  pkStore.updateRoomId("");
+  pkStore.updateStatus("matching");
+  pkStore.updateLoser("none");
+  pkStore.updateOpponent({
     username: "My Opponent",
     photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png",
   });
@@ -92,3 +94,4 @@ div.result-board-btn {
   }
 }
 </style>
+

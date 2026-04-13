@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="record-content-wrap">
     <div class="record-content-head">
       <h2>Match Replay</h2>
@@ -13,12 +13,16 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
+import { usePkStore } from "@/store/pk";
+import { useRecordStore } from "@/store/record";
 import PlayGround from "@/components/PlayGround.vue";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
-const store = useStore();
+const userStore = useUserStore();
+const pkStore = usePkStore();
+const recordStore = useRecordStore();
 const route = useRoute();
 
 const loading = ref(false);
@@ -39,8 +43,8 @@ const stringTo2D = (map) => {
 
 onMounted(async () => {
   // If store already has the map data (navigated from RecordIndexView), use it directly
-  if (store.state.pk.gamemap) {
-    store.commit("updateIsRecord", true);
+  if (pkStore.gamemap) {
+    recordStore.updateIsRecord(true);
     ready.value = true;
     return;
   }
@@ -56,7 +60,7 @@ onMounted(async () => {
   try {
     const resp = await apiRequest(API_PATHS.records, {
       data: { page: 1 },
-      token: store.state.user.token,
+      token: userStore.token,
     });
     const list = Array.isArray(resp.records) ? resp.records : [];
     const target = list.find((item) => String(item.record?.id) === String(recordId));
@@ -67,8 +71,8 @@ onMounted(async () => {
     }
 
     const r = target.record;
-    store.commit("updateIsRecord", true);
-    store.commit("updateGame", {
+    recordStore.updateIsRecord(true);
+    pkStore.updateGame({
       map: stringTo2D(r.map),
       a_id: r.aid,
       a_sx: r.asx,
@@ -77,8 +81,8 @@ onMounted(async () => {
       b_sx: r.bsx,
       b_sy: r.bsy,
     });
-    store.commit("updateSteps", { a_steps: r.asteps, b_steps: r.bsteps });
-    store.commit("updateRecordLoser", r.loser);
+    recordStore.updateSteps({ a_steps: r.asteps, b_steps: r.bsteps });
+    recordStore.updateRecordLoser(r.loser);
     ready.value = true;
   } catch (e) {
     loadError.value = "录像加载失败，请确认后端接口是否可用。";
@@ -135,3 +139,4 @@ onMounted(async () => {
   }
 }
 </style>
+

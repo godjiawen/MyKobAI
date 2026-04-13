@@ -1,5 +1,5 @@
-﻿<template>
-  <ContentField v-if="!store.state.user.pulling_info">
+<template>
+  <ContentField v-if="!userStore.pulling_info">
     <section class="auth-wrap">
       <div class="auth-head">
         <h2>Welcome Back</h2>
@@ -28,10 +28,10 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
 import ContentField from "@/components/ContentField.vue";
 
-const store = useStore();
+const userStore = useUserStore();
 const router = useRouter();
 
 const username = ref("");
@@ -41,11 +41,11 @@ const errorMessage = ref("");
 const login = async () => {
   errorMessage.value = "";
   try {
-    await store.dispatch("login", {
+    await userStore.login({
       username: username.value,
       password: password.value,
     });
-    await store.dispatch("getinfo");
+    await userStore.getinfo();
     await router.push({ name: "home" });
   } catch (error) {
     errorMessage.value = error.message || "Invalid username or password";
@@ -96,3 +96,4 @@ div.error-message {
   color: #e74c3c;
 }
 </style>
+

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ContentField>
     <section class="list-panel">
       <div class="panel-header">
@@ -62,12 +62,16 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
+import { usePkStore } from "@/store/pk";
+import { useRecordStore } from "@/store/record";
 import ContentField from "@/components/ContentField.vue";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
-const store = useStore();
+const userStore = useUserStore();
+const pkStore = usePkStore();
+const recordStore = useRecordStore();
 const router = useRouter();
 
 const records = ref([]);
@@ -101,7 +105,7 @@ const pullPage = async (page) => {
   try {
     const resp = await apiRequest(API_PATHS.records, {
       data: { page },
-      token: store.state.user.token,
+      token: userStore.token,
     });
     const list = Array.isArray(resp.records) ? resp.records : [];
     records.value = list.map((item) => ({
@@ -149,8 +153,8 @@ const openRecordContent = (recordId) => {
   const targetRecord = records.value.find((item) => item.record.id === recordId);
   if (!targetRecord || !targetRecord.record?.map) return;
 
-  store.commit("updateIsRecord", true);
-  store.commit("updateGame", {
+  recordStore.updateIsRecord(true);
+  pkStore.updateGame({
     map: stringTo2D(targetRecord.record.map),
     a_id: targetRecord.record.aid,
     a_sx: targetRecord.record.asx,
@@ -159,11 +163,11 @@ const openRecordContent = (recordId) => {
     b_sx: targetRecord.record.bsx,
     b_sy: targetRecord.record.bsy,
   });
-  store.commit("updateSteps", {
+  recordStore.updateSteps({
     a_steps: targetRecord.record.asteps,
     b_steps: targetRecord.record.bsteps,
   });
-  store.commit("updateRecordLoser", targetRecord.record.loser);
+  recordStore.updateRecordLoser(targetRecord.record.loser);
 
   router.push({
     name: "record_content",
@@ -237,3 +241,4 @@ img.record-user-photo {
   color: var(--kob-muted);
 }
 </style>
+

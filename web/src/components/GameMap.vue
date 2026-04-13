@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div ref="parent" class="gamemap">
     <canvas ref="canvas" tabindex="0"></canvas>
   </div>
@@ -6,11 +6,13 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue";
-import { useStore } from "vuex";
+import { usePkStore } from "@/store/pk";
+import { useRecordStore } from "@/store/record";
 import { GameMap } from "@/assets/scripts/GameMap";
 import { startGameLoop, stopGameLoop } from "@/assets/scripts/AcGameObject";
 
-const store = useStore();
+const pkStore = usePkStore();
+const recordStore = useRecordStore();
 const parent = ref(null);
 const canvas = ref(null);
 
@@ -18,13 +20,13 @@ onMounted(() => {
   const ctx = canvas.value?.getContext("2d");
   if (!ctx || !parent.value) return;
 
-  store.commit("updateGameObject", new GameMap(ctx, parent.value, store));
+  pkStore.updateGameObject(new GameMap(ctx, parent.value, { pkStore, recordStore }));
   startGameLoop();
 });
 
 onUnmounted(() => {
   try {
-    const gameObject = store.state.pk.gameObject;
+    const gameObject = pkStore.gameObject;
     if (gameObject && typeof gameObject.destroy === "function") {
       gameObject.destroy();
     }
@@ -32,7 +34,7 @@ onUnmounted(() => {
     console.error("game map cleanup error:", error);
   } finally {
     stopGameLoop();
-    store.commit("updateGameObject", null);
+    pkStore.updateGameObject(null);
   }
 });
 </script>
@@ -56,3 +58,4 @@ canvas {
   box-shadow: inset 0 0 0 1px rgba(90, 180, 255, 0.15), 0 14px 26px rgba(0, 50, 100, 0.12);
 }
 </style>
+

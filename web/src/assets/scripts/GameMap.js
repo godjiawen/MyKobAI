@@ -4,12 +4,13 @@ import { Snake } from "./Snake";
 import { Wall } from "./Wall";
 
 export class GameMap extends AcGameObject {
-    constructor(ctx, parent, store) {
+    constructor(ctx, parent, { pkStore, recordStore }) {
         super();
 
         this.ctx = ctx;
         this.parent = parent;
-        this.store = store;
+        this.pkStore = pkStore;
+        this.recordStore = recordStore;
         this.L = 0;
 
         this.rows = 13;
@@ -28,7 +29,7 @@ export class GameMap extends AcGameObject {
 
 
     create_walls() {
-        const g = this.store.state.pk.gamemap;
+        const g = this.pkStore.gamemap;
 
         for (let r = 0; r < this.rows; r ++ ) {
             for (let c = 0; c < this.cols; c ++ ) {
@@ -41,11 +42,11 @@ export class GameMap extends AcGameObject {
 
 
     add_listening_events() {
-        if (this.store.state.record.is_record) {
+        if (this.recordStore.is_record) {
             let k = 0;
-            const a_steps = this.store.state.record.a_steps;
-            const b_steps = this.store.state.record.b_steps;
-            const loser = this.store.state.record.record_loser;
+            const a_steps = this.recordStore.a_steps;
+            const b_steps = this.recordStore.b_steps;
+            const loser = this.recordStore.record_loser;
             const [snake0, snake1] = this.snakes;
             this.replayIntervalId = setInterval(() => {
                 if (k >= a_steps.length - 1) {
@@ -69,7 +70,7 @@ export class GameMap extends AcGameObject {
                 const tag = document.activeElement?.tagName?.toUpperCase();
                 if (tag === 'INPUT' || tag === 'TEXTAREA') return;
                 // 暂停中不处理移动
-                if (this.store.state.pk.isPaused) return;
+                if (this.pkStore.isPaused) return;
 
                 let d = -1;
                 if (e.key === 'w') d = 0;
@@ -79,7 +80,7 @@ export class GameMap extends AcGameObject {
     
                 if (d >= 0) {
                     e.preventDefault(); // 阻止浏览器默认行为（Edge 滚动/速度覆盖层等）
-                    const socket = this.store.state.pk.socket;
+                    const socket = this.pkStore.socket;
                     if (socket && socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({
                             event: "move",

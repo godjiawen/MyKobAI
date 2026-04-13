@@ -1,44 +1,45 @@
-﻿import { API_PATHS } from "@/config/env";
+import { defineStore } from "pinia";
+import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
-export default {
-  state: () => ({
-    id: "",
-    username: "",
-    photo: "",
-    token: "",
-    is_login: false,
-    pulling_info: true,
-  }),
-  mutations: {
-    updateUser(state, user) {
-      state.id = user.id;
-      state.username = user.username;
-      state.photo = user.photo;
-      state.is_login = user.is_login;
-    },
-    updateToken(state, token) {
-      state.token = token;
-    },
-    updatePhoto(state, photoUrl) {
-      state.photo = photoUrl;
-    },
-    updateUsername(state, newUsername) {
-      state.username = newUsername;
-    },
-    logout(state) {
-      state.id = "";
-      state.photo = "";
-      state.username = "";
-      state.token = "";
-      state.is_login = false;
-    },
-    updatePullingInfo(state, pullingInfo) {
-      state.pulling_info = pullingInfo;
-    },
-  },
+const createDefaultState = () => ({
+  id: "",
+  username: "",
+  photo: "",
+  token: "",
+  is_login: false,
+  pulling_info: true,
+});
+
+export const useUserStore = defineStore("user", {
+  state: createDefaultState,
   actions: {
-    async login({ commit }, { username, password }) {
+    updateUser(user) {
+      this.id = user.id;
+      this.username = user.username;
+      this.photo = user.photo;
+      this.is_login = user.is_login;
+    },
+    updateToken(token) {
+      this.token = token;
+    },
+    updatePhoto(photoUrl) {
+      this.photo = photoUrl;
+    },
+    updateUsername(newUsername) {
+      this.username = newUsername;
+    },
+    clearUserSession() {
+      this.id = "";
+      this.photo = "";
+      this.username = "";
+      this.token = "";
+      this.is_login = false;
+    },
+    updatePullingInfo(pullingInfo) {
+      this.pulling_info = pullingInfo;
+    },
+    async login({ username, password }) {
       const resp = await apiRequest(API_PATHS.login, {
         method: "POST",
         data: { username, password },
@@ -49,49 +50,46 @@ export default {
       }
 
       localStorage.setItem("jwt_token", resp.token);
-      commit("updateToken", resp.token);
+      this.updateToken(resp.token);
       return resp;
     },
-
-    async getinfo({ commit, state }) {
+    async getinfo() {
       const resp = await apiRequest(API_PATHS.userInfo, {
-        token: state.token,
+        token: this.token,
       });
 
       if (resp.error_message !== "success") {
         throw new Error(resp.error_message || "Get info failed");
       }
 
-      commit("updateUser", {
+      this.updateUser({
         ...resp,
         is_login: true,
       });
       return resp;
     },
-
-    logout({ commit }) {
+    logout() {
       localStorage.removeItem("jwt_token");
-      commit("logout");
+      this.clearUserSession();
     },
-
-    async initAuth({ commit, dispatch }) {
+    async initAuth() {
       const token = localStorage.getItem("jwt_token");
       if (!token) {
-        commit("updatePullingInfo", false);
+        this.updatePullingInfo(false);
         return false;
       }
 
-      commit("updateToken", token);
+      this.updateToken(token);
       try {
-        await dispatch("getinfo");
+        await this.getinfo();
         return true;
       } catch (error) {
         localStorage.removeItem("jwt_token");
-        commit("logout");
+        this.clearUserSession();
         return false;
       } finally {
-        commit("updatePullingInfo", false);
+        this.updatePullingInfo(false);
       }
     },
   },
-};
+});

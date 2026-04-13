@@ -1,4 +1,6 @@
-﻿export default {
+import { defineStore } from "pinia";
+
+export const usePkStore = defineStore("pk", {
   state: () => ({
     status: "matching",
     socket: null,
@@ -17,38 +19,38 @@
     isPaused: false,
     pausedByUserId: null,
   }),
-  mutations: {
-    updateSocket(state, socket) {
-      state.socket = socket;
+  actions: {
+    updateSocket(socket) {
+      this.socket = socket;
     },
-    updateOpponent(state, opponent) {
-      state.opponent_username = opponent.username;
-      state.opponent_photo = opponent.photo;
+    updateOpponent(opponent) {
+      this.opponent_username = opponent.username;
+      this.opponent_photo = opponent.photo;
     },
-    updateStatus(state, status) {
-      state.status = status;
+    updateStatus(status) {
+      this.status = status;
     },
-    updateGame(state, game) {
-      state.gamemap = game.map;
-      state.a_id = game.a_id;
-      state.a_sx = game.a_sx;
-      state.a_sy = game.a_sy;
-      state.b_id = game.b_id;
-      state.b_sx = game.b_sx;
-      state.b_sy = game.b_sy;
+    updateGame(game) {
+      this.gamemap = game.map;
+      this.a_id = game.a_id;
+      this.a_sx = game.a_sx;
+      this.a_sy = game.a_sy;
+      this.b_id = game.b_id;
+      this.b_sx = game.b_sx;
+      this.b_sy = game.b_sy;
     },
-    updateGameObject(state, gameObject) {
-      state.gameObject = gameObject;
+    updateGameObject(gameObject) {
+      this.gameObject = gameObject;
     },
-    updateLoser(state, loser) {
-      state.loser = loser;
+    updateLoser(loser) {
+      this.loser = loser;
     },
-    updateRoomId(state, roomId) {
-      state.roomId = roomId;
+    updateRoomId(roomId) {
+      this.roomId = roomId;
     },
-    updatePaused(state, { isPaused, pausedByUserId }) {
-      state.isPaused = isPaused;
-      state.pausedByUserId = pausedByUserId ?? null;
+    updatePaused({ isPaused, pausedByUserId }) {
+      this.isPaused = isPaused;
+      this.pausedByUserId = pausedByUserId ?? null;
     },
   },
-};
+});

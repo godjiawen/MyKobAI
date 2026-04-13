@@ -1,20 +1,22 @@
-﻿export default {
+import { defineStore } from "pinia";
+
+export const useRecordStore = defineStore("record", {
   state: () => ({
     is_record: false,
     a_steps: "",
     b_steps: "",
     record_loser: "",
   }),
-  mutations: {
-    updateIsRecord(state, isRecord) {
-      state.is_record = isRecord;
+  actions: {
+    updateIsRecord(isRecord) {
+      this.is_record = isRecord;
     },
-    updateSteps(state, data) {
-      state.a_steps = data.a_steps;
-      state.b_steps = data.b_steps;
+    updateSteps(data) {
+      this.a_steps = data.a_steps;
+      this.b_steps = data.b_steps;
     },
-    updateRecordLoser(state, loser) {
-      state.record_loser = loser;
+    updateRecordLoser(loser) {
+      this.record_loser = loser;
     },
   },
-};
+});

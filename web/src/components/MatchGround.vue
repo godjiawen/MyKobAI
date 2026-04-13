@@ -1,11 +1,11 @@
-﻿<template>
+<template>
   <div class="matchground">
     <div class="row">
       <div class="col-4">
         <div class="user-photo">
-          <img :src="store.state.user.photo" alt="" />
+          <img :src="userStore.photo" alt="" />
         </div>
-        <div class="user-username">{{ store.state.user.username }}</div>
+        <div class="user-username">{{ userStore.username }}</div>
       </div>
       <div class="col-4">
         <div class="user-select-bot">
@@ -19,9 +19,9 @@
       </div>
       <div class="col-4">
         <div class="user-photo">
-          <img :src="store.state.pk.opponent_photo" alt="" />
+          <img :src="pkStore.opponent_photo" alt="" />
         </div>
-        <div class="user-username">{{ store.state.pk.opponent_username }}</div>
+        <div class="user-username">{{ pkStore.opponent_username }}</div>
       </div>
       <div class="col-12" style="text-align: center; padding-top: 15vh;">
         <button @click="toggleMatch" type="button" class="btn btn-warning btn-lg">
@@ -34,11 +34,13 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
+import { usePkStore } from "@/store/pk";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
-const store = useStore();
+const userStore = useUserStore();
+const pkStore = usePkStore();
 const bots = ref([]);
 const selectedBot = ref("-1");
 const matchButtonText = ref("Start Matching");
@@ -46,7 +48,7 @@ const matchButtonText = ref("Start Matching");
 const refreshBots = async () => {
   try {
     bots.value = await apiRequest(API_PATHS.botList, {
-      token: store.state.user.token,
+      token: userStore.token,
     });
   } catch (error) {
     console.error(error);
@@ -54,7 +56,7 @@ const refreshBots = async () => {
 };
 
 const toggleMatch = () => {
-  const socket = store.state.pk.socket;
+  const socket = pkStore.socket;
   if (!socket) return;
 
   if (matchButtonText.value === "Start Matching") {
@@ -147,3 +149,4 @@ div.user-select-bot > select {
   }
 }
 </style>
+

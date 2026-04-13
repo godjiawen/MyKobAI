@@ -51,7 +51,7 @@
 
 <script setup>
 import { ref, computed, watch, onUnmounted, nextTick } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
 import { buildChatWebSocketUrl } from "@/config/env";
 
 const props = defineProps({
@@ -59,7 +59,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["activity-change"]);
 
-const store = useStore();
+const userStore = useUserStore();
 const messages = ref([]);
 const inputText = ref("");
 const messagesEl = ref(null);
@@ -68,7 +68,7 @@ const isConnected = ref(false);
 let socket = null;
 let blurTimer = null;
 
-const currentUserId = computed(() => Number.parseInt(store.state.user.id, 10));
+const currentUserId = computed(() => Number.parseInt(userStore.id, 10));
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -119,7 +119,7 @@ const connectChat = (roomId) => {
   disconnectChat();
   if (!roomId) return;
 
-  const token = store.state.user.token;
+  const token = userStore.token;
   if (!token) return;
 
   socket = new WebSocket(buildChatWebSocketUrl(token, roomId));
@@ -155,7 +155,7 @@ const sendMessage = () => {
   socket.send(
     JSON.stringify({
       content,
-      username: store.state.user.username,
+      username: userStore.username,
     })
   );
   inputText.value = "";
@@ -345,4 +345,5 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 </style>
+
 

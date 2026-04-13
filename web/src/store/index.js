@@ -1,12 +1,5 @@
-﻿import { createStore } from "vuex";
-import user from "./user";
-import pk from "./pk";
-import record from "./record";
+import { createPinia } from "pinia";
 
-export default createStore({
-  modules: {
-    user,
-    pk,
-    record,
-  },
-});
+const pinia = createPinia();
+
+export default pinia;

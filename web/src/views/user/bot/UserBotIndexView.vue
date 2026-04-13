@@ -1,17 +1,17 @@
-﻿<template>
+<template>
   <div class="container bot-page">
     <div class="row g-3">
       <div class="col-lg-3 col-md-4">
         <div class="card bot-profile-card">
           <div class="card-body photo-section">
             <div class="avatar-wrap" @click="triggerUpload">
-              <img :src="store.state.user.photo" alt="avatar" class="profile-avatar" />
+              <img :src="userStore.photo" alt="avatar" class="profile-avatar" />
               <div class="avatar-overlay">
                 <span v-if="!uploading">Click to change</span>
                 <span v-else>Uploading...</span>
               </div>
             </div>
-            <p class="profile-name">{{ store.state.user.username }}</p>
+            <p class="profile-name">{{ userStore.username }}</p>
             <div class="profile-actions mt-3">
               <button class="btn btn-sm btn-outline-primary mb-2 w-100" @click="openModal(usernameModalRef)">Modify Username</button>
               <button class="btn btn-sm btn-outline-warning w-100" @click="openModal(passwordModalRef)">Modify Password</button>
@@ -162,18 +162,30 @@
         </div>
       </div>
     </div>
+
+    <AppDialog
+      v-model="dialogState.visible"
+      :title="dialogState.title"
+      :message="dialogState.message"
+      :confirm-text="dialogState.confirmText"
+      :cancel-text="dialogState.cancelText"
+      :show-cancel="dialogState.showCancel"
+      @confirm="handleDialogConfirm"
+      @cancel="handleDialogCancel"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
 import { useRouter } from "vue-router";
 import Modal from "bootstrap/js/dist/modal";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
+import AppDialog from "@/components/AppDialog.vue";
 
-// 引入 vue3-ace-editor 及其依赖
+// Import vue3-ace-editor and its dependencies
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-java';
 import 'ace-builds/src-noconflict/mode-python';
@@ -181,19 +193,27 @@ import 'ace-builds/src-noconflict/mode-c_cpp';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-chrome';
 
-const store = useStore();
+const userStore = useUserStore();
 const router = useRouter();
-const authToken = () => store.state.user.token;
+const authToken = () => userStore.token;
 
 const bots = ref([]);
-const isSubmitting = ref(false); // 全局的加载状态保护
-
-// --- DOM 引用映射 ---
+const isSubmitting = ref(false); // global loading guard
+// --- DOM ref map ---
 const botModalRef = ref(null);
 const usernameModalRef = ref(null);
 const passwordModalRef = ref(null);
+const dialogState = reactive({
+  visible: false,
+  title: "",
+  message: "",
+  confirmText: "OK",
+  cancelText: "Cancel",
+  showCancel: false,
+});
+let dialogResolver = null;
 
-// 安全地获取和控制 Bootstrap Modal 实例
+// Bootstrap Modal instance helpers
 const openModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).show();
 };
@@ -201,7 +221,33 @@ const closeModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).hide();
 };
 
-// --- Bot 草稿数据管理 ---
+const openDialog = ({
+  title = "Notice",
+  message = "",
+  confirmText = "OK",
+  cancelText = "Cancel",
+  showCancel = false,
+} = {}) => new Promise((resolve) => {
+  dialogState.title = title;
+  dialogState.message = message;
+  dialogState.confirmText = confirmText;
+  dialogState.cancelText = cancelText;
+  dialogState.showCancel = showCancel;
+  dialogState.visible = true;
+  dialogResolver = resolve;
+});
+
+const settleDialog = (result) => {
+  dialogState.visible = false;
+  const resolve = dialogResolver;
+  dialogResolver = null;
+  if (resolve) resolve(result);
+};
+
+const handleDialogConfirm = () => settleDialog(true);
+const handleDialogCancel = () => settleDialog(false);
+
+// --- Bot draft data management ---
 const botDraft = reactive({
   id: null,
   title: "",
@@ -211,7 +257,7 @@ const botDraft = reactive({
   error_message: "",
 });
 
-// 计算 Ace Editor 需要的语言标识映射
+// Compute the Ace Editor language mode identifier
 const aceLang = computed(() => {
   const map = { cpp: 'c_cpp', java: 'java', python: 'python', javascript: 'javascript' };
   return map[botDraft.language] || 'java';
@@ -225,10 +271,13 @@ const accountDraft = reactive({
 const fileInput = ref(null);
 const uploading = ref(false);
 
-// --- 初始化与获取数据 ---
+// --- Initialization and data fetching ---
 const refreshBots = async () => {
   try {
-    bots.value = await apiRequest(API_PATHS.botList, { token: authToken() });
+    bots.value = await apiRequest(API_PATHS.botList, {
+      token: authToken(),
+      query: { _: Date.now() }, // avoid browser/proxy returning cached list
+    });
   } catch (error) {
     console.error("Failed to load bots", error);
   }
@@ -238,13 +287,13 @@ onMounted(() => {
   refreshBots();
 });
 
-// --- Bot 业务逻辑 ---
+// --- Bot business logic ---
 const openBotModal = (bot = null) => {
   if (bot) {
-    // 编辑模式：深拷贝当前 bot 数据给草稿
+    // Edit mode: copy current bot data into draft
     Object.assign(botDraft, { ...bot, error_message: "" });
   } else {
-    // 新建模式：重置草稿并填充模板代码
+    // New bot mode: reset draft and fill template code
     Object.assign(botDraft, {
       id: null, title: "", description: "", language: "java", error_message: "",
       content: codePlaceholder("java")
@@ -256,7 +305,7 @@ const openBotModal = (bot = null) => {
 const saveBot = async () => {
   botDraft.error_message = "";
 
-  // 1. 前端基础校验
+  // 1. Front-end validation
   if (!botDraft.title.trim()) return botDraft.error_message = "Title cannot be empty.";
   if (!botDraft.content.trim()) return botDraft.error_message = "Code cannot be empty.";
 
@@ -282,14 +331,21 @@ const saveBot = async () => {
       return;
     }
 
-    // 2. 优化：如果为编辑模式，执行本地（乐观）UI更新，省去重新拉取全量接口的时间
+    // 2. UI update: for edit mode do an optimistic local update to avoid a full list re-fetch.
+    //    For create mode, show a temporary entry immediately then replace with server data.
     if (isEdit) {
-      const index = bots.value.findIndex(b => b.id === botDraft.id);
+      const index = bots.value.findIndex((b) => b.id === botDraft.id);
       if (index !== -1) {
         bots.value[index] = { ...bots.value[index], ...payload };
       }
     } else {
-      // 新增模式：因为需要后端的 bot id 和创建时间，所以执行列表刷新
+      // Show optimistic entry immediately, then fetch real list (with real id/createtime from server)
+      const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+      bots.value = [{
+        id: `tmp-${Date.now()}`,
+        ...payload,
+        createtime: now,
+      }, ...bots.value];
       await refreshBots();
     }
 
@@ -302,7 +358,14 @@ const saveBot = async () => {
 };
 
 const removeBot = async (bot) => {
-  if (!confirm(`Are you sure you want to delete bot "${bot.title}"?`)) return;
+  const confirmed = await openDialog({
+    title: "Delete Bot",
+    message: `Are you sure you want to delete bot "${bot.title}"?`,
+    confirmText: "Delete",
+    cancelText: "Cancel",
+    showCancel: true,
+  });
+  if (!confirmed) return;
 
   try {
     const resp = await apiRequest(API_PATHS.botRemove, {
@@ -310,17 +373,23 @@ const removeBot = async (bot) => {
     });
 
     if (resp.error_message === "success") {
-      // 优化：本地剔除数据，瞬间响应 UI，不重新请求列表
-      bots.value = bots.value.filter(b => b.id !== bot.id);
+      bots.value = bots.value.filter((b) => b.id !== bot.id);
     } else {
-      alert(resp.error_message || "Delete failed");
+      await openDialog({
+        title: "Delete Failed",
+        message: resp.error_message || "Delete failed",
+      });
     }
   } catch (error) {
     console.error(error);
+    await openDialog({
+      title: "Delete Failed",
+      message: "Delete request failed. Please try again.",
+    });
   }
 };
 
-// --- 用户资料业务逻辑 ---
+// --- User profile business logic ---
 const triggerUpload = () => {
   if (fileInput.value) fileInput.value.click();
 };
@@ -330,8 +399,20 @@ const uploadAvatar = async (event) => {
   if (!file) return;
 
   const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-  if (!validTypes.includes(file.type)) return alert("只能上传 JPG/PNG 格式的图片");
-  if (file.size > 5 * 1024 * 1024) return alert("图片大小不能超过 5MB");
+  if (!validTypes.includes(file.type)) {
+    await openDialog({
+      title: "Invalid File Type",
+      message: "Only JPG/PNG files are allowed.",
+    });
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    await openDialog({
+      title: "File Too Large",
+      message: "Image size must be less than 5MB.",
+    });
+    return;
+  }
 
   const formData = new FormData();
   formData.append("file", file);
@@ -342,12 +423,18 @@ const uploadAvatar = async (event) => {
       method: "POST", token: authToken(), data: formData,
     });
     if (resp.error_message === "success") {
-      store.commit("updatePhoto", resp.photo);
+      userStore.updatePhoto(resp.photo);
     } else {
-      alert(resp.error_message || "上传失败");
+      await openDialog({
+        title: "Upload Failed",
+        message: resp.error_message || "Upload failed",
+      });
     }
   } catch (error) {
-    alert("头像上传失败");
+    await openDialog({
+      title: "Upload Failed",
+      message: "Avatar upload failed. Please try again.",
+    });
   } finally {
     uploading.value = false;
     if (fileInput.value) fileInput.value.value = "";
@@ -356,17 +443,22 @@ const uploadAvatar = async (event) => {
 
 const updateUsername = async () => {
   accountDraft.username_error = "";
-  if (!accountDraft.new_username.trim()) return accountDraft.username_error = "Username cannot be empty";
+  const newUsername = accountDraft.new_username.trim();
+  if (!newUsername) return accountDraft.username_error = "Username cannot be empty";
 
   isSubmitting.value = true;
   try {
     const resp = await apiRequest(API_PATHS.updateUsername, {
-      method: "POST", token: authToken(), data: { new_username: accountDraft.new_username },
+      method: "POST", token: authToken(), data: { new_username: newUsername },
     });
     if (resp.error_message === "success") {
-      store.commit("updateUsername", accountDraft.new_username);
+      userStore.updateUsername(newUsername);
       accountDraft.new_username = "";
       closeModal(usernameModalRef.value);
+      await openDialog({
+        title: "Username Updated",
+        message: "Username updated successfully.",
+      });
     } else {
       accountDraft.username_error = resp.error_message;
     }
@@ -394,8 +486,11 @@ const updatePassword = async () => {
     });
     if (resp.error_message === "success") {
       closeModal(passwordModalRef.value);
-      alert("Password updated successfully! Please login again.");
-      store.dispatch("logout");
+      await openDialog({
+        title: "Password Updated",
+        message: "Password updated successfully! Please login again.",
+      });
+      await userStore.logout();
       await router.push({ name: "user_account_login" });
     } else {
       accountDraft.password_error = resp.error_message;
@@ -407,7 +502,7 @@ const updatePassword = async () => {
   }
 };
 
-// 预设代码模板配置
+// Preset code template configuration
 const codePlaceholder = (lang) => {
   const map = {
     java: `import java.util.Scanner;\nimport java.io.File;\n\npublic class Bot implements java.util.function.Supplier<Integer> {\n    @Override\n    public Integer get() {\n        // Return direction: 0=Up, 1=Right, 2=Down, 3=Left\n        return 0;\n    }\n}`,
@@ -448,7 +543,7 @@ const codePlaceholder = (lang) => {
 .modal-header .btn-close { filter: none; }
 .error-message { color: #e74c3c; min-height: 20px;}
 
-/* 语言徽章 */
+/* Language badges */
 .lang-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.4px; }
 .lang-java       { background: rgba(237, 129, 50, 0.15); color: #c25a00; }
 .lang-python     { background: rgba(55, 118, 171, 0.15); color: #1e6fa6; }

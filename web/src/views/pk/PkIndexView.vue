@@ -1,67 +1,71 @@
-﻿<template>
-  <PlayGround v-if="store.state.pk.status === 'playing'" />
-  <MatchGround v-if="store.state.pk.status === 'matching'" />
-  <ResultBoard v-if="store.state.pk.loser !== 'none'" />
+<template>
+  <PlayGround v-if="pkStore.status === 'playing'" />
+  <MatchGround v-if="pkStore.status === 'matching'" />
+  <ResultBoard v-if="pkStore.loser !== 'none'" />
   <div class="user-color" v-if="isAPlayer" @mousedown.stop>Bottom Left</div>
   <div class="user-color" v-if="isBPlayer" @mousedown.stop>Top Right</div>
 </template>
 
 <script setup>
 import { computed, onMounted, onUnmounted } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
+import { usePkStore } from "@/store/pk";
+import { useRecordStore } from "@/store/record";
 import MatchGround from "@/components/MatchGround.vue";
 import PlayGround from "@/components/PlayGround.vue";
 import ResultBoard from "@/components/ResultBoard.vue";
 import { buildWebSocketUrl } from "@/config/env";
 
-const store = useStore();
+const userStore = useUserStore();
+const pkStore = usePkStore();
+const recordStore = useRecordStore();
 
 let socket = null;
 
-const currentUserId = computed(() => Number.parseInt(store.state.user.id, 10));
+const currentUserId = computed(() => Number.parseInt(userStore.id, 10));
 const isAPlayer = computed(
-  () => store.state.pk.status === "playing" && currentUserId.value === Number.parseInt(store.state.pk.a_id, 10)
+  () => pkStore.status === "playing" && currentUserId.value === Number.parseInt(pkStore.a_id, 10)
 );
 const isBPlayer = computed(
-  () => store.state.pk.status === "playing" && currentUserId.value === Number.parseInt(store.state.pk.b_id, 10)
+  () => pkStore.status === "playing" && currentUserId.value === Number.parseInt(pkStore.b_id, 10)
 );
 
 onMounted(() => {
-  store.commit("updateLoser", "none");
-  store.commit("updateIsRecord", false);
-  store.commit("updatePaused", { isPaused: false, pausedByUserId: null });
-  store.commit("updateOpponent", {
+  pkStore.updateLoser("none");
+  recordStore.updateIsRecord(false);
+  pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
+  pkStore.updateOpponent({
     username: "My Opponent",
     photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png",
   });
 
-  const token = store.state.user.token;
+  const token = userStore.token;
   if (!token) return;
 
   socket = new WebSocket(buildWebSocketUrl(token));
 
   socket.onopen = () => {
-    store.commit("updateSocket", socket);
+    pkStore.updateSocket(socket);
   };
 
   socket.onmessage = (msg) => {
     const data = JSON.parse(msg.data);
 
     if (data.event === "start-matching") {
-      store.commit("updateOpponent", {
+      pkStore.updateOpponent({
         username: data.opponent_username,
         photo: data.opponent_photo,
       });
-      store.commit("updateRoomId", data.room_id || "");
+      pkStore.updateRoomId(data.room_id || "");
       setTimeout(() => {
-        store.commit("updateStatus", "playing");
+        pkStore.updateStatus("playing");
       }, 200);
-      store.commit("updateGame", data.game);
+      pkStore.updateGame(data.game);
       return;
     }
 
     if (data.event === "move") {
-      const game = store.state.pk.gameObject;
+      const game = pkStore.gameObject;
       if (!game) return;
       const [snake0, snake1] = game.snakes;
       snake0.set_direction(data.a_direction);
@@ -70,17 +74,17 @@ onMounted(() => {
     }
 
     if (data.event === "result") {
-      const game = store.state.pk.gameObject;
+      const game = pkStore.gameObject;
       if (!game) return;
       const [snake0, snake1] = game.snakes;
       if (data.loser === "all" || data.loser === "A") snake0.status = "die";
       if (data.loser === "all" || data.loser === "B") snake1.status = "die";
-      store.commit("updateLoser", data.loser);
+      pkStore.updateLoser(data.loser);
       return;
     }
 
     if (data.event === "game-paused") {
-      store.commit("updatePaused", {
+      pkStore.updatePaused({
         isPaused: true,
         pausedByUserId: data.paused_by,
       });
@@ -88,13 +92,13 @@ onMounted(() => {
     }
 
     if (data.event === "game-resumed") {
-      store.commit("updatePaused", { isPaused: false, pausedByUserId: null });
+      pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
       return;
     }
   };
 
   socket.onclose = () => {
-    store.commit("updateSocket", null);
+    pkStore.updateSocket(null);
   };
 });
 
@@ -112,11 +116,11 @@ onUnmounted(() => {
     console.error("pk socket cleanup error:", error);
   } finally {
     socket = null;
-    store.commit("updateSocket", null);
-    store.commit("updateLoser", "none");
-    store.commit("updateStatus", "matching");
-    store.commit("updateRoomId", "");
-    store.commit("updatePaused", { isPaused: false, pausedByUserId: null });
+    pkStore.updateSocket(null);
+    pkStore.updateLoser("none");
+    pkStore.updateStatus("matching");
+    pkStore.updateRoomId("");
+    pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
   }
 });
 </script>
@@ -149,3 +153,4 @@ div.user-color {
   }
 }
 </style>
+

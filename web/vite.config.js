@@ -17,7 +17,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          "vue-vendor": ["vue", "vue-router", "vuex"],
+          "vue-vendor": ["vue", "vue-router", "pinia"],
           "ui-vendor": ["bootstrap", "@popperjs/core"],
           "editor-vendor": ["ace-builds", "vue3-ace-editor"],
         },
@@ -25,3 +25,4 @@ export default defineConfig({
     },
   },
 });
+

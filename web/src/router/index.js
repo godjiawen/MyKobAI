@@ -1,5 +1,6 @@
-﻿import { createRouter, createWebHistory } from "vue-router";
-import store from "@/store";
+import { createRouter, createWebHistory } from "vue-router";
+import pinia from "@/store";
+import { useUserStore } from "@/store/user";
 
 const routes = [
   {
@@ -66,11 +67,12 @@ const router = createRouter({
 
 let authInitialized = false;
 let authInitPromise = null;
+const userStore = useUserStore(pinia);
 
 router.beforeEach(async (to) => {
   if (!authInitialized) {
     if (!authInitPromise) {
-      authInitPromise = store.dispatch("initAuth").finally(() => {
+      authInitPromise = userStore.initAuth().finally(() => {
         authInitialized = true;
         authInitPromise = null;
       });
@@ -78,7 +80,7 @@ router.beforeEach(async (to) => {
     await authInitPromise;
   }
 
-  if (to.meta.requiresAuth && !store.state.user.is_login) {
+  if (to.meta.requiresAuth && !userStore.is_login) {
     return { name: "user_account_login" };
   }
 
@@ -86,3 +88,4 @@ router.beforeEach(async (to) => {
 });
 
 export default router;
+

@@ -34,3 +34,9 @@ pnpm-debug.log*
 # Temp
 *.tmp
 *.swp
+
+# Test code
+**/tests/
+**/__tests__/
+*.test.*
+*.spec.*

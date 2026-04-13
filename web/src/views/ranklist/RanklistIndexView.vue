@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ContentField>
     <section class="list-panel">
       <div class="panel-header">
@@ -47,12 +47,12 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
 import ContentField from "@/components/ContentField.vue";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
-const store = useStore();
+const userStore = useUserStore();
 
 const users = ref([]);
 const pages = ref([]);
@@ -85,7 +85,7 @@ const pullPage = async (page) => {
   try {
     const resp = await apiRequest(API_PATHS.ranklist, {
       data: { page },
-      token: store.state.user.token,
+      token: userStore.token,
     });
     users.value = Array.isArray(resp.users) ? resp.users : [];
     totalUsers = resp.users_count || 0;
@@ -167,3 +167,4 @@ img.record-user-photo {
   color: var(--kob-muted);
 }
 </style>
+

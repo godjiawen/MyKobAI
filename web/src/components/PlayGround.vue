@@ -1,10 +1,10 @@
-﻿<template>
+<template>
   <!-- @mousedown.stop 阻止冒泡到 document，只有点到 battle-area 外才触发暂离 -->
-  <div :class="['battle-area', { 'battle-area--record': store.state.record.is_record }]" @mousedown.stop>
+  <div :class="['battle-area', { 'battle-area--record': recordStore.is_record }]" @mousedown.stop>
     <div class="playground">
       <GameMap />
       <!-- 暂离遮罩 -->
-      <div v-if="store.state.pk.isPaused" class="pause-overlay">
+      <div v-if="pkStore.isPaused" class="pause-overlay">
         <div class="pause-panel">
           <div class="pause-icon">⏸</div>
           <template v-if="isPausedByMe">
@@ -20,8 +20,8 @@
       </div>
     </div>
     <ChatBox
-      v-if="!store.state.record.is_record"
-      :roomId="store.state.pk.roomId"
+      v-if="!recordStore.is_record"
+      :roomId="pkStore.roomId"
       @activity-change="handleChatActivityChange"
     />
   </div>
@@ -29,37 +29,41 @@
 
 <script setup>
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
+import { usePkStore } from "@/store/pk";
+import { useRecordStore } from "@/store/record";
 import GameMap from "@/components/GameMap.vue";
 import ChatBox from "@/components/ChatBox.vue";
 
-const store = useStore();
+const userStore = useUserStore();
+const pkStore = usePkStore();
+const recordStore = useRecordStore();
 
 const isPausedByMe = computed(
   () =>
-    store.state.pk.isPaused &&
-    store.state.pk.pausedByUserId === Number.parseInt(store.state.user.id, 10)
+    pkStore.isPaused &&
+    pkStore.pausedByUserId === Number.parseInt(userStore.id, 10)
 );
 
 const resumeGame = () => {
-  const socket = store.state.pk.socket;
+  const socket = pkStore.socket;
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify({ event: "resume" }));
   }
 };
 
 const handleChatActivityChange = (active) => {
-  const socket = store.state.pk.socket;
+  const socket = pkStore.socket;
   if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
   if (active) {
-    if (!store.state.pk.isPaused && store.state.pk.loser === "none") {
+    if (!pkStore.isPaused && pkStore.loser === "none") {
       socket.send(JSON.stringify({ event: "pause" }));
     }
     return;
   }
 
-  if (isPausedByMe.value && store.state.pk.loser === "none") {
+  if (isPausedByMe.value && pkStore.loser === "none") {
     socket.send(JSON.stringify({ event: "resume" }));
   }
 };
@@ -169,3 +173,4 @@ div.playground {
   height: clamp(400px, 68vh, 720px);
 }
 </style>
+

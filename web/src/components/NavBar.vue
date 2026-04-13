@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <nav class="navbar navbar-expand-lg kob-navbar">
     <div class="container">
       <router-link class="navbar-brand kob-brand" :to="{ name: 'home' }">
@@ -28,14 +28,14 @@
             <router-link :class="routeName === 'ranklist_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'ranklist_index' }">Ranklist</router-link>
           </li>
         </ul>
-        <ul class="navbar-nav" v-if="store.state.user.is_login">
+        <ul class="navbar-nav" v-if="userStore.is_login">
           <li ref="userMenuRef" class="nav-item user-menu">
             <button
               class="nav-link kob-user-chip user-menu-trigger"
               type="button"
               @click="toggleUserMenu"
             >
-              {{ store.state.user.username }}
+              {{ userStore.username }}
             </button>
             <ul v-show="isUserMenuOpen" class="kob-dropdown-menu">
               <li>
@@ -46,7 +46,7 @@
             </ul>
           </li>
         </ul>
-        <ul class="navbar-nav" v-else-if="!store.state.user.pulling_info">
+        <ul class="navbar-nav" v-else-if="!userStore.pulling_info">
           <li class="nav-item">
             <router-link class="nav-link kob-link" :to="{ name: 'user_account_login' }" role="button">
               Log In
@@ -66,9 +66,9 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { useUserStore } from "@/store/user";
 
-const store = useStore();
+const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -98,7 +98,7 @@ const goMyBots = async () => {
 
 const logout = async () => {
   closeUserMenu();
-  await store.dispatch("logout");
+  await userStore.logout();
   await router.push({ name: "user_account_login" });
 };
 
@@ -209,3 +209,4 @@ onBeforeUnmount(() => {
   color: var(--kob-accent-strong);
 }
 </style>
+
