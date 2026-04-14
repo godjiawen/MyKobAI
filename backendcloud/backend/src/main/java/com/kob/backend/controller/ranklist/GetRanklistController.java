@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * 控制器，负责接收请求并调用服务层。
+ */
 @RestController
 public class GetRanklistController {
     @Autowired

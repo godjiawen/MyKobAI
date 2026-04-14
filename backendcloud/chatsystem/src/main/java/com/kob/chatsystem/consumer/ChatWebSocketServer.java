@@ -12,20 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * In-game chat WebSocket endpoint.
- * URL: /chat/{token}/{roomId}
+ * 对局聊天 WebSocket 端点。
+ * 地址：/chat/{token}/{roomId}
  *
- * roomId convention: "{min(aId, bId)}_{max(aId, bId)}"  – set by the backend when the game starts.
- * Auth:              JWT token in path – userId extracted, username comes from client messages.
+ * roomId 约定为 "{min(aId, bId)}_{max(aId, bId)}"，由后端在开局时下发。
+ * 鉴权方式：路径中携带令牌，服务端解析 userId，用户名由客户端消息提供。
  *
- * Inbound message  : { "content": "...", "username": "..." }
- * Outbound message : { "userId": 1, "username": "...", "content": "...", "timestamp": 1234567890 }
+ * 入站消息：{ "content": "...", "username": "..." }
+ * 出站消息：{ "userId": 1, "username": "...", "content": "...", "timestamp": 1234567890 }
  */
 @Component
 @ServerEndpoint("/chat/{token}/{roomId}")
 public class ChatWebSocketServer {
 
-    /** roomId → set of connected sessions in that room */
+    /** roomId 到该房间连接集合的映射 */
     private static final ConcurrentHashMap<String, CopyOnWriteArraySet<ChatWebSocketServer>> rooms =
             new ConcurrentHashMap<>();
 
@@ -33,7 +33,7 @@ public class ChatWebSocketServer {
     private String  roomId;
     private Integer userId;
 
-    // ------------------------------------------------------------------ lifecycle
+    // 连接生命周期
 
     @OnOpen
     public void onOpen(Session session,
@@ -77,7 +77,7 @@ public class ChatWebSocketServer {
         error.printStackTrace();
     }
 
-    // ------------------------------------------------------------------ messaging
+    // 消息收发
 
     @OnMessage
     public void onMessage(String message, Session session) {

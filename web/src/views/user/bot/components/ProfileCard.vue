@@ -1,17 +1,18 @@
+<!-- 界面组件。 -->
 <template>
   <div class="card bot-profile-card">
     <div class="card-body photo-section">
       <div class="avatar-wrap" @click="triggerUpload">
         <img :src="userStore.photo" alt="avatar" class="profile-avatar" />
         <div class="avatar-overlay">
-          <span v-if="!uploading">Click to change</span>
-          <span v-else>Uploading...</span>
+          <span v-if="!uploading">点击更换头像</span>
+          <span v-else>上传中...</span>
         </div>
       </div>
       <p class="profile-name">{{ userStore.username }}</p>
       <div class="profile-actions mt-3">
-        <button class="btn btn-sm btn-outline-primary mb-2 w-100" @click="openModal(usernameModalRef)">Modify Username</button>
-        <button class="btn btn-sm btn-outline-warning w-100" @click="openModal(passwordModalRef)">Modify Password</button>
+        <button class="btn btn-sm btn-outline-primary mb-2 w-100" @click="openModal(usernameModalRef)">修改用户名</button>
+        <button class="btn btn-sm btn-outline-warning w-100" @click="openModal(passwordModalRef)">修改密码</button>
       </div>
       <input type="file" ref="fileInput" @change="uploadAvatar" accept="image/png, image/jpeg, image/jpg" style="display: none;" />
     </div>
@@ -21,19 +22,19 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Modify Username</h5>
+          <h5 class="modal-title">修改用户名</h5>
           <button type="button" class="btn-close" @click="closeModal(usernameModalRef)"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">New Username</label>
-            <input v-model="accountDraft.new_username" type="text" class="form-control" placeholder="6-12 characters, letters/numbers/underscores" />
+            <label class="form-label">新用户名</label>
+            <input v-model="accountDraft.new_username" type="text" class="form-control" placeholder="6-12位，字母/数字/下划线" />
           </div>
           <div class="error-message">{{ accountDraft.username_error }}</div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="updateUsername" :disabled="isSubmitting">Save</button>
-          <button type="button" class="btn btn-secondary" @click="closeModal(usernameModalRef)">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="updateUsername" :disabled="isSubmitting">保存</button>
+          <button type="button" class="btn btn-secondary" @click="closeModal(usernameModalRef)">取消</button>
         </div>
       </div>
     </div>
@@ -43,28 +44,28 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Modify Password</h5>
+          <h5 class="modal-title">修改密码</h5>
           <button type="button" class="btn-close" @click="closeModal(passwordModalRef)"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Current Password</label>
-            <input v-model="accountDraft.old_password" type="password" class="form-control" placeholder="Enter current password" />
+            <label class="form-label">当前密码</label>
+            <input v-model="accountDraft.old_password" type="password" class="form-control" placeholder="请输入当前密码" />
           </div>
           <div class="mb-3">
-            <label class="form-label">New Password</label>
-            <input v-model="accountDraft.new_password" type="password" class="form-control" placeholder="Enter new password" />
-            <div class="form-text">8-16 chars, include at least 3: Uppercase, Lowercase, Number, Symbol.</div>
+            <label class="form-label">新密码</label>
+            <input v-model="accountDraft.new_password" type="password" class="form-control" placeholder="请输入新密码" />
+            <div class="form-text">8-16位，至少包含大写字母/小写字母/数字/特殊字符中的两类。</div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Confirm New Password</label>
-            <input v-model="accountDraft.confirmed_password" type="password" class="form-control" placeholder="Confirm new password" />
+            <label class="form-label">确认新密码</label>
+            <input v-model="accountDraft.confirmed_password" type="password" class="form-control" placeholder="请再次输入新密码" />
           </div>
           <div class="error-message">{{ accountDraft.password_error }}</div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="updatePassword" :disabled="isSubmitting">Save</button>
-          <button type="button" class="btn btn-secondary" @click="closeModal(passwordModalRef)">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="updatePassword" :disabled="isSubmitting">保存</button>
+          <button type="button" class="btn btn-secondary" @click="closeModal(passwordModalRef)">取消</button>
         </div>
       </div>
     </div>
@@ -114,8 +115,8 @@ const dialogState = reactive({
   visible: false,
   title: "",
   message: "",
-  confirmText: "OK",
-  cancelText: "Cancel",
+  confirmText: "确定",
+  cancelText: "取消",
   showCancel: false,
 });
 let dialogResolver = null;
@@ -129,10 +130,10 @@ const closeModal = (modalRef) => {
 };
 
 const openDialog = ({
-  title = "Notice",
+  title = "提示",
   message = "",
-  confirmText = "OK",
-  cancelText = "Cancel",
+  confirmText = "确定",
+  cancelText = "取消",
   showCancel = false,
 } = {}) => new Promise((resolve) => {
   if (dialogResolver) {
@@ -170,15 +171,15 @@ const uploadAvatar = async (event) => {
   const validTypes = ["image/jpeg", "image/png", "image/jpg"];
   if (!validTypes.includes(file.type)) {
     await openDialog({
-      title: "Invalid File Type",
-      message: "Only JPG/PNG files are allowed.",
+      title: "文件类型无效",
+      message: "仅支持 JPG/PNG 图片。",
     });
     return;
   }
   if (file.size > 5 * 1024 * 1024) {
     await openDialog({
-      title: "File Too Large",
-      message: "Image size must be less than 5MB.",
+      title: "文件过大",
+      message: "头像大小不能超过 5MB。",
     });
     return;
   }
@@ -197,14 +198,14 @@ const uploadAvatar = async (event) => {
       userStore.updatePhoto(resp.photo);
     } else {
       await openDialog({
-        title: "Upload Failed",
-        message: resp.error_message || "Upload failed",
+        title: "上传失败",
+        message: resp.error_message || "头像上传失败",
       });
     }
   } catch {
     await openDialog({
-      title: "Upload Failed",
-      message: "Avatar upload failed. Please try again.",
+      title: "上传失败",
+      message: "头像上传失败，请稍后重试。",
     });
   } finally {
     uploading.value = false;
@@ -216,7 +217,7 @@ const updateUsername = async () => {
   accountDraft.username_error = "";
   const newUsername = accountDraft.new_username.trim();
   if (!newUsername) {
-    accountDraft.username_error = "Username cannot be empty";
+    accountDraft.username_error = "用户名不能为空";
     return;
   }
 
@@ -232,8 +233,8 @@ const updateUsername = async () => {
       accountDraft.new_username = "";
       closeModal(usernameModalRef.value);
       await openDialog({
-        title: "Username Updated",
-        message: "Username updated successfully.",
+        title: "修改成功",
+        message: "用户名已更新。",
       });
     } else {
       accountDraft.username_error = resp.error_message;
@@ -248,11 +249,26 @@ const updateUsername = async () => {
 const updatePassword = async () => {
   accountDraft.password_error = "";
   if (!accountDraft.new_password) {
-    accountDraft.password_error = "New password cannot be empty.";
+    accountDraft.password_error = "新密码不能为空。";
     return;
   }
+  if (accountDraft.new_password.length < 8 || accountDraft.new_password.length > 16) {
+    accountDraft.password_error = "新密码长度需为8-16位。";
+    return;
+  }
+
+  let score = 0;
+  if (/[A-Z]/.test(accountDraft.new_password)) score += 1;
+  if (/[a-z]/.test(accountDraft.new_password)) score += 1;
+  if (/\d/.test(accountDraft.new_password)) score += 1;
+  if (/[^A-Za-z0-9]/.test(accountDraft.new_password)) score += 1;
+  if (score < 2) {
+    accountDraft.password_error = "新密码至少包含大写字母、小写字母、数字、特殊字符中的两项。";
+    return;
+  }
+
   if (accountDraft.new_password !== accountDraft.confirmed_password) {
-    accountDraft.password_error = "Passwords do not match.";
+    accountDraft.password_error = "两次输入的新密码不一致。";
     return;
   }
 
@@ -270,8 +286,8 @@ const updatePassword = async () => {
     if (resp.error_message === "success") {
       closeModal(passwordModalRef.value);
       await openDialog({
-        title: "Password Updated",
-        message: "Password updated successfully! Please login again.",
+        title: "修改成功",
+        message: "密码已更新，请重新登录。",
       });
       await userStore.logout();
       await router.push({ name: "user_account_login" });

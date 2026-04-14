@@ -1,23 +1,24 @@
+<!-- 界面组件。 -->
 <template>
   <ContentField v-if="!userStore.pulling_info">
     <section class="auth-wrap">
       <div class="auth-head">
-        <h2>Welcome Back</h2>
-        <p>Sign in and jump into your next match.</p>
+        <h2>欢迎回来</h2>
+        <p>登录后即可继续开始对局。</p>
       </div>
       <div class="row justify-content-md-center">
         <div class="col-lg-5 col-md-7 col-12">
           <form class="auth-form" @submit.prevent="login">
             <div class="mb-3">
-              <label for="username" class="form-label">Username</label>
-              <input id="username" v-model="username" type="text" class="form-control" placeholder="Enter username" />
+              <label for="username" class="form-label">用户名</label>
+              <input id="username" v-model="username" type="text" class="form-control" placeholder="请输入用户名" />
             </div>
             <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input id="password" v-model="password" type="password" class="form-control" placeholder="Enter password" />
+              <label for="password" class="form-label">密码</label>
+              <input id="password" v-model="password" type="password" class="form-control" placeholder="请输入密码" />
             </div>
             <div class="error-message">{{ errorMessage }}</div>
-            <button type="submit" class="btn btn-primary auth-btn">Log In</button>
+            <button type="submit" class="btn btn-primary auth-btn">登录</button>
           </form>
         </div>
       </div>
@@ -48,7 +49,7 @@ const login = async () => {
     await userStore.getinfo();
     await router.push({ name: "home" });
   } catch (error) {
-    errorMessage.value = error.message || "Invalid username or password";
+    errorMessage.value = error.message || "用户名或密码错误";
   }
 };
 </script>

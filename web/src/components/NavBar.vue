@@ -1,3 +1,4 @@
+<!-- 界面组件。 -->
 <template>
   <nav class="navbar navbar-expand-lg kob-navbar">
     <div class="container">
@@ -22,10 +23,10 @@
             <router-link :class="routeName === 'pk_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'pk_index' }">PK</router-link>
           </li>
           <li class="nav-item">
-            <router-link :class="routeName === 'record_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'record_index' }">Records</router-link>
+            <router-link :class="routeName === 'record_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'record_index' }">对局记录</router-link>
           </li>
           <li class="nav-item">
-            <router-link :class="routeName === 'ranklist_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'ranklist_index' }">Ranklist</router-link>
+            <router-link :class="routeName === 'ranklist_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'ranklist_index' }">排行榜</router-link>
           </li>
         </ul>
         <ul class="navbar-nav" v-if="userStore.is_login">
@@ -39,22 +40,22 @@
             </button>
             <ul v-show="isUserMenuOpen" class="kob-dropdown-menu">
               <li>
-                <button class="dropdown-item" type="button" @click="goMyBots">My Bots</button>
+                <button class="dropdown-item" type="button" @click="goMyBots">我的 Bot</button>
               </li>
               <li><hr class="dropdown-divider" /></li>
-              <li><button class="dropdown-item" type="button" @click="logout">Log Out</button></li>
+              <li><button class="dropdown-item" type="button" @click="logout">退出登录</button></li>
             </ul>
           </li>
         </ul>
         <ul class="navbar-nav" v-else-if="!userStore.pulling_info">
           <li class="nav-item">
             <router-link class="nav-link kob-link" :to="{ name: 'user_account_login' }" role="button">
-              Log In
+              登录
             </router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link kob-link" :to="{ name: 'user_account_register' }" role="button">
-              Register
+              注册
             </router-link>
           </li>
         </ul>

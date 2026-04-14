@@ -5,6 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * 服务接口定义。
  */
-public interface GetRecordListService {
-    JSONObject getList(Integer page);
+public interface GetRecordService {
+    JSONObject getRecord(Integer recordId);
 }

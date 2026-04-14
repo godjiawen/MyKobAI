@@ -19,7 +19,7 @@ const routes = [
     path: "/record/",
     name: "record_index",
     component: () => import("@/views/record/RecordIndexView.vue"),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, keepAlive: true },
   },
   {
     path: "/record/:recordId/",
@@ -31,7 +31,7 @@ const routes = [
     path: "/ranklist/",
     name: "ranklist_index",
     component: () => import("@/views/ranklist/RanklistIndexView.vue"),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, keepAlive: true },
   },
   {
     path: "/user/account/login/",
@@ -70,6 +70,7 @@ let authInitPromise = null;
 const userStore = useUserStore(pinia);
 
 router.beforeEach(async (to) => {
+  // 首次路由跳转时仅初始化一次鉴权态，避免并发重复请求 用户信息接口。
   if (!authInitialized) {
     if (!authInitPromise) {
       authInitPromise = userStore.initAuth().finally(() => {
@@ -81,6 +82,7 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta.requiresAuth && !userStore.is_login) {
+    // 受保护页面在未登录时统一跳转登录页。
     return { name: "user_account_login" };
   }
 

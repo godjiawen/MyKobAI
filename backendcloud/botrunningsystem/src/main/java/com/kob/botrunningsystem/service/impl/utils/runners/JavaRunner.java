@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Java Bot 通过独立的 javac/java 子进程执行，避免与 botrunningsystem 进程共享 JVM。
+ * Java 运行器通过独立的 javac/java 子进程执行机器人代码，避免与服务进程共享 JVM。
  */
 public class JavaRunner implements LanguageRunner {
 

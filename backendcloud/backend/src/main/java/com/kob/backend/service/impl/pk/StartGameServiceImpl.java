@@ -4,6 +4,9 @@ import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.service.pk.StartGameService;
 import org.springframework.stereotype.Service;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class StartGameServiceImpl implements StartGameService {
     @Override

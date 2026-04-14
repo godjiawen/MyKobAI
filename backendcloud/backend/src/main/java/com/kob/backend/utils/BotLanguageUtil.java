@@ -2,6 +2,9 @@ package com.kob.backend.utils;
 
 import java.util.Set;
 
+/**
+ * 机器人语言标准化与支持性校验工具类。
+ */
 public final class BotLanguageUtil {
     private static final Set<String> SUPPORTED_LANGUAGES = Set.of("java", "python", "cpp", "javascript");
 

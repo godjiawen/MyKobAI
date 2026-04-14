@@ -15,11 +15,11 @@ import java.util.Date;
 public class Bot {
     @TableId(type = IdType.AUTO)
     private Integer id;
-    private Integer userId; //mybatis中使用带下划线列名会报错需要用驼峰命名法
+    private Integer userId; // MyBatis 下划线字段映射需使用驼峰命名
     private String title;
     private String description;
     private String content;
-    private String language;   // java | python | cpp | javascript
+    private String language;   // 机器人语言标识（四种语言）
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date createtime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

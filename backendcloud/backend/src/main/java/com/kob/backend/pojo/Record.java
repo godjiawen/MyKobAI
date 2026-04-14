@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * 实体类。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

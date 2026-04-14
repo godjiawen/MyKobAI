@@ -31,7 +31,7 @@ public class BotPool extends Thread {
             Bot bot;
             lock.lock();
             try {
-                // 用 while 防止虚假唤醒
+                // 使用循环判断，避免线程被虚假唤醒
                 while (bots.isEmpty()) {
                     condition.await();
                 }

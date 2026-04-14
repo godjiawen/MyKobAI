@@ -1,3 +1,4 @@
+// 游戏脚本模块。
 import { AcGameObject } from "./AcGameObject";
 
 export class Wall extends AcGameObject {

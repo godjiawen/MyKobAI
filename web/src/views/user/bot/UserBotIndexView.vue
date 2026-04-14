@@ -1,3 +1,4 @@
+<!-- 界面组件。 -->
 <template>
   <div class="container bot-page">
     <div class="row g-3">

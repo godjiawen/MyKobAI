@@ -6,15 +6,15 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 子进程 Runner 基类，封装"写临时目录 → 启动子进程 → 异步读 stdout → 清理"的通用流程。
- * 子类只需实现 buildProcess(File tmpDir) 返回配置好的 ProcessBuilder。
+ * 子进程运行器基类，封装“写临时目录 -> 启动子进程 -> 异步读取标准输出 -> 清理”的通用流程。
+ * 子类只需实现 buildProcess(File tmpDir) 并返回配置好的 ProcessBuilder。
  *
- * 每次执行都在独立的临时目录里，Bot 代码读 input.txt（当前目录）即可。
- * 输出异步读取，防止 stdout 缓冲区满导致子进程阻塞。
+ * 每次执行都在独立临时目录中进行，机器人代码读取 input.txt（当前目录）即可。
+ * 使用异步读取，防止标准输出缓冲区写满导致子进程阻塞。
  */
 public abstract class SubprocessRunner implements LanguageRunner {
 
-    /** 子类返回在 tmpDir 内运行的 ProcessBuilder（working directory 已设好） */
+    /** 子类返回在 tmpDir 内运行的 ProcessBuilder（工作目录已设置） */
     protected abstract ProcessBuilder buildProcess(File tmpDir) throws Exception;
 
     /** 代码文件的扩展名，如 ".py" ".js" ".cpp" */
@@ -33,15 +33,15 @@ public abstract class SubprocessRunner implements LanguageRunner {
             // 2. 写代码文件
             Files.writeString(new File(tmpDir, "bot" + codeFileExtension()).toPath(), code);
 
-            // 3. 构建并启动子进程（stderr 分离，方便诊断）
+            // 3. 构建并启动子进程（标准错误分离，便于诊断）
             ProcessBuilder pb = buildProcess(tmpDir);
             pb.directory(tmpDir);
-            // 不合并 stderr，用独立线程读取，避免缓冲区死锁
+            // 不合并标准错误，改为独立线程读取，避免缓冲区死锁
             pb.redirectErrorStream(false);
 
             Process process = pb.start();
 
-            // 4. 异步读取 stdout（关键：防止 stdout buffer 满导致进程挂起）
+            // 4. 异步读取标准输出（关键：防止缓冲区写满导致进程挂起）
             StringBuilder stdoutBuf = new StringBuilder();
             StringBuilder stderrBuf = new StringBuilder();
             Thread stdoutReader = new Thread(() -> {
@@ -81,11 +81,11 @@ public abstract class SubprocessRunner implements LanguageRunner {
             String output = stdoutBuf.toString().trim();
             if (output.isEmpty()) {
                 String errOut = stderrBuf.toString().trim();
-                System.err.println("[BotRunner] 子进程无 stdout 输出"
-                        + (errOut.isEmpty() ? "" : "\n[stderr] " + errOut));
+                System.err.println("[BotRunner] 子进程无标准输出"
+                        + (errOut.isEmpty() ? "" : "\n[标准错误] " + errOut));
                 return 0;
             }
-            // 只取第一行，防止 Bot 额外打印了调试信息
+            // 只取第一行，防止机器人输出额外调试信息
             String firstLine = output.split("\\r?\\n")[0].trim();
             int direction = Integer.parseInt(firstLine);
             if (direction < 0 || direction > 3) {

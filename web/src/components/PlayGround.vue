@@ -1,29 +1,37 @@
-<template>
-  <!-- @mousedown.stop 阻止冒泡到 document，只有点到 battle-area 外才触发暂离 -->
+﻿<template>
   <div :class="['battle-area', { 'battle-area--record': recordStore.is_record }]" @mousedown.stop>
     <div class="playground">
+      <div v-if="showPauseControl" class="play-controls">
+        <button
+          class="pause-toggle-btn"
+          type="button"
+          :disabled="isPauseButtonDisabled"
+          @click="togglePause"
+        >
+          {{ pauseButtonText }}
+        </button>
+        <span class="pause-status">{{ pauseHintText }}</span>
+      </div>
+
       <GameMap />
-      <!-- 暂离遮罩 -->
+
       <div v-if="pkStore.isPaused" class="pause-overlay">
         <div class="pause-panel">
           <div class="pause-icon">⏸</div>
           <template v-if="isPausedByMe">
-            <p class="pause-title">你暂离了对局</p>
-            <p class="pause-sub">游戏已暂停，对手正在等你</p>
-            <button class="btn-resume" @click="resumeGame">回到对局</button>
+            <p class="pause-title">你已暂停对局</p>
+            <p class="pause-sub">游戏暂停中，对手正在等待你返回。</p>
+            <button class="btn-resume" type="button" @click="resumeGame">继续对局</button>
           </template>
           <template v-else>
-            <p class="pause-title">对手暂时离开了</p>
-            <p class="pause-sub">游戏已暂停，等待对手回来…</p>
+            <p class="pause-title">对手已暂停对局</p>
+            <p class="pause-sub">游戏暂停中，请等待对手恢复。</p>
           </template>
         </div>
       </div>
     </div>
-    <ChatBox
-      v-if="!recordStore.is_record"
-      :roomId="pkStore.roomId"
-      @activity-change="handleChatActivityChange"
-    />
+
+    <ChatBox v-if="!recordStore.is_record" :roomId="pkStore.roomId" />
   </div>
 </template>
 
@@ -45,6 +53,33 @@ const isPausedByMe = computed(
     pkStore.pausedByUserId === Number.parseInt(userStore.id, 10)
 );
 
+const isSocketReady = computed(
+  () => pkStore.socket && pkStore.socket.readyState === WebSocket.OPEN
+);
+
+const showPauseControl = computed(
+  () => !recordStore.is_record && pkStore.loser === "none"
+);
+
+const pauseButtonText = computed(() => {
+  if (!pkStore.isPaused) return "暂停";
+  if (isPausedByMe.value) return "继续";
+  return "对手已暂停";
+});
+
+const pauseHintText = computed(() => {
+  if (!isSocketReady.value) return "连接未就绪";
+  if (!pkStore.isPaused) return "点击按钮可主动暂停";
+  if (isPausedByMe.value) return "你可以手动继续对局";
+  return "当前由对手暂停";
+});
+
+const isPauseButtonDisabled = computed(() => {
+  if (!isSocketReady.value) return true;
+  if (!pkStore.isPaused) return false;
+  return !isPausedByMe.value;
+});
+
 const resumeGame = () => {
   const socket = pkStore.socket;
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -52,19 +87,23 @@ const resumeGame = () => {
   }
 };
 
-const handleChatActivityChange = (active) => {
+const pauseGame = () => {
   const socket = pkStore.socket;
-  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ event: "pause" }));
+  }
+};
 
-  if (active) {
-    if (!pkStore.isPaused && pkStore.loser === "none") {
-      socket.send(JSON.stringify({ event: "pause" }));
-    }
+const togglePause = () => {
+  if (pkStore.loser !== "none") return;
+
+  if (!pkStore.isPaused) {
+    pauseGame();
     return;
   }
 
-  if (isPausedByMe.value && pkStore.loser === "none") {
-    socket.send(JSON.stringify({ event: "resume" }));
+  if (isPausedByMe.value) {
+    resumeGame();
   }
 };
 </script>
@@ -84,7 +123,7 @@ const handleChatActivityChange = (active) => {
 }
 
 div.playground {
-  position: relative; /* 让遮罩绝对定位在此 div 内 */
+  position: relative;
   flex: 1 1 0;
   min-width: 0;
   height: clamp(400px, 68vh, 720px);
@@ -96,6 +135,47 @@ div.playground {
   padding: 14px;
 }
 
+.play-controls {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pause-toggle-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
+  box-shadow: 0 6px 16px rgba(61, 174, 255, 0.35);
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.pause-toggle-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.pause-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pause-status {
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(90, 180, 255, 0.35);
+  color: var(--kob-muted);
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
 .battle-area--record div.playground {
   flex: 0 0 auto;
   width: min(96vw, calc(clamp(400px, 68vh, 720px) * 14 / 13));
@@ -103,7 +183,6 @@ div.playground {
   aspect-ratio: 14 / 13;
 }
 
-/* 暂离遮罩 */
 .pause-overlay {
   position: absolute;
   inset: 0;
@@ -118,8 +197,12 @@ div.playground {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .pause-panel {
@@ -168,9 +251,65 @@ div.playground {
   transform: translateY(-2px);
 }
 
-/* 让 ChatBox 与 playground 等高 */
 .battle-area :deep(.chat-box) {
   height: clamp(400px, 68vh, 720px);
 }
-</style>
 
+@media (max-width: 1199px) {
+  .battle-area {
+    width: min(1000px, 96vw);
+    gap: 12px;
+  }
+
+  .battle-area :deep(.chat-box) {
+    height: clamp(340px, 58vh, 620px);
+  }
+}
+
+@media (max-width: 991px) {
+  .battle-area {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  div.playground {
+    height: clamp(320px, 54vh, 520px);
+    border-radius: 18px;
+    padding: 10px;
+  }
+
+  .play-controls {
+    top: 14px;
+    right: 14px;
+    gap: 8px;
+  }
+
+  .pause-status {
+    display: none;
+  }
+
+  .battle-area--record div.playground {
+    width: min(96vw, 560px);
+  }
+
+  .pause-overlay {
+    border-radius: 18px;
+  }
+
+  .pause-panel {
+    width: min(92%, 420px);
+    padding: 26px 20px;
+  }
+
+  .pause-title {
+    font-size: 1.15rem;
+  }
+
+  .battle-area :deep(.chat-box) {
+    width: 100%;
+    min-height: 220px;
+    height: clamp(220px, 30vh, 320px);
+  }
+}
+</style>

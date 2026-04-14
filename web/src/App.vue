@@ -7,12 +7,23 @@
       <section v-if="renderError" class="app-error-panel container">
         <h3>页面渲染异常</h3>
         <p>{{ renderError }}</p>
-        <button class="btn btn-primary" type="button" @click="resetRenderError">
-          清除错误并继续
-        </button>
+        <button class="btn btn-primary" type="button" @click="resetRenderError">清除错误并继续</button>
       </section>
+
       <router-view v-else v-slot="{ Component, route }">
-        <component :is="Component" :key="route.fullPath" />
+        <transition name="route-fade" mode="out-in" appear>
+          <keep-alive v-if="route.meta.keepAlive" include="RecordIndexView,RanklistIndexView">
+            <component :is="Component" :key="route.name" />
+          </keep-alive>
+        </transition>
+
+        <transition name="route-fade" mode="out-in" appear>
+          <component
+            v-if="!route.meta.keepAlive"
+            :is="Component"
+            :key="route.fullPath"
+          />
+        </transition>
       </router-view>
     </main>
   </div>
@@ -50,6 +61,10 @@ onErrorCaptured((error) => {
   --kob-accent: #3daeff;
   --kob-accent-strong: #0088e8;
   --kob-warn: #ffb732;
+
+  --motion-fast: 140ms;
+  --motion-medium: 260ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -103,6 +118,25 @@ body {
   padding-bottom: 28px;
 }
 
+.route-fade-enter-active,
+.route-fade-leave-active {
+  transition:
+    opacity var(--motion-medium) var(--ease-out),
+    transform var(--motion-medium) var(--ease-out);
+}
+
+.route-fade-enter-from,
+.route-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.route-fade-enter-to,
+.route-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .app-error-panel {
   margin-top: 20px;
   padding: 18px;
@@ -122,8 +156,6 @@ body {
   color: #e74c3c;
 }
 
-
-/* Ensure modals appear above the custom navigation bar */
 .modal-backdrop {
   z-index: 3000 !important;
 }
@@ -136,7 +168,7 @@ body {
   background: var(--kob-panel);
   border: 1px solid var(--kob-panel-border);
   border-radius: 18px;
-  box-shadow: 0 14px 40px rgba(0, 50, 100, 0.08); /* light shadow */
+  box-shadow: 0 14px 40px rgba(0, 50, 100, 0.08);
   backdrop-filter: blur(8px);
 }
 
@@ -189,4 +221,21 @@ body {
   color: #ffffff;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .route-fade-enter-from,
+  .route-fade-leave-to,
+  .route-fade-enter-to,
+  .route-fade-leave-from {
+    transform: none !important;
+  }
+}
 </style>

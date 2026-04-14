@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
             dir.mkdirs();
         }
         
-        // 映射本地文件，这样外部就能通过 http://localhost:3000/avatars/xxx.jpg 访问头像了
+        // 映射本地头像目录，使外部请求可直接访问头像资源
         registry.addResourceHandler("/avatars/**")
                 .addResourceLocations("file:" + uploadDir);
     }

@@ -16,7 +16,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 鉴权由 WebSocket 路径中的 JWT token 负责，HTTP 层全部放行
+                        // 鉴权由 WebSocket 路径中的令牌负责，HTTP 层全部放行
                         .anyRequest().permitAll()
                 );
         return http.build();

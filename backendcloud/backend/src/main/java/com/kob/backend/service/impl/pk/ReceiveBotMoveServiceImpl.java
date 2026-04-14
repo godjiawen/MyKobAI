@@ -5,6 +5,9 @@ import com.kob.backend.consumer.utils.Game;
 import com.kob.backend.service.pk.ReceiveBotMoveService;
 import org.springframework.stereotype.Service;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class ReceiveBotMoveServiceImpl implements ReceiveBotMoveService {
     @Override

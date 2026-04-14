@@ -1,29 +1,30 @@
-﻿<template>
+<!-- 界面组件。 -->
+<template>
   <ContentField>
     <section class="auth-wrap">
       <div class="auth-head">
-        <h2>Create Account</h2>
-        <p>Register and start climbing the ranklist.</p>
+        <h2>创建账号</h2>
+        <p>完成注册后即可开始冲榜。</p>
       </div>
       <div class="row justify-content-md-center">
         <div class="col-lg-5 col-md-7 col-12">
           <form class="auth-form" @submit.prevent="register">
             <div class="mb-3">
-              <label for="username" class="form-label">Username</label>
-              <input id="username" v-model="username" type="text" class="form-control" placeholder="Choose username" />
+              <label for="username" class="form-label">用户名</label>
+              <input id="username" v-model="username" type="text" class="form-control" placeholder="请输入用户名" />
               <div class="rule-tip">6-12位，仅字母/数字/下划线</div>
             </div>
             <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input id="password" v-model="password" type="password" class="form-control" placeholder="Set password" />
-              <div class="rule-tip">8-16位，且至少包含以下四类中的三类：大写字母/小写字母/数字/特殊字符</div>
+              <label for="password" class="form-label">密码</label>
+              <input id="password" v-model="password" type="password" class="form-control" placeholder="请输入密码" />
+              <div class="rule-tip">8-16位，且至少包含两类字符：大写字母/小写字母/数字/特殊字符</div>
             </div>
             <div class="mb-3">
-              <label for="confirmedPassword" class="form-label">Confirm Password</label>
-              <input id="confirmedPassword" v-model="confirmedPassword" type="password" class="form-control" placeholder="Repeat password" />
+              <label for="confirmedPassword" class="form-label">确认密码</label>
+              <input id="confirmedPassword" v-model="confirmedPassword" type="password" class="form-control" placeholder="请再次输入密码" />
             </div>
             <div class="error-message">{{ errorMessage }}</div>
-            <button type="submit" class="btn btn-primary auth-btn">Create</button>
+            <button type="submit" class="btn btn-primary auth-btn">注册</button>
           </form>
         </div>
       </div>
@@ -58,17 +59,13 @@ const validateRegisterForm = () => {
     return "密码长度需为8-16位";
   }
 
-  if (/\s/.test(passwordValue)) {
-    return "密码不能包含空白字符";
-  }
-
   let score = 0;
   if (/[A-Z]/.test(passwordValue)) score += 1;
   if (/[a-z]/.test(passwordValue)) score += 1;
   if (/\d/.test(passwordValue)) score += 1;
   if (/[^A-Za-z0-9]/.test(passwordValue)) score += 1;
-  if (score < 3) {
-    return "密码至少包含大写字母、小写字母、数字、特殊字符中的三项";
+  if (score < 2) {
+    return "密码至少包含大写字母、小写字母、数字、特殊字符中的两项";
   }
 
   if (passwordValue !== confirmedValue) {
@@ -98,13 +95,13 @@ const register = async () => {
     });
 
     if (resp.error_message !== "success") {
-      errorMessage.value = resp.error_message || "Register failed";
+      errorMessage.value = resp.error_message || "注册失败";
       return;
     }
 
     await router.push({ name: "user_account_login" });
   } catch (error) {
-    errorMessage.value = error.message || "Register failed";
+    errorMessage.value = error.message || "注册失败";
   }
 };
 </script>

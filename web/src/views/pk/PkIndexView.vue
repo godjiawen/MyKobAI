@@ -1,9 +1,9 @@
 <template>
   <PlayGround v-if="pkStore.status === 'playing'" />
   <MatchGround v-if="pkStore.status === 'matching'" />
-  <ResultBoard v-if="pkStore.loser !== 'none'" />
-  <div class="user-color" v-if="isAPlayer" @mousedown.stop>Bottom Left</div>
-  <div class="user-color" v-if="isBPlayer" @mousedown.stop>Top Right</div>
+  <ResultBoard v-if="pkStore.resultVisible" />
+  <div class="user-color" v-if="isAPlayer" @mousedown.stop>你在左下角</div>
+  <div class="user-color" v-if="isBPlayer" @mousedown.stop>你在右上角</div>
 </template>
 
 <script setup>
@@ -15,6 +15,7 @@ import MatchGround from "@/components/MatchGround.vue";
 import PlayGround from "@/components/PlayGround.vue";
 import ResultBoard from "@/components/ResultBoard.vue";
 import { buildWebSocketUrl } from "@/config/env";
+import defaultAvatar from "@/assets/images/default-avatar.svg";
 
 const userStore = useUserStore();
 const pkStore = usePkStore();
@@ -31,12 +32,14 @@ const isBPlayer = computed(
 );
 
 onMounted(() => {
+  // 每次进入对局页先重置展示态，避免上局残留。
   pkStore.updateLoser("none");
+  pkStore.updateResultVisible(false);
   recordStore.updateIsRecord(false);
   pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
   pkStore.updateOpponent({
-    username: "My Opponent",
-    photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png",
+    username: "匹配对手",
+    photo: defaultAvatar,
   });
 
   const token = userStore.token;
@@ -51,7 +54,10 @@ onMounted(() => {
   socket.onmessage = (msg) => {
     const data = JSON.parse(msg.data);
 
+    // 协议事件 1：匹配成功，进入对局并初始化地图。
     if (data.event === "start-matching") {
+      pkStore.updateResultVisible(false);
+      pkStore.updateLoser("none");
       pkStore.updateOpponent({
         username: data.opponent_username,
         photo: data.opponent_photo,
@@ -64,6 +70,7 @@ onMounted(() => {
       return;
     }
 
+    // 协议事件 2：服务端广播双方方向，驱动蛇前进。
     if (data.event === "move") {
       const game = pkStore.gameObject;
       if (!game) return;
@@ -73,16 +80,20 @@ onMounted(() => {
       return;
     }
 
+    // 协议事件 3：对局结果（A/B/all）。
     if (data.event === "result") {
       const game = pkStore.gameObject;
-      if (!game) return;
-      const [snake0, snake1] = game.snakes;
-      if (data.loser === "all" || data.loser === "A") snake0.status = "die";
-      if (data.loser === "all" || data.loser === "B") snake1.status = "die";
-      pkStore.updateLoser(data.loser);
+      if (game) {
+        const [snake0, snake1] = game.snakes;
+        if (data.loser === "all" || data.loser === "A") snake0.status = "die";
+        if (data.loser === "all" || data.loser === "B") snake1.status = "die";
+      }
+      pkStore.updateLoser(data.loser || "all");
+      pkStore.updateResultVisible(true);
       return;
     }
 
+    // 协议事件 4：暂离与恢复。
     if (data.event === "game-paused") {
       pkStore.updatePaused({
         isPaused: true,
@@ -115,9 +126,11 @@ onUnmounted(() => {
   } catch (error) {
     console.error("pk socket cleanup error:", error);
   } finally {
+    // 离开页面时恢复默认态，防止切页后状态污染。
     socket = null;
     pkStore.updateSocket(null);
     pkStore.updateLoser("none");
+    pkStore.updateResultVisible(false);
     pkStore.updateStatus("matching");
     pkStore.updateRoomId("");
     pkStore.updatePaused({ isPaused: false, pausedByUserId: null });

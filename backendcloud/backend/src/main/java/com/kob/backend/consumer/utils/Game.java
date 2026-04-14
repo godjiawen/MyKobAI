@@ -27,8 +27,8 @@ public class Game extends Thread {
     private Integer nextStepA = null;
     private Integer nextStepB = null;
     private ReentrantLock lock = new ReentrantLock();
-    private String status = "playing"; //playing -> finished
-    private String loser = ""; //all: 平局 A: A输 B: B输
+    private String status = "playing"; // 对局状态：playing（进行中） -> finished（已结束）
+    private String loser = ""; // 失败方标记：all 表示平局，A 表示 A 失败，B 表示 B 失败
     private volatile boolean paused = false;
     private volatile String pausedBy = "";
     private final static String addBotUrl = "http://127.0.0.1:3002/bot/add/";

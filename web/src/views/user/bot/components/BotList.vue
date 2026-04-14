@@ -1,17 +1,17 @@
 <template>
   <div class="card bot-main-card">
     <div class="card-header bot-main-header">
-      <span class="title">My Bots</span>
-      <button type="button" class="btn btn-primary" @click="openBotModal(null)">Create Bot</button>
+      <span class="title">我的 Bot</span>
+      <button type="button" class="btn btn-primary" @click="openBotModal(null)">新建 Bot</button>
     </div>
     <div class="card-body">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Language</th>
-            <th>Created At</th>
-            <th>Actions</th>
+            <th>名称</th>
+            <th>语言</th>
+            <th>创建时间</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -24,12 +24,12 @@
             </td>
             <td class="align-middle">{{ bot.createtime }}</td>
             <td>
-              <button type="button" class="btn btn-secondary me-2" @click="openBotModal(bot)">Edit</button>
-              <button type="button" class="btn btn-danger" @click="removeBot(bot)">Delete</button>
+              <button type="button" class="btn btn-secondary me-2" @click="openBotModal(bot)">编辑</button>
+              <button type="button" class="btn btn-danger" @click="removeBot(bot)">删除</button>
             </td>
           </tr>
           <tr v-if="bots.length === 0">
-            <td colspan="4" class="text-center text-muted py-4">You have no bots yet. Create one!</td>
+            <td colspan="4" class="text-center text-muted py-4">当前还没有 Bot，先创建一个吧。</td>
           </tr>
         </tbody>
       </table>
@@ -40,16 +40,16 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ botDraft.id ? "Edit Bot" : "Create Bot" }}</h5>
+          <h5 class="modal-title">{{ botDraft.id ? "编辑 Bot" : "新建 Bot" }}</h5>
           <button type="button" class="btn-close" @click="closeModal(botModalRef)"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Title <span class="text-danger">*</span></label>
-            <input v-model="botDraft.title" type="text" class="form-control" placeholder="Bot title" />
+            <label class="form-label">名称 <span class="text-danger">*</span></label>
+            <input v-model="botDraft.title" type="text" class="form-control" placeholder="请输入 Bot 名称" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Language <span class="text-danger">*</span></label>
+            <label class="form-label">语言 <span class="text-danger">*</span></label>
             <select v-model="botDraft.language" class="form-select" @change="onLanguageChange">
               <option value="java">Java</option>
               <option value="python">Python</option>
@@ -58,11 +58,11 @@
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea v-model="botDraft.description" class="form-control" rows="3" placeholder="Bot description"></textarea>
+            <label class="form-label">描述</label>
+            <textarea v-model="botDraft.description" class="form-control" rows="3" placeholder="简要描述 Bot 思路"></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label">Code <span class="text-danger">*</span></label>
+            <label class="form-label">代码 <span class="text-danger">*</span></label>
             <VAceEditor
               v-model:value="botDraft.content"
               :lang="aceLang"
@@ -75,9 +75,9 @@
         <div class="modal-footer">
           <div class="error-message me-auto">{{ botDraft.error_message }}</div>
           <button type="button" class="btn btn-primary" @click="saveBot" :disabled="isSubmitting">
-            {{ isSubmitting ? "Saving..." : "Save" }}
+            {{ isSubmitting ? "保存中..." : "保存" }}
           </button>
-          <button type="button" class="btn btn-secondary" @click="closeModal(botModalRef)">Cancel</button>
+          <button type="button" class="btn btn-secondary" @click="closeModal(botModalRef)">取消</button>
         </div>
       </div>
     </div>
@@ -120,8 +120,8 @@ const dialogState = reactive({
   visible: false,
   title: "",
   message: "",
-  confirmText: "OK",
-  cancelText: "Cancel",
+  confirmText: "确定",
+  cancelText: "取消",
   showCancel: false,
 });
 let dialogResolver = null;
@@ -149,10 +149,10 @@ const closeModal = (modalRef) => {
 };
 
 const openDialog = ({
-  title = "Notice",
+  title = "提示",
   message = "",
-  confirmText = "OK",
-  cancelText = "Cancel",
+  confirmText = "确定",
+  cancelText = "取消",
   showCancel = false,
 } = {}) => new Promise((resolve) => {
   if (dialogResolver) {
@@ -214,11 +214,11 @@ const openBotModal = (bot = null) => {
 const saveBot = async () => {
   botDraft.error_message = "";
   if (!botDraft.title.trim()) {
-    botDraft.error_message = "Title cannot be empty.";
+    botDraft.error_message = "Bot 名称不能为空。";
     return;
   }
   if (!botDraft.content.trim()) {
-    botDraft.error_message = "Code cannot be empty.";
+    botDraft.error_message = "Bot代码不能为空。";
     return;
   }
 
@@ -241,7 +241,7 @@ const saveBot = async () => {
     });
 
     if (resp.error_message !== "success") {
-      botDraft.error_message = resp.error_message || "Operation failed";
+      botDraft.error_message = resp.error_message || "保存失败";
       return;
     }
 
@@ -260,14 +260,14 @@ const saveBot = async () => {
         await refreshBots();
       } catch {
         bots.value = bots.value.filter((b) => !String(b.id).startsWith("tmp-"));
-        botDraft.error_message = "Refresh failed, please try again.";
+        botDraft.error_message = "列表刷新失败，请稍后重试。";
         return;
       }
     }
 
     closeModal(botModalRef.value);
   } catch (error) {
-    botDraft.error_message = error.message || "Network error";
+    botDraft.error_message = error.message || "网络异常";
   } finally {
     isSubmitting.value = false;
   }
@@ -275,10 +275,10 @@ const saveBot = async () => {
 
 const removeBot = async (bot) => {
   const confirmed = await openDialog({
-    title: "Delete Bot",
-    message: `Are you sure you want to delete bot "${bot.title}"?`,
-    confirmText: "Delete",
-    cancelText: "Cancel",
+    title: "删除 Bot",
+    message: `确定删除 Bot「${bot.title}」吗？`,
+    confirmText: "删除",
+    cancelText: "取消",
     showCancel: true,
   });
   if (!confirmed) return;
@@ -293,14 +293,14 @@ const removeBot = async (bot) => {
       bots.value = bots.value.filter((b) => b.id !== bot.id);
     } else {
       await openDialog({
-        title: "Delete Failed",
-        message: resp.error_message || "Delete failed",
+        title: "删除失败",
+        message: resp.error_message || "删除失败",
       });
     }
   } catch {
     await openDialog({
-      title: "Delete Failed",
-      message: "Delete request failed. Please try again.",
+      title: "删除失败",
+      message: "删除请求失败，请稍后重试。",
     });
   }
 };
@@ -320,10 +320,10 @@ const onLanguageChange = () => {
 
 const codePlaceholder = (lang) => {
   const map = {
-    java: `import java.util.Scanner;\nimport java.io.File;\n\npublic class Bot implements java.util.function.Supplier<Integer> {\n    @Override\n    public Integer get() {\n        // Return direction: 0=Up, 1=Right, 2=Down, 3=Left\n        return 0;\n    }\n}`,
-    python: `# Return direction: 0=Up, 1=Right, 2=Down, 3=Left\n\ndirection = 0\nprint(direction)`,
-    cpp: `#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // Return direction: 0=Up, 1=Right, 2=Down, 3=Left\n    cout << 0 << endl;\n    return 0;\n}`,
-    javascript: `"use strict";\n// Return direction: 0=Up, 1=Right, 2=Down, 3=Left\nconsole.log(0);`,
+    java: `import java.util.Scanner;\nimport java.io.File;\n\npublic class Bot implements java.util.function.Supplier<Integer> {\n    @Override\n    public Integer get() {\n        // 返回方向：0=上，1=右，2=下，3=左\n        return 0;\n    }\n}`,
+    python: `# 返回方向：0=上，1=右，2=下，3=左\n\ndirection = 0\nprint(direction)`,
+    cpp: `#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // 返回方向：0=上，1=右，2=下，3=左\n    cout << 0 << endl;\n    return 0;\n}`,
+    javascript: `"use strict";\n// 返回方向：0=上，1=右，2=下，3=左\nconsole.log(0);`,
   };
   return map[lang] || map.java;
 };

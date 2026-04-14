@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 /**
- * C++ Runner —— 先用 g++ 编译，再运行生成的可执行文件。
+ * C++ 运行器：先用 g++ 编译，再运行生成的可执行文件。
  *
- * Bot 代码模板：
+ * 机器人代码模板：
  *   #include <bits/stdc++.h>
  *   using namespace std;
  *   int main() {
@@ -30,7 +30,7 @@ public class CppRunner extends SubprocessRunner {
 
     @Override
     protected ProcessBuilder buildProcess(File tmpDir) throws Exception {
-        // Step 1: 编译（最多 10 秒）
+        // 第 1 步：编译（最多 10 秒）
         String outputBinary = IS_WINDOWS ? "bot.exe" : "bot";
         ProcessBuilder compileBuilder = new ProcessBuilder("g++", "-O2", "-o", outputBinary, "bot.cpp");
         compileBuilder.directory(tmpDir);
@@ -48,7 +48,7 @@ public class CppRunner extends SubprocessRunner {
             throw new RuntimeException("C++ 编译失败:\n" + err);
         }
 
-        // Step 2: 返回运行 Builder（SubprocessRunner 会 start 它）
+        // 第 2 步：返回运行配置（由 SubprocessRunner 启动）
         return new ProcessBuilder(IS_WINDOWS ? "bot.exe" : "./bot");
     }
 }

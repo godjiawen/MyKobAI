@@ -3,9 +3,9 @@ package com.kob.botrunningsystem.service.impl.utils.runners;
 import java.io.File;
 
 /**
- * Python Runner
+ * Python 运行器。
  *
- * Bot 代码模板：
+ * 机器人代码模板：
  *   with open('input.txt') as f:
  *       data = f.read().strip()
  *   # ... 解析 data，计算方向 ...

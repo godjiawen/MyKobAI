@@ -1,63 +1,59 @@
-<template>
-  <div
-    ref="chatRoot"
-    class="chat-box"
-    @focusin="handleFocusIn"
-    @focusout="handleFocusOut"
-  >
-    <!-- Header -->
+﻿<template>
+  <div ref="chatRoot" class="chat-box" @focusin="handleFocusIn" @focusout="handleFocusOut">
     <div class="chat-header">
-      <span class="chat-title">💬 Chat</span>
-      <span class="chat-dot" :class="{ online: isConnected }" :title="isConnected ? 'Connected' : 'Connecting…'"></span>
+      <span class="chat-title">对局聊天</span>
+      <div class="chat-indicators">
+        <span v-if="isInputFocused" class="chat-focus">输入中</span>
+        <span
+          class="chat-dot"
+          :class="{ online: isConnected }"
+          :title="isConnected ? '已连接' : '连接中'"
+        ></span>
+      </div>
     </div>
 
-    <!-- Message list -->
-    <div class="chat-messages" ref="messagesEl">
-      <div v-if="messages.length === 0" class="chat-empty">
-        Game chat is ready. Say hi!
-      </div>
+    <div ref="messagesEl" class="chat-messages">
+      <div v-if="messages.length === 0" class="chat-empty">聊天已就绪，发条消息吧。</div>
       <div
         v-for="(msg, idx) in messages"
         :key="idx"
         class="chat-msg"
         :class="{ 'is-self': msg.userId === currentUserId }"
       >
-        <span class="msg-name">{{ msg.userId === currentUserId ? 'You' : msg.username }}</span>
+        <span class="msg-name">{{ msg.userId === currentUserId ? '我' : msg.username }}</span>
         <div class="msg-bubble">{{ msg.content }}</div>
       </div>
     </div>
 
-    <!-- Input -->
     <div class="chat-input-row">
       <input
         v-model="inputText"
         class="chat-input"
-        placeholder="Type a message…"
+        placeholder="输入消息..."
         maxlength="200"
-        @keyup.enter="sendMessage"
         :disabled="!isConnected"
+        @keyup.enter="sendMessage"
       />
       <button
         class="chat-send-btn"
-        @click="sendMessage"
         :disabled="!isConnected || !inputText.trim()"
-        title="Send (Enter)"
+        title="发送（Enter）"
+        @click="sendMessage"
       >
-        ↑
+        发
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onUnmounted, nextTick } from "vue";
+import { computed, nextTick, onUnmounted, ref, watch } from "vue";
 import { useUserStore } from "@/store/user";
 import { buildChatWebSocketUrl } from "@/config/env";
 
 const props = defineProps({
   roomId: { type: String, default: "" },
 });
-const emit = defineEmits(["activity-change"]);
 
 const userStore = useUserStore();
 const messages = ref([]);
@@ -65,6 +61,8 @@ const inputText = ref("");
 const messagesEl = ref(null);
 const chatRoot = ref(null);
 const isConnected = ref(false);
+const isInputFocused = ref(false);
+
 let socket = null;
 let blurTimer = null;
 
@@ -77,16 +75,12 @@ const scrollToBottom = async () => {
   }
 };
 
-const emitActivity = (active) => {
-  emit("activity-change", active);
-};
-
 const handleFocusIn = () => {
   if (blurTimer) {
     clearTimeout(blurTimer);
     blurTimer = null;
   }
-  emitActivity(true);
+  isInputFocused.value = true;
 };
 
 const handleFocusOut = () => {
@@ -94,8 +88,7 @@ const handleFocusOut = () => {
   blurTimer = setTimeout(() => {
     const root = chatRoot.value;
     const activeElement = document.activeElement;
-    if (root && activeElement && root.contains(activeElement)) return;
-    emitActivity(false);
+    isInputFocused.value = !!(root && activeElement && root.contains(activeElement));
   }, 0);
 };
 
@@ -111,8 +104,8 @@ const disconnectChat = () => {
     socket = null;
   }
   isConnected.value = false;
+  isInputFocused.value = false;
   messages.value = [];
-  emitActivity(false);
 };
 
 const connectChat = (roomId) => {
@@ -133,8 +126,8 @@ const connectChat = (roomId) => {
       const data = JSON.parse(event.data);
       messages.value.push(data);
       scrollToBottom();
-    } catch (e) {
-      console.error("[ChatBox] parse error", e);
+    } catch (error) {
+      console.error("[ChatBox] parse error", error);
     }
   };
 
@@ -173,10 +166,9 @@ watch(
   { immediate: true }
 );
 
-onUnmounted(disconnectChat);
 onUnmounted(() => {
+  disconnectChat();
   if (blurTimer) clearTimeout(blurTimer);
-  emitActivity(false);
 });
 </script>
 
@@ -184,7 +176,8 @@ onUnmounted(() => {
 .chat-box {
   display: flex;
   flex-direction: column;
-  width: 270px;
+  width: min(320px, 30vw);
+  min-width: 250px;
   flex-shrink: 0;
   border-radius: 18px;
   border: 1px solid var(--kob-panel-border);
@@ -194,7 +187,6 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-/* ---- header ---- */
 .chat-header {
   display: flex;
   justify-content: space-between;
@@ -212,6 +204,22 @@ onUnmounted(() => {
   color: var(--kob-text);
 }
 
+.chat-indicators {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-focus {
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: rgba(61, 174, 255, 0.12);
+  color: var(--kob-accent-strong);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .chat-dot {
   width: 9px;
   height: 9px;
@@ -225,7 +233,6 @@ onUnmounted(() => {
   box-shadow: 0 0 6px rgba(39, 174, 96, 0.5);
 }
 
-/* ---- messages ---- */
 .chat-messages {
   flex: 1 1 0;
   overflow-y: auto;
@@ -239,9 +246,11 @@ onUnmounted(() => {
 .chat-messages::-webkit-scrollbar {
   width: 4px;
 }
+
 .chat-messages::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .chat-messages::-webkit-scrollbar-thumb {
   background: rgba(90, 180, 255, 0.3);
   border-radius: 4px;
@@ -289,7 +298,6 @@ onUnmounted(() => {
   border-radius: 14px 14px 4px 14px;
 }
 
-/* ---- input ---- */
 .chat-input-row {
   display: flex;
   gap: 8px;
@@ -325,7 +333,7 @@ onUnmounted(() => {
   flex-shrink: 0;
   border: none;
   border-radius: 50%;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #fff;
   background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
@@ -344,6 +352,16 @@ onUnmounted(() => {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+@media (max-width: 991px) {
+  .chat-box {
+    width: 100%;
+    min-width: 0;
+    border-radius: 16px;
+  }
+
+  .chat-messages {
+    padding: 10px 10px 4px;
+  }
+}
 </style>
-
-

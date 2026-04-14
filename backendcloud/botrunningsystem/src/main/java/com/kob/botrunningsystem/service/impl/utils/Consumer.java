@@ -31,7 +31,7 @@ public class Consumer extends Thread {
         }
     }
 
-    /** 根据语言获取对应 Runner */
+    /** 根据语言选择对应运行器 */
     private static LanguageRunner getRunner(String language) {
         if (language == null) return new JavaRunner();
         return switch (language.toLowerCase()) {
@@ -49,7 +49,7 @@ public class Consumer extends Thread {
         try {
             direction = runner.run(bot.getBotCode(), bot.getInput(), 2000);
         } catch (Exception e) {
-            System.err.println("[Consumer] Runner 异常: " + e.getMessage());
+            System.err.println("[Consumer] 运行器异常: " + e.getMessage());
             direction = 0;
         }
 

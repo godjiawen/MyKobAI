@@ -1,4 +1,4 @@
-﻿const trimTrailingSlash = (value) => value.replace(/\/+$/, "");
+const trimTrailingSlash = (value) => value.replace(/\/+$/, "");
 
 const apiBaseFromEnv = import.meta.env.VITE_API_BASE_URL;
 const wsBaseFromEnv = import.meta.env.VITE_WS_BASE_URL;
@@ -8,7 +8,7 @@ export const API_BASE_URL = trimTrailingSlash(apiBaseFromEnv || "http://127.0.0.
 export const WS_BASE_URL = trimTrailingSlash(
   wsBaseFromEnv || API_BASE_URL.replace(/^http/i, "ws")
 );
-// Chat system runs on port 3003 by default
+// 聊天服务默认运行在 3003 端口
 export const CHAT_WS_BASE_URL = trimTrailingSlash(
   chatWsBaseFromEnv || WS_BASE_URL.replace(/:(\d+)$/, ":3003")
 );
@@ -22,6 +22,7 @@ export const API_PATHS = {
   uploadAvatar: "/api/user/account/avatar/upload/",
   ranklist: "/api/ranklist/getlist/",
   records: "/api/record/getlist/",
+  recordDetail: "/api/record/get/",
   botList: "/api/user/bot/getlist/",
   botAdd: "/api/user/bot/add/",
   botUpdate: "/api/user/bot/update/",

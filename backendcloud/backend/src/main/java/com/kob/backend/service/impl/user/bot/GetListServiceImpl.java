@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class GetListServiceImpl implements GetListService {
     @Autowired

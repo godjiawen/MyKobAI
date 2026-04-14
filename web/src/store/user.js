@@ -1,3 +1,4 @@
+// 状态仓库模块。
 import { defineStore } from "pinia";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";

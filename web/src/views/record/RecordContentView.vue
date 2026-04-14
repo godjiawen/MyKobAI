@@ -1,8 +1,13 @@
 <template>
   <section class="record-content-wrap">
     <div class="record-content-head">
-      <h2>Match Replay</h2>
-      <p>Playback of a historical battle record.</p>
+      <button type="button" class="back-btn" @click="goBackToRecordList">
+        返回记录列表
+      </button>
+      <div class="head-copy">
+        <h2>对局回放</h2>
+        <p>按时间顺序查看这场对局的完整过程。</p>
+      </div>
     </div>
     <div v-if="loadError" class="state-error">{{ loadError }}</div>
     <div v-else-if="loading" class="state-tip">录像加载中...</div>
@@ -12,7 +17,7 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { usePkStore } from "@/store/pk";
 import { useRecordStore } from "@/store/record";
@@ -24,10 +29,15 @@ const userStore = useUserStore();
 const pkStore = usePkStore();
 const recordStore = useRecordStore();
 const route = useRoute();
+const router = useRouter();
 
 const loading = ref(false);
 const loadError = ref("");
 const ready = ref(false);
+
+const goBackToRecordList = async () => {
+  await router.push({ name: "record_index" });
+};
 
 const stringTo2D = (map) => {
   const graph = [];
@@ -42,14 +52,14 @@ const stringTo2D = (map) => {
 };
 
 onMounted(async () => {
-  // If store already has the map data (navigated from RecordIndexView), use it directly
+  // 如果状态仓库中已经有地图数据（从记录列表页跳转而来），则直接复用
   if (pkStore.gamemap) {
     recordStore.updateIsRecord(true);
     ready.value = true;
     return;
   }
 
-  // Otherwise (direct URL / page refresh), fetch from backend by recordId
+  // 否则（直接访问链接或刷新页面）时，根据记录编号从后端拉取数据
   const recordId = route.params.recordId;
   if (!recordId) {
     loadError.value = "无效的录像 ID";
@@ -58,19 +68,16 @@ onMounted(async () => {
 
   loading.value = true;
   try {
-    const resp = await apiRequest(API_PATHS.records, {
-      data: { page: 1 },
+    const resp = await apiRequest(API_PATHS.recordDetail, {
+      data: { record_id: recordId },
       token: userStore.token,
     });
-    const list = Array.isArray(resp.records) ? resp.records : [];
-    const target = list.find((item) => String(item.record?.id) === String(recordId));
-
-    if (!target || !target.record?.map) {
+    if (resp.error_message !== "success" || !resp.record?.map) {
       loadError.value = "未找到对应录像，请返回列表重新选择。";
       return;
     }
 
-    const r = target.record;
+    const r = resp.record;
     recordStore.updateIsRecord(true);
     pkStore.updateGame({
       map: stringTo2D(r.map),
@@ -100,8 +107,15 @@ onMounted(async () => {
 }
 
 .record-content-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.head-copy {
   text-align: center;
-  margin-bottom: 10px;
+  grid-column: 2;
 }
 
 .record-content-head h2 {
@@ -114,6 +128,26 @@ onMounted(async () => {
 .record-content-head p {
   margin: 6px 0 0;
   color: var(--kob-muted);
+}
+
+.back-btn {
+  grid-column: 1;
+  justify-self: start;
+  border: 1px solid rgba(90, 180, 255, 0.45);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--kob-text);
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 600;
+  line-height: 1;
+  transition: all 160ms ease;
+}
+
+.back-btn:hover {
+  color: var(--kob-accent-strong);
+  border-color: rgba(90, 180, 255, 0.7);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
 }
 
 .state-tip {
@@ -138,5 +172,21 @@ onMounted(async () => {
     transform: translateY(0);
   }
 }
-</style>
 
+@media (max-width: 768px) {
+  .record-content-head {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    justify-items: center;
+  }
+
+  .back-btn,
+  .head-copy {
+    grid-column: 1;
+  }
+
+  .back-btn {
+    justify-self: center;
+  }
+}
+</style>

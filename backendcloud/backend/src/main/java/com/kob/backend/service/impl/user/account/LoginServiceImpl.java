@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class LoginServiceImpl implements LoginService {
     @Autowired

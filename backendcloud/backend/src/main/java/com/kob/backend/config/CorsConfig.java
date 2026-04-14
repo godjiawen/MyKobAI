@@ -14,6 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * 配置类。
+ */
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsConfig implements Filter {

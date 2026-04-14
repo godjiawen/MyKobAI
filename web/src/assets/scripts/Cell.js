@@ -1,3 +1,4 @@
+// 游戏脚本模块。
 export class Cell {
     constructor(r, c) {
         this.r = r;

@@ -74,8 +74,7 @@ public class UploadAvatarServiceImpl implements UploadAvatarService {
             return map;
         }
 
-        // 构建图片访问URL（依赖于当前的服务器地址和刚才WebConfig映射的/avatars/）
-        // 比如：http://127.0.0.1:3000/avatars/550e8400-e29b-41d4-a716-446655440000.jpg
+        // 基于当前服务地址拼接头像访问路径
         String photoUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/avatars/")
                 .path(newFileName)

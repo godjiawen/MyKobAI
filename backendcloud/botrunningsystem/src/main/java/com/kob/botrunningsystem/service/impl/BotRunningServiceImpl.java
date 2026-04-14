@@ -4,6 +4,9 @@ import com.kob.botrunningsystem.service.BotRunningService;
 import com.kob.botrunningsystem.service.impl.utils.BotPool;
 import org.springframework.stereotype.Service;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class BotRunningServiceImpl implements BotRunningService {
     public final static BotPool botpool = new BotPool();

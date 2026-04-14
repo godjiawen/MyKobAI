@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class UpdateAccountServiceImpl implements UpdateAccountService {
 

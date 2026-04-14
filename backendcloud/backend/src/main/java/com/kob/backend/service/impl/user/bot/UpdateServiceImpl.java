@@ -15,6 +15,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class UpdateServiceImpl implements UpdateService {
     @Autowired

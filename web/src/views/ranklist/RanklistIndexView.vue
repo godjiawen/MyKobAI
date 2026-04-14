@@ -1,43 +1,59 @@
+<!-- 界面组件。 -->
 <template>
   <ContentField>
     <section class="list-panel">
       <div class="panel-header">
-        <h2>Ranklist</h2>
-        <p>Top players by rating.</p>
+        <h2>排行榜</h2>
+        <p>按积分查看当前顶尖玩家。</p>
       </div>
-      <table class="table table-striped table-hover" style="text-align: center;">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Rating</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>
-              <img :src="user.photo || fallbackPhoto" alt="" class="record-user-photo" />
-              &nbsp;
-              <span class="record-user-username">{{ user.username || '-' }}</span>
-            </td>
-            <td>{{ user.rating ?? 0 }}</td>
-          </tr>
-          <tr v-if="!loading && !errorMessage && users.length === 0">
-            <td colspan="2" class="empty-row">暂无排行榜数据</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table class="table table-striped table-hover" style="text-align: center;" :aria-busy="loading">
+          <thead>
+            <tr>
+              <th>玩家</th>
+              <th>积分</th>
+            </tr>
+          </thead>
+          <tbody v-if="loading">
+            <tr v-for="row in skeletonRows" :key="`rank-skeleton-${row}`" class="skeleton-row">
+              <td colspan="2">
+                <div class="skeleton-line"></div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr v-for="user in users" :key="user.id">
+              <td>
+                <img :src="user.photo || fallbackPhoto" alt="" class="record-user-photo" />
+                &nbsp;
+                <span class="record-user-username">{{ user.username || '-' }}</span>
+              </td>
+              <td>{{ user.rating ?? 0 }}</td>
+            </tr>
+            <tr v-if="!errorMessage && users.length === 0">
+              <td colspan="2" class="empty-row">暂无排行榜数据</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p v-if="loading" class="state-tip">排行榜加载中...</p>
       <p v-if="errorMessage" class="state-tip state-error">{{ errorMessage }}</p>
       <nav aria-label="pagination" class="pager-wrap">
         <ul class="pagination">
-          <li class="page-item" @click.prevent="clickPage(-2)">
-            <a class="page-link" href="#">Prev</a>
+          <li :class="['page-item', { disabled: loading || !canPrev }]">
+            <button class="page-link page-btn" type="button" :disabled="loading || !canPrev" @click="clickPage(-2)">
+              上一页
+            </button>
           </li>
-          <li :class="`page-item ${page.is_active}`" v-for="page in pages" :key="page.number" @click.prevent="clickPage(page.number)">
-            <a class="page-link" href="#">{{ page.number }}</a>
+          <li :class="`page-item ${page.is_active}`" v-for="page in pages" :key="page.number">
+            <button class="page-link page-btn" type="button" :disabled="loading" @click="clickPage(page.number)">
+              {{ page.number }}
+            </button>
           </li>
-          <li class="page-item" @click.prevent="clickPage(-1)">
-            <a class="page-link" href="#">Next</a>
+          <li :class="['page-item', { disabled: loading || !canNext }]">
+            <button class="page-link page-btn" type="button" :disabled="loading || !canNext" @click="clickPage(-1)">
+              下一页
+            </button>
           </li>
         </ul>
       </nav>
@@ -46,31 +62,36 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useUserStore } from "@/store/user";
 import ContentField from "@/components/ContentField.vue";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
+import defaultAvatar from "@/assets/images/default-avatar.svg";
 
 const userStore = useUserStore();
 
 const users = ref([]);
 const pages = ref([]);
-const loading = ref(false);
+const loading = ref(true);
 const errorMessage = ref("");
-let currentPage = 1;
-let totalUsers = 0;
-const fallbackPhoto = "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png";
+const currentPage = ref(1);
+const totalUsers = ref(0);
+const skeletonRows = [1, 2, 3, 4, 5];
+const fallbackPhoto = defaultAvatar;
+
+const maxPages = computed(() => Math.ceil(totalUsers.value / 10));
+const canPrev = computed(() => currentPage.value > 1);
+const canNext = computed(() => currentPage.value < maxPages.value);
 
 const updatePages = () => {
-  const maxPages = Math.ceil(totalUsers / 10);
   const nextPages = [];
 
-  for (let i = currentPage - 2; i <= currentPage + 2; i += 1) {
-    if (i >= 1 && i <= maxPages) {
+  for (let i = currentPage.value - 2; i <= currentPage.value + 2; i += 1) {
+    if (i >= 1 && i <= maxPages.value) {
       nextPages.push({
         number: i,
-        is_active: i === currentPage ? "active" : "",
+        is_active: i === currentPage.value ? "active" : "",
       });
     }
   }
@@ -78,8 +99,10 @@ const updatePages = () => {
   pages.value = nextPages;
 };
 
-const pullPage = async (page) => {
-  currentPage = page;
+const pullPage = async (page, { force = false } = {}) => {
+  if (loading.value && !force) return;
+
+  currentPage.value = page;
   loading.value = true;
   errorMessage.value = "";
   try {
@@ -88,12 +111,12 @@ const pullPage = async (page) => {
       token: userStore.token,
     });
     users.value = Array.isArray(resp.users) ? resp.users : [];
-    totalUsers = resp.users_count || 0;
+    totalUsers.value = resp.users_count || 0;
     updatePages();
   } catch (error) {
     console.error(error);
     users.value = [];
-    totalUsers = 0;
+    totalUsers.value = 0;
     pages.value = [];
     errorMessage.value = "排行榜加载失败，请确认后端接口是否可用。";
   } finally {
@@ -102,18 +125,19 @@ const pullPage = async (page) => {
 };
 
 const clickPage = (page) => {
-  let target = page;
-  if (target === -2) target = currentPage - 1;
-  if (target === -1) target = currentPage + 1;
+  if (loading.value) return;
 
-  const maxPages = Math.ceil(totalUsers / 10);
-  if (target >= 1 && target <= maxPages) {
+  let target = page;
+  if (target === -2) target = currentPage.value - 1;
+  if (target === -1) target = currentPage.value + 1;
+
+  if (target >= 1 && target <= maxPages.value) {
     pullPage(target);
   }
 };
 
 onMounted(() => {
-  pullPage(currentPage);
+  pullPage(currentPage.value, { force: true });
 });
 </script>
 
@@ -142,6 +166,36 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table-wrap .table {
+  min-width: 420px;
+}
+
+.page-btn {
+  cursor: pointer;
+}
+
+.page-btn:disabled {
+  cursor: not-allowed;
+}
+
+.skeleton-row td {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.skeleton-line {
+  width: 100%;
+  height: 22px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(90, 180, 255, 0.12), rgba(90, 180, 255, 0.28), rgba(90, 180, 255, 0.12));
+  background-size: 240% 100%;
+  animation: skeleton-wave 1.25s ease-in-out infinite;
+}
+
 img.record-user-photo {
   width: 36px;
   height: 36px;
@@ -166,5 +220,34 @@ img.record-user-photo {
 .empty-row {
   color: var(--kob-muted);
 }
-</style>
 
+@keyframes skeleton-wave {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (max-width: 991px) {
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .table-wrap .table {
+    min-width: 380px;
+    font-size: 0.92rem;
+  }
+
+  .record-user-username {
+    font-size: 0.9rem;
+  }
+
+  .pager-wrap {
+    justify-content: center;
+  }
+}
+</style>

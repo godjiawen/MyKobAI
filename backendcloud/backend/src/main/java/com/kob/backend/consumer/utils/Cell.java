@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 消息处理组件。
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

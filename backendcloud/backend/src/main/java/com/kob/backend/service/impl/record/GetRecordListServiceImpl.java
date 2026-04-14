@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * 服务实现类。
+ */
 @Service
 public class GetRecordListServiceImpl implements GetRecordListService {
     @Autowired

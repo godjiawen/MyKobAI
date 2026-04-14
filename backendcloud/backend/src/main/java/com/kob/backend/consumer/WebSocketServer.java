@@ -69,7 +69,7 @@ public class WebSocketServer {
         try {
             userId = JwtAuthentication.getUserId(token);
         } catch (Exception e) {
-            // token 无效或过期，拒绝连接
+            // 连接令牌无效或已过期，拒绝连接
             this.session.close();
             return;
         }
@@ -120,7 +120,7 @@ public class WebSocketServer {
         respGame.put("b_sy", game.getPlayerB().getSy());
         respGame.put("map", game.getG());
 
-        // Chat room id: sorted player ids so both sides compute the same key
+        // 聊天房间号按双方 id 排序生成，确保双方计算一致
         String roomId = Math.min(aId, bId) + "_" + Math.max(aId, bId);
 
         JSONObject respA = new JSONObject();

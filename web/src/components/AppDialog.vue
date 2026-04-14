@@ -1,16 +1,38 @@
+<!-- 界面组件。 -->
 <template>
   <div v-if="modelValue" class="app-dialog-backdrop" @click.self="handleCancel">
-    <div class="app-dialog" role="dialog" aria-modal="true">
+    <div
+      ref="dialogRef"
+      class="app-dialog"
+      role="dialog"
+      aria-modal="true"
+      :aria-labelledby="titleId"
+      :aria-describedby="messageId"
+    >
       <div class="app-dialog-header">
-        <h5 class="app-dialog-title">{{ title }}</h5>
-        <button type="button" class="app-dialog-close" @click="handleCancel">x</button>
+        <h5 :id="titleId" class="app-dialog-title">{{ title }}</h5>
+        <button
+          ref="closeButtonRef"
+          type="button"
+          class="app-dialog-close"
+          aria-label="关闭弹窗"
+          @click="handleCancel"
+        >
+          ×
+        </button>
       </div>
-      <div class="app-dialog-body">{{ message }}</div>
+      <div :id="messageId" class="app-dialog-body">{{ message }}</div>
       <div class="app-dialog-footer">
-        <button v-if="showCancel" type="button" class="btn-cancel" @click="handleCancel">
+        <button
+          v-if="showCancel"
+          ref="cancelButtonRef"
+          type="button"
+          class="btn-cancel"
+          @click="handleCancel"
+        >
           {{ cancelText }}
         </button>
-        <button type="button" class="btn-confirm" @click="handleConfirm">
+        <button ref="confirmButtonRef" type="button" class="btn-confirm" @click="handleConfirm">
           {{ confirmText }}
         </button>
       </div>
@@ -19,16 +41,72 @@
 </template>
 
 <script setup>
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
-  title: { type: String, default: "Notice" },
+  title: { type: String, default: "提示" },
   message: { type: String, default: "" },
-  confirmText: { type: String, default: "OK" },
-  cancelText: { type: String, default: "Cancel" },
+  confirmText: { type: String, default: "确定" },
+  cancelText: { type: String, default: "取消" },
   showCancel: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["update:modelValue", "confirm", "cancel"]);
+
+const dialogRef = ref(null);
+const closeButtonRef = ref(null);
+const cancelButtonRef = ref(null);
+const confirmButtonRef = ref(null);
+const previousActiveElement = ref(null);
+
+const uid = Math.random().toString(36).slice(2, 10);
+const titleId = computed(() => `app-dialog-title-${uid}`);
+const messageId = computed(() => `app-dialog-message-${uid}`);
+
+const getFocusableElements = () => {
+  const root = dialogRef.value;
+  if (!root) return [];
+  return Array.from(
+    root.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  );
+};
+
+const focusPreferredButton = async () => {
+  await nextTick();
+  const target = confirmButtonRef.value || cancelButtonRef.value || closeButtonRef.value;
+  if (target && typeof target.focus === "function") {
+    target.focus();
+  }
+};
+
+const handleKeydown = (event) => {
+  if (!props.modelValue) return;
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    handleCancel();
+    return;
+  }
+
+  if (event.key !== "Tab") return;
+  const focusables = getFocusableElements();
+  if (focusables.length === 0) return;
+
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  const active = document.activeElement;
+
+  if (!event.shiftKey && active === last) {
+    event.preventDefault();
+    first.focus();
+  } else if (event.shiftKey && active === first) {
+    event.preventDefault();
+    last.focus();
+  }
+};
 
 const close = () => {
   if (!props.modelValue) return;
@@ -44,6 +122,31 @@ const handleCancel = () => {
   emit("cancel");
   close();
 };
+
+watch(
+  () => props.modelValue,
+  async (visible) => {
+    if (visible) {
+      previousActiveElement.value = document.activeElement;
+      document.addEventListener("keydown", handleKeydown);
+      await focusPreferredButton();
+      return;
+    }
+
+    document.removeEventListener("keydown", handleKeydown);
+    if (
+      previousActiveElement.value &&
+      typeof previousActiveElement.value.focus === "function"
+    ) {
+      previousActiveElement.value.focus();
+    }
+    previousActiveElement.value = null;
+  }
+);
+
+onBeforeUnmount(() => {
+  document.removeEventListener("keydown", handleKeydown);
+});
 </script>
 
 <style scoped>

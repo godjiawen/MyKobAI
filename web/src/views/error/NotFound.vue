@@ -1,10 +1,11 @@
-﻿<template>
+<!-- 界面组件。 -->
+<template>
   <ContentField>
     <section class="notfound-wrap">
       <p class="code">404</p>
-      <h1>Page Lost In The Arena</h1>
-      <p class="desc">The page you requested does not exist or has been moved.</p>
-      <router-link class="btn btn-primary back-btn" :to="{ name: 'home' }">Back Home</router-link>
+      <h1>页面在竞技场里迷路了</h1>
+      <p class="desc">你访问的页面不存在，或已被移动到其他位置。</p>
+      <router-link class="btn btn-primary back-btn" :to="{ name: 'home' }">返回首页</router-link>
     </section>
   </ContentField>
 </template>

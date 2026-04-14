@@ -1,4 +1,5 @@
-﻿<template>
+<!-- 界面组件。 -->
+<template>
   <div class="container content-field">
     <div class="card content-card">
       <div class="card-body">

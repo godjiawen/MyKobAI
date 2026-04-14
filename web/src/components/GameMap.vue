@@ -1,3 +1,4 @@
+<!-- 界面组件。 -->
 <template>
   <div ref="parent" class="gamemap">
     <canvas ref="canvas" tabindex="0"></canvas>

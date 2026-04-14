@@ -1,4 +1,4 @@
-// import { event } from "jquery";
+// 游戏脚本模块。
 import { AcGameObject } from "./AcGameObject";
 import { Snake } from "./Snake";
 import { Wall } from "./Wall";
@@ -79,7 +79,7 @@ export class GameMap extends AcGameObject {
                 else if (e.key === 'a') d = 3;
     
                 if (d >= 0) {
-                    e.preventDefault(); // 阻止浏览器默认行为（Edge 滚动/速度覆盖层等）
+                    e.preventDefault(); // 阻止浏览器默认行为（例如页面滚动等）
                     const socket = this.pkStore.socket;
                     if (socket && socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({
@@ -89,7 +89,7 @@ export class GameMap extends AcGameObject {
                     }
                 }
             };
-            // 监听在 document 上，不依赖 canvas 焦点，点击聊天框后依然有效
+            // 键盘事件绑定在页面对象上，不依赖画布焦点，点击聊天框后依然有效
             document.addEventListener("keydown", this.keydownHandler);
         }
        

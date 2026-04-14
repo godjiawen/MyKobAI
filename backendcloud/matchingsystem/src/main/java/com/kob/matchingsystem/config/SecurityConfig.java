@@ -9,6 +9,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * 配置类。
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

@@ -1,10 +1,11 @@
+<!-- 界面组件。 -->
 <template>
   <div class="result-board">
-    <div class="result-board-text" v-if="pkStore.loser === 'all'">Draw!</div>
-    <div class="result-board-text" v-else-if="isLose">You Lose!</div>
-    <div class="result-board-text" v-else>You Win!</div>
+    <div class="result-board-text" v-if="pkStore.loser === 'all'">平局</div>
+    <div class="result-board-text" v-else-if="isLose">你输了</div>
+    <div class="result-board-text" v-else>你赢了</div>
     <div class="result-board-btn">
-      <button @click="restart" type="button" class="btn btn-warning btn-lg">Again!</button>
+      <button @click="restart" type="button" class="btn btn-warning btn-lg">再来一局</button>
     </div>
   </div>
 </template>
@@ -13,6 +14,7 @@
 import { computed } from "vue";
 import { useUserStore } from "@/store/user";
 import { usePkStore } from "@/store/pk";
+import defaultAvatar from "@/assets/images/default-avatar.svg";
 
 const userStore = useUserStore();
 const pkStore = usePkStore();
@@ -29,9 +31,10 @@ const restart = () => {
   pkStore.updateRoomId("");
   pkStore.updateStatus("matching");
   pkStore.updateLoser("none");
+  pkStore.updateResultVisible(false);
   pkStore.updateOpponent({
-    username: "My Opponent",
-    photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png",
+    username: "匹配对手",
+    photo: defaultAvatar,
   });
 };
 </script>
@@ -94,4 +97,3 @@ div.result-board-btn {
   }
 }
 </style>
-

@@ -1,3 +1,4 @@
+// 状态仓库模块。
 import { defineStore } from "pinia";
 
 export const useRecordStore = defineStore("record", {

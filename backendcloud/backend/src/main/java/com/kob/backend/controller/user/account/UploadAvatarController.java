@@ -9,6 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
+/**
+ * 控制器，负责接收请求并调用服务层。
+ */
 @RestController
 public class UploadAvatarController {
     
