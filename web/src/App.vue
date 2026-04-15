@@ -11,15 +11,20 @@
       </section>
 
       <router-view v-else v-slot="{ Component, route }">
-        <transition name="route-fade" mode="out-in" appear>
+        <!--
+          不使用 mode="out-in"：该模式与 keep-alive 存在 Vue 3 兼容性问题，
+          会导致 keep-alive 拦截 unmounted 钩子后 leave 信号永远不触发，新组件无法挂载。
+          改用 CSS position:absolute 让离开的组件脱离文档流，进入的组件天然渲染在正确位置。
+        -->
+        <transition name="route-fade" appear>
           <keep-alive v-if="route.meta.keepAlive" include="RecordIndexView,RanklistIndexView">
-            <component :is="Component" :key="route.name" />
+            <component
+              :is="Component"
+              :key="route.name"
+            />
           </keep-alive>
-        </transition>
-
-        <transition name="route-fade" mode="out-in" appear>
           <component
-            v-if="!route.meta.keepAlive"
+            v-else
             :is="Component"
             :key="route.fullPath"
           />
@@ -120,21 +125,29 @@ body {
 
 .route-fade-enter-active,
 .route-fade-leave-active {
-  transition:
-    opacity var(--motion-medium) var(--ease-out),
-    transform var(--motion-medium) var(--ease-out);
+  transition: opacity var(--motion-medium) var(--ease-out);
+  will-change: opacity;
+}
+
+/*
+ * 离开时将组件移出文档流（position: absolute），使进入的组件立即渲染在正确位置，
+ * 避免两个组件同时在文档流中导致进入组件被挤到错误的位置后再弹回（位移抖动）。
+ * pointer-events: none 防止正在淡出的组件遮挡新页面的交互。
+ */
+.route-fade-leave-active {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .route-fade-enter-from,
 .route-fade-leave-to {
   opacity: 0;
-  transform: translateY(10px);
 }
 
 .route-fade-enter-to,
 .route-fade-leave-from {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .app-error-panel {
@@ -229,13 +242,6 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .route-fade-enter-from,
-  .route-fade-leave-to,
-  .route-fade-enter-to,
-  .route-fade-leave-from {
-    transform: none !important;
   }
 }
 </style>
