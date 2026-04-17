@@ -162,7 +162,18 @@ watch(
   }
 );
 
-onMounted(refreshBots);
+watch(
+  selectedBot,
+  (value) => {
+    pkStore.updateSelectedBot(value);
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
+  selectedBot.value = pkStore.selectedBotId || "-1";
+  refreshBots();
+});
 </script>
 
 <style scoped>

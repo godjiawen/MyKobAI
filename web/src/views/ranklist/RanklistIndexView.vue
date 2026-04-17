@@ -62,7 +62,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+defineOptions({
+  name: "RanklistIndexView",
+});
+
+import { computed, onActivated, onMounted, ref } from "vue";
 import { useUserStore } from "@/store/user";
 import ContentField from "@/components/ContentField.vue";
 import { API_PATHS } from "@/config/env";
@@ -77,6 +81,7 @@ const loading = ref(true);
 const errorMessage = ref("");
 const currentPage = ref(1);
 const totalUsers = ref(0);
+const hasMounted = ref(false);
 const skeletonRows = [1, 2, 3, 4, 5];
 const fallbackPhoto = defaultAvatar;
 
@@ -137,6 +142,12 @@ const clickPage = (page) => {
 };
 
 onMounted(() => {
+  hasMounted.value = true;
+  pullPage(currentPage.value, { force: true });
+});
+
+onActivated(() => {
+  if (!hasMounted.value) return;
   pullPage(currentPage.value, { force: true });
 });
 </script>

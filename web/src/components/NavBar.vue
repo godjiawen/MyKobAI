@@ -1,4 +1,3 @@
-<!-- 界面组件。 -->
 <template>
   <nav class="navbar navbar-expand-lg kob-navbar">
     <div class="container">
@@ -20,13 +19,24 @@
       <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <router-link :class="routeName === 'pk_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'pk_index' }">PK</router-link>
+            <router-link :class="routeName === 'pk_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'pk_index' }">
+              PK
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link :class="routeName === 'record_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'record_index' }">对局记录</router-link>
+            <router-link :class="routeName === 'friends_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'friends_index' }">
+              好友
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link :class="routeName === 'ranklist_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'ranklist_index' }">排行榜</router-link>
+            <router-link :class="routeName === 'record_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'record_index' }">
+              对局记录
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link :class="routeName === 'ranklist_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'ranklist_index' }">
+              排行榜
+            </router-link>
           </li>
         </ul>
         <ul class="navbar-nav" v-if="userStore.is_login">
@@ -151,13 +161,20 @@ onBeforeUnmount(() => {
   margin-right: 6px;
   border-radius: 999px;
   color: var(--kob-muted);
-  transition: all 180ms ease;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
 }
 
 .kob-link:hover,
 .kob-link.active {
   color: var(--kob-accent-strong);
   background: rgba(61, 174, 255, 0.1);
+}
+
+.kob-link:hover {
+  transform: translateY(-1px);
 }
 
 .kob-user-chip {
@@ -210,4 +227,3 @@ onBeforeUnmount(() => {
   color: var(--kob-accent-strong);
 }
 </style>
-

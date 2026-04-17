@@ -3,6 +3,7 @@
     <div class="bg-layer bg-gradient"></div>
     <div class="bg-layer bg-grid"></div>
     <Navbar />
+    <GlobalRealtimePanel />
     <main class="app-main">
       <section v-if="renderError" class="app-error-panel container">
         <h3>页面渲染异常</h3>
@@ -35,12 +36,17 @@
 </template>
 
 <script setup>
-import { onErrorCaptured, ref } from "vue";
+import { onBeforeUnmount, onErrorCaptured, ref, watch } from "vue";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Navbar from "@/components/NavBar.vue";
+import GlobalRealtimePanel from "@/components/GlobalRealtimePanel.vue";
+import { useRealtimeStore } from "@/store/realtime";
+import { useUserStore } from "@/store/user";
 
 const renderError = ref("");
+const userStore = useUserStore();
+const realtimeStore = useRealtimeStore();
 
 const resetRenderError = () => {
   renderError.value = "";
@@ -50,6 +56,22 @@ onErrorCaptured((error) => {
   console.error(error);
   renderError.value = error?.message || "Unknown render error";
   return false;
+});
+
+watch(
+  () => [userStore.is_login, userStore.token, userStore.id],
+  ([isLogin, token, userId]) => {
+    if (isLogin && token && userId) {
+      realtimeStore.initialize();
+      return;
+    }
+    realtimeStore.disconnect();
+  },
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  realtimeStore.disconnect();
 });
 </script>
 

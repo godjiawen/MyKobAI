@@ -24,6 +24,7 @@ export const usePkStore = defineStore("pk", {
     // 暂离状态由服务端广播同步
     isPaused: false,
     pausedByUserId: null,
+    selectedBotId: "-1",
   }),
   actions: {
     updateSocket(socket) {
@@ -61,6 +62,9 @@ export const usePkStore = defineStore("pk", {
     updatePaused({ isPaused, pausedByUserId }) {
       this.isPaused = isPaused;
       this.pausedByUserId = pausedByUserId ?? null;
+    },
+    updateSelectedBot(botId) {
+      this.selectedBotId = String(botId ?? "-1");
     },
   },
 });

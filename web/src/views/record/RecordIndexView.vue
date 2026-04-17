@@ -76,7 +76,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+defineOptions({
+  name: "RecordIndexView",
+});
+
+import { computed, onActivated, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { usePkStore } from "@/store/pk";
@@ -97,6 +101,7 @@ const loading = ref(true);
 const errorMessage = ref("");
 const currentPage = ref(1);
 const totalRecords = ref(0);
+const hasMounted = ref(false);
 const skeletonRows = [1, 2, 3, 4, 5];
 const fallbackPhoto = defaultAvatar;
 
@@ -200,6 +205,12 @@ const openRecordContent = (recordId) => {
 };
 
 onMounted(() => {
+  hasMounted.value = true;
+  pullPage(currentPage.value, { force: true });
+});
+
+onActivated(() => {
+  if (!hasMounted.value) return;
   pullPage(currentPage.value, { force: true });
 });
 </script>

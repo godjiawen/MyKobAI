@@ -24,6 +24,10 @@
       </div>
     </section>
   </ContentField>
+  <section v-else class="global-loading" aria-live="polite">
+    <div class="global-loading-spinner" aria-hidden="true"></div>
+    <p>正在验证登录状态...</p>
+  </section>
 </template>
 
 <script setup>
@@ -96,5 +100,29 @@ div.error-message {
   min-height: 22px;
   color: #e74c3c;
 }
-</style>
 
+.global-loading {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--kob-muted);
+}
+
+.global-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(90, 180, 255, 0.25);
+  border-top-color: var(--kob-accent-strong);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

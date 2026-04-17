@@ -354,6 +354,7 @@ public class Game extends Thread {
         resp.put("loser", loser);
         saveToDatabase();
         sendAllMessage(resp.toJSONString());
+        WebSocketServer.clearGame(playerA.getId(), playerB.getId());
     }
 
     @Override
