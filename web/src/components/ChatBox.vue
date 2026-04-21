@@ -75,6 +75,10 @@ const scrollToBottom = async () => {
   }
 };
 
+/**
+ * Handles handleFocusIn.
+ * ??handleFocusIn?
+ */
 const handleFocusIn = () => {
   if (blurTimer) {
     clearTimeout(blurTimer);
@@ -83,6 +87,10 @@ const handleFocusIn = () => {
   isInputFocused.value = true;
 };
 
+/**
+ * Handles handleFocusOut.
+ * ??handleFocusOut?
+ */
 const handleFocusOut = () => {
   if (blurTimer) clearTimeout(blurTimer);
   blurTimer = setTimeout(() => {
@@ -92,6 +100,10 @@ const handleFocusOut = () => {
   }, 0);
 };
 
+/**
+ * Handles disconnectChat.
+ * ??disconnectChat?
+ */
 const disconnectChat = () => {
   if (socket) {
     socket.onopen = null;
@@ -108,6 +120,10 @@ const disconnectChat = () => {
   messages.value = [];
 };
 
+/**
+ * Handles connectChat.
+ * ??connectChat?
+ */
 const connectChat = (roomId) => {
   disconnectChat();
   if (!roomId) return;
@@ -141,6 +157,10 @@ const connectChat = (roomId) => {
   };
 };
 
+/**
+ * Handles sendMessage.
+ * ??sendMessage?
+ */
 const sendMessage = () => {
   const content = inputText.value.trim();
   if (!content || !socket || socket.readyState !== WebSocket.OPEN) return;
@@ -179,10 +199,12 @@ onUnmounted(() => {
   width: min(320px, 30vw);
   min-width: 250px;
   flex-shrink: 0;
-  border-radius: 18px;
-  border: 1px solid var(--kob-panel-border);
-  background: var(--kob-panel);
-  box-shadow: 0 10px 28px rgba(0, 50, 100, 0.08);
+  border-radius: var(--kob-radius-md);
+  border: 1px solid rgba(90, 180, 255, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 250, 255, 0.84)),
+    radial-gradient(circle at top right, rgba(61, 174, 255, 0.08), transparent 40%);
+  box-shadow: var(--kob-shadow-sm);
   backdrop-filter: blur(12px);
   overflow: hidden;
 }
@@ -225,7 +247,7 @@ onUnmounted(() => {
   height: 9px;
   border-radius: 50%;
   background: #bbb;
-  transition: background 0.3s;
+  transition: background var(--motion-fast) var(--ease-out);
 }
 
 .chat-dot.online {
@@ -315,12 +337,18 @@ onUnmounted(() => {
   color: var(--kob-text);
   background: #fff;
   outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .chat-input:focus {
   border-color: var(--kob-accent);
   box-shadow: 0 0 0 3px rgba(61, 174, 255, 0.15);
+}
+
+.chat-input:focus-visible {
+  outline: none;
 }
 
 .chat-input:disabled {
@@ -338,7 +366,10 @@ onUnmounted(() => {
   color: #fff;
   background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
   cursor: pointer;
-  transition: transform 150ms ease, opacity 150ms ease;
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -346,6 +377,13 @@ onUnmounted(() => {
 
 .chat-send-btn:hover:not(:disabled) {
   transform: translateY(-2px);
+}
+
+.chat-send-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 0 6px rgba(61, 174, 255, 0.28);
 }
 
 .chat-send-btn:disabled {

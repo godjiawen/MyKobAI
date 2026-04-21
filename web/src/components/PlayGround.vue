@@ -1,5 +1,5 @@
 ﻿<template>
-  <div :class="['battle-area', { 'battle-area--record': recordStore.is_record }]" @mousedown.stop>
+  <div :class="['battle-area', 'kob-page-shell', { 'battle-area--record': recordStore.is_record }]" @mousedown.stop>
     <div class="playground">
       <div v-if="showPauseControl" class="play-controls">
         <button
@@ -27,6 +27,15 @@
             <p class="pause-title">对手已暂停对局</p>
             <p class="pause-sub">游戏暂停中，请等待对手恢复。</p>
           </template>
+        </div>
+      </div>
+
+      <!-- 暂离遮罩：主动暂停优先，暂离只在非暂停时显示 -->
+      <div v-if="pkStore.isAwaySuspended && !pkStore.isPaused" class="pause-overlay away-overlay">
+        <div class="pause-panel">
+          <div class="pause-icon">🚶</div>
+          <p class="pause-title">对手暂时离开对局</p>
+          <p class="pause-sub">等待对方返回后继续……</p>
         </div>
       </div>
     </div>
@@ -80,6 +89,10 @@ const isPauseButtonDisabled = computed(() => {
   return !isPausedByMe.value;
 });
 
+/**
+ * Handles resumeGame.
+ * ??resumeGame?
+ */
 const resumeGame = () => {
   const socket = pkStore.socket;
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -87,6 +100,10 @@ const resumeGame = () => {
   }
 };
 
+/**
+ * Handles pauseGame.
+ * ??pauseGame?
+ */
 const pauseGame = () => {
   const socket = pkStore.socket;
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -94,6 +111,10 @@ const pauseGame = () => {
   }
 };
 
+/**
+ * Handles togglePause.
+ * ??togglePause?
+ */
 const togglePause = () => {
   if (pkStore.loser !== "none") return;
 
@@ -114,7 +135,7 @@ const togglePause = () => {
   align-items: stretch;
   gap: 16px;
   width: min(1120px, 96vw);
-  margin: 22px auto 40px;
+  margin: 12px auto 40px;
 }
 
 .battle-area--record {
@@ -122,15 +143,17 @@ const togglePause = () => {
   justify-content: center;
 }
 
-div.playground {
+.playground {
   position: relative;
   flex: 1 1 0;
   min-width: 0;
   height: clamp(400px, 68vh, 720px);
-  border: 1px solid var(--kob-panel-border);
-  border-radius: 22px;
-  background: var(--kob-panel);
-  box-shadow: 0 22px 48px rgba(0, 50, 100, 0.08);
+  border: 1px solid rgba(90, 180, 255, 0.24);
+  border-radius: var(--kob-radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 250, 255, 0.84)),
+    radial-gradient(circle at top right, rgba(255, 208, 93, 0.1), transparent 36%);
+  box-shadow: var(--kob-shadow-md);
   backdrop-filter: blur(12px);
   padding: 14px;
 }
@@ -154,11 +177,21 @@ div.playground {
   color: #fff;
   background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
   box-shadow: 0 6px 16px rgba(61, 174, 255, 0.35);
-  transition: transform 150ms ease, opacity 150ms ease;
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .pause-toggle-btn:hover:not(:disabled) {
   transform: translateY(-1px);
+}
+
+.pause-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 0 6px rgba(61, 174, 255, 0.28);
 }
 
 .pause-toggle-btn:disabled {
@@ -176,7 +209,7 @@ div.playground {
   line-height: 1;
 }
 
-.battle-area--record div.playground {
+.battle-area--record .playground {
   flex: 0 0 auto;
   width: min(96vw, calc(clamp(400px, 68vh, 720px) * 14 / 13));
   height: auto;
@@ -193,7 +226,11 @@ div.playground {
   align-items: center;
   justify-content: center;
   z-index: 50;
-  animation: fade-in 200ms ease;
+  animation: fade-in var(--motion-medium) var(--ease-out);
+}
+
+.away-overlay {
+  background: rgba(255, 248, 220, 0.76);
 }
 
 @keyframes fade-in {
@@ -244,11 +281,20 @@ div.playground {
   background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(61, 174, 255, 0.35);
-  transition: transform 160ms ease;
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .btn-resume:hover {
   transform: translateY(-2px);
+}
+
+.btn-resume:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 0 6px rgba(61, 174, 255, 0.28);
 }
 
 .battle-area :deep(.chat-box) {
@@ -273,7 +319,7 @@ div.playground {
     margin-top: 14px;
   }
 
-  div.playground {
+  .playground {
     height: clamp(320px, 54vh, 520px);
     border-radius: 18px;
     padding: 10px;
@@ -289,7 +335,7 @@ div.playground {
     display: none;
   }
 
-  .battle-area--record div.playground {
+  .battle-area--record .playground {
     width: min(96vw, 560px);
   }
 
@@ -310,6 +356,12 @@ div.playground {
     width: 100%;
     min-height: 220px;
     height: clamp(220px, 30vh, 320px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pause-overlay {
+    animation: none;
   }
 }
 </style>

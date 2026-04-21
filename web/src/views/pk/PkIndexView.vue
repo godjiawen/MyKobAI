@@ -9,7 +9,7 @@
             <h3>{{ incomingInvite.senderUsername }} 邀请你开始一场 PK 对战</h3>
             <p class="invite-banner__meta">
               对方出战设置：{{ incomingInvite.senderBotTitle }}
-              <span>你将使用当前配置应战：{{ selectedBotLabel }}</span>
+              <span>你将使用当前设置应战：{{ selectedBotLabel }}</span>
             </p>
             <p class="invite-banner__meta">邀请有效期至 {{ incomingInvite.expiredAt || "稍后失效" }}</p>
           </div>
@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, onBeforeUnmount } from "vue";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/user";
 import { usePkStore } from "@/store/pk";
@@ -132,6 +132,28 @@ onMounted(() => {
     realtimeStore.fetchPendingInvites().catch((error) => {
       console.error("load pending invites failed:", error);
     });
+  }
+
+  // 上报进入 PK 页面（WebSocket 可能尚未就绪，稍等后发送）
+  const sendEnter = () => {
+    const socket = pkStore.socket;
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ event: "game-enter" }));
+      socket.send(JSON.stringify({ event: "sync-game" }));
+    } else {
+      setTimeout(sendEnter, 300);
+    }
+  };
+  setTimeout(sendEnter, 400);
+});
+
+onBeforeUnmount(() => {
+  // 离开 PK 页面时通知后端暂离
+  if (pkStore.status === "playing" && pkStore.loser === "none") {
+    const socket = pkStore.socket;
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ event: "game-leave", reason: "route-leave" }));
+    }
   }
 });
 </script>

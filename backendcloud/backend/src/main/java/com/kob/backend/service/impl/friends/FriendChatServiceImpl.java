@@ -37,6 +37,10 @@ public class FriendChatServiceImpl implements FriendChatService {
     private FriendDomainService friendDomainService;
 
     @Override
+    /**
+     * Handles conversations.
+     * ??conversations?
+     */
     public Map<String, Object> conversations() {
         User currentUser = friendDomainService.currentUser();
         QueryWrapper<FriendRelation> relationWrapper = new QueryWrapper<>();
@@ -84,6 +88,10 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     @Override
+    /**
+     * Handles history.
+     * ??history?
+     */
     public Map<String, Object> history(Integer friendId, Integer page, Integer pageSize) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -112,6 +120,10 @@ public class FriendChatServiceImpl implements FriendChatService {
 
     @Override
     @Transactional
+    /**
+     * Handles send.
+     * ??send?
+     */
     public Map<String, Object> send(Integer friendId, String content) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -141,6 +153,10 @@ public class FriendChatServiceImpl implements FriendChatService {
 
     @Override
     @Transactional
+    /**
+     * Handles read.
+     * ??read?
+     */
     public Map<String, Object> read(Integer friendId) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -149,6 +165,10 @@ public class FriendChatServiceImpl implements FriendChatService {
         return success();
     }
 
+    /**
+     * Handles buildConversationWrapper.
+     * ??buildConversationWrapper?
+     */
     private QueryWrapper<FriendChatMessage> buildConversationWrapper(Integer currentUserId, Integer friendId) {
         QueryWrapper<FriendChatMessage> wrapper = new QueryWrapper<>();
         wrapper.and(query -> query
@@ -157,6 +177,10 @@ public class FriendChatServiceImpl implements FriendChatService {
         return wrapper;
     }
 
+    /**
+     * Handles buildMessageView.
+     * ??buildMessageView?
+     */
     private Map<String, Object> buildMessageView(FriendChatMessage message) {
         User sender = userMapper.selectById(message.getSenderId());
         User receiver = userMapper.selectById(message.getReceiverId());
@@ -174,6 +198,10 @@ public class FriendChatServiceImpl implements FriendChatService {
         return item;
     }
 
+    /**
+     * Handles notifyChatMessage.
+     * ??notifyChatMessage?
+     */
     private void notifyChatMessage(Integer targetUserId, Map<String, Object> message) {
         JSONObject event = new JSONObject();
         event.put("event", "friend-chat-message");
@@ -181,6 +209,10 @@ public class FriendChatServiceImpl implements FriendChatService {
         WebSocketServer.sendEvent(targetUserId, event);
     }
 
+    /**
+     * Handles markConversationAsRead.
+     * ??markConversationAsRead?
+     */
     private void markConversationAsRead(Integer currentUserId, Integer friendId) {
         UpdateWrapper<FriendChatMessage> wrapper = new UpdateWrapper<>();
         wrapper.eq("sender_id", friendId)
@@ -190,12 +222,20 @@ public class FriendChatServiceImpl implements FriendChatService {
         friendChatMessageMapper.update(null, wrapper);
     }
 
+    /**
+     * Handles success.
+     * ??success?
+     */
     private Map<String, Object> success() {
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("error_message", "success");
         return resp;
     }
 
+    /**
+     * Handles error.
+     * ??error?
+     */
     private Map<String, Object> error(String errorMessage) {
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("error_message", errorMessage);

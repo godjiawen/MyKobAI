@@ -72,6 +72,10 @@ public class Bot implements java.util.function.Supplier<Integer> {
     // ------------------------------------------------------------------ 主逻辑
 
     @Override
+    /**
+     * Handles get.
+     * ??get?
+     */
     public Integer get() {
         // 1. 读取输入
         Scanner sc;

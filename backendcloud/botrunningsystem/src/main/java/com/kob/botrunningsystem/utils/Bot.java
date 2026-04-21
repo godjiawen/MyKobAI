@@ -20,6 +20,10 @@ public class Bot implements java.util.function.Supplier<Integer> {
         return step % 3 == 1;
     }
 
+    /**
+     * Handles getCells.
+     * ??getCells?
+     */
     public List<Cell> getCells(int sx, int sy, String steps) {
         steps = steps.substring(1, steps.length() - 1);
         List<Cell> res = new ArrayList<>();
@@ -41,6 +45,10 @@ public class Bot implements java.util.function.Supplier<Integer> {
     }
 
 
+    /**
+     * Handles nextMove.
+     * ??nextMove?
+     */
     public Integer nextMove(String input) {
         String[] strs = input.split("#");
         int[][] g = new int[13][14];
@@ -74,6 +82,10 @@ public class Bot implements java.util.function.Supplier<Integer> {
     }
 
     @Override
+    /**
+     * Handles get.
+     * ??get?
+     */
     public Integer get() {
         File file = new File("input.txt");
 

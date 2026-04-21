@@ -15,12 +15,19 @@ const int ROWS = 13, COLS = 14;
 const int DX[] = {-1, 0, 1, 0};
 const int DY[] = {0,  1, 0, -1};
 
+/**
+ * Determines whether the snake tail should grow at the given step.
+ * 判断在给定步数时蛇尾是否应增长。
+ */
 bool checkTailIncreasing(int step) {
     if (step <= 10) return true;
     return step % 3 == 1;
 }
 
-/** 从起点 + 历史步骤重建蛇身，返回格子列表（front = 蛇尾，back = 蛇头） */
+/**
+ * Rebuilds snake body cells from start position and step history.
+ * 根据起点和历史步骤重建蛇身格子。
+ */
 vector<pair<int,int>> getCells(int sx, int sy, const string& steps) {
     deque<pair<int,int>> cells;
     cells.push_back({sx, sy});
@@ -35,7 +42,10 @@ vector<pair<int,int>> getCells(int sx, int sy, const string& steps) {
     return {cells.begin(), cells.end()};
 }
 
-/** BFS 计算从 (sx, sy) 出发能到达的空格数（含起点） */
+/**
+ * Runs BFS and returns reachable free-cell count from the given start cell.
+ * 运行BFS并返回从给定起点可到达的空白格数量。
+ */
 int floodFill(int g[ROWS][COLS], int sx, int sy) {
     if (g[sx][sy] != 0) return 0;
     bool visited[ROWS][COLS] = {};
@@ -58,6 +68,10 @@ int floodFill(int g[ROWS][COLS], int sx, int sy) {
     return count;
 }
 
+/**
+ * Parses input, evaluates four directions, and outputs the safest move direction.
+ * 解析输入、评估四个方向并输出最安全的移动方向。
+ */
 int main() {
     // ── 读取输入 ──────────────────────────────────────────────────────────────
     ifstream fin("input.txt");
@@ -107,4 +121,3 @@ int main() {
     cout << bestDir << endl;
     return 0;
 }
-

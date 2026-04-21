@@ -11,7 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * 服务实现类。
+ * Spring Security UserDetailsService implementation that loads user data by username from the database.
+ * 从数据库按用户名加载用户数据的Spring Security UserDetailsService实现。
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -19,7 +20,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * Loads the user record matching the given username and wraps it in a UserDetailsImpl.
+     * 加载与给定用户名匹配的用户记录并将其封装为UserDetailsImpl。
+     */
     @Override
+    /**
+     * Handles loadUserByUsername.
+     * ??loadUserByUsername?
+     */
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);

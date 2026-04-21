@@ -11,10 +11,18 @@ let friendRequestTimer = null;
 let friendMessageTimer = null;
 let manuallyClosed = false;
 
+/**
+ * Handles clearTimer.
+ * ??clearTimer?
+ */
 const clearTimer = (timerRef) => {
   if (timerRef) clearTimeout(timerRef);
 };
 
+/**
+ * Handles syncFriendStoreRelationships.
+ * ??syncFriendStoreRelationships?
+ */
 const syncFriendStoreRelationships = () => {
   import("@/store/friend")
     .then(({ useFriendStore }) => {
@@ -28,6 +36,10 @@ const syncFriendStoreRelationships = () => {
     });
 };
 
+/**
+ * Handles pushRealtimeChatMessage.
+ * ??pushRealtimeChatMessage?
+ */
 const pushRealtimeChatMessage = (message) => {
   import("@/store/friend")
     .then(({ useFriendStore }) => {
@@ -41,11 +53,11 @@ const pushRealtimeChatMessage = (message) => {
 const normalizeInvite = (invite = {}) => ({
   id: invite.invite_id,
   senderId: invite.sender_id,
-  senderUsername: invite.sender_username || "未知玩家",
+  senderUsername: invite.sender_username || "閺堫亞鐓￠悳鈺侇啀",
   senderPhoto: invite.sender_photo || defaultAvatar,
   senderBotTitle: invite.sender_bot_title || "manual",
   receiverId: invite.receiver_id,
-  receiverUsername: invite.receiver_username || "未知玩家",
+  receiverUsername: invite.receiver_username || "閺堫亞鐓￠悳鈺侇啀",
   receiverPhoto: invite.receiver_photo || defaultAvatar,
   status: invite.status || "pending",
   createdAt: invite.created_at || "",
@@ -55,20 +67,20 @@ const normalizeInvite = (invite = {}) => ({
 const normalizeFriendRequest = (request = {}) => ({
   id: request.request_id,
   senderId: request.sender_id,
-  senderUsername: request.sender_username || "未知玩家",
+  senderUsername: request.sender_username || "閺堫亞鐓￠悳鈺侇啀",
   senderPhoto: request.sender_photo || defaultAvatar,
   senderRating: request.sender_rating || 0,
-  message: request.message || "向你发送了好友申请。",
-  createdAt: request.created_at || "刚刚",
+    message: request.message || "sent a friend request",
+    createdAt: request.created_at || "just now",
 });
 
 const normalizeFriendMessage = (message = {}) => ({
   id: message.message_id,
   senderId: message.sender_id,
-  senderUsername: message.sender_username || "未知玩家",
+  senderUsername: message.sender_username || "閺堫亞鐓￠悳鈺侇啀",
   senderPhoto: message.sender_photo || defaultAvatar,
   receiverId: message.receiver_id,
-  receiverUsername: message.receiver_username || "未知玩家",
+  receiverUsername: message.receiver_username || "閺堫亞鐓￠悳鈺侇啀",
   receiverPhoto: message.receiver_photo || defaultAvatar,
   content: message.content || "",
   createdAt: message.created_at || "",
@@ -99,16 +111,28 @@ export const useRealtimeStore = defineStore("realtime", {
     },
   }),
   actions: {
+    /**
+     * Handles getToken.
+     * ??getToken?
+     */
     getToken() {
       const userStore = useUserStore();
       return userStore.token || localStorage.getItem("jwt_token") || "";
     },
+    /**
+     * Handles syncInviteSnapshots.
+     * ??syncInviteSnapshots?
+     */
     syncInviteSnapshots() {
       const userStore = useUserStore();
       const currentUserId = Number.parseInt(userStore.id, 10);
       this.incomingInvite = this.pendingInvites.find((invite) => invite.receiverId === currentUserId) || null;
       this.outgoingInvite = this.pendingInvites.find((invite) => invite.senderId === currentUserId) || null;
     },
+    /**
+     * Handles getPendingInviteWithFriend.
+     * ??getPendingInviteWithFriend?
+     */
     getPendingInviteWithFriend(friendId) {
       const userStore = useUserStore();
       const currentUserId = Number.parseInt(userStore.id, 10);
@@ -121,6 +145,10 @@ export const useRealtimeStore = defineStore("realtime", {
         ) || null
       );
     },
+    /**
+     * Handles initialize.
+     * ??initialize?
+     */
     initialize() {
       const token = this.getToken();
       if (!token) return;
@@ -140,6 +168,8 @@ export const useRealtimeStore = defineStore("realtime", {
         this.connecting = false;
         this.initialized = true;
         pkStore.updateSocket(socket);
+        // 鏉╃偞甯村铏圭彌閸氬氦鍤滈崝銊ュ絺闁?sync-game閿涘瞼鏁ゆ禍搴㈡焽缁惧潡鍣告潻鐐翠划婢跺秴顕仦鈧?
+        socket.send(JSON.stringify({ event: "sync-game" }));
         this.fetchPendingInvites().catch((error) => {
           console.error("fetch pending invites failed:", error);
         });
@@ -165,6 +195,10 @@ export const useRealtimeStore = defineStore("realtime", {
         console.error("realtime socket error:", error);
       };
     },
+    /**
+     * Handles disconnect.
+     * ??disconnect?
+     */
     disconnect() {
       manuallyClosed = true;
       clearTimer(reconnectTimer);
@@ -179,6 +213,10 @@ export const useRealtimeStore = defineStore("realtime", {
       this.initialized = false;
       this.resetNotifications();
     },
+    /**
+     * Handles resetNotifications.
+     * ??resetNotifications?
+     */
     resetNotifications() {
       clearTimer(inviteNoticeTimer);
       clearTimer(friendRequestTimer);
@@ -206,6 +244,10 @@ export const useRealtimeStore = defineStore("realtime", {
       this.pendingInvites = (resp.invites || []).map(normalizeInvite);
       this.syncInviteSnapshots();
     },
+    /**
+     * Handles showInviteNotice.
+     * ??showInviteNotice?
+     */
     showInviteNotice(title, message, type = "info") {
       this.inviteNotice = {
         visible: true,
@@ -218,11 +260,19 @@ export const useRealtimeStore = defineStore("realtime", {
         this.clearInviteNotice();
       }, 3200);
     },
+    /**
+     * Handles clearInviteNotice.
+     * ??clearInviteNotice?
+     */
     clearInviteNotice() {
       clearTimer(inviteNoticeTimer);
       inviteNoticeTimer = null;
       this.inviteNotice.visible = false;
     },
+    /**
+     * Handles showFriendRequestNotice.
+     * ??showFriendRequestNotice?
+     */
     showFriendRequestNotice(request) {
       this.friendRequestNotice.visible = true;
       this.friendRequestNotice.request = normalizeFriendRequest(request);
@@ -231,12 +281,20 @@ export const useRealtimeStore = defineStore("realtime", {
         this.clearFriendRequestNotice();
       }, 4200);
     },
+    /**
+     * Handles clearFriendRequestNotice.
+     * ??clearFriendRequestNotice?
+     */
     clearFriendRequestNotice() {
       clearTimer(friendRequestTimer);
       friendRequestTimer = null;
       this.friendRequestNotice.visible = false;
       this.friendRequestNotice.request = null;
     },
+    /**
+     * Handles showFriendMessageNotice.
+     * ??showFriendMessageNotice?
+     */
     showFriendMessageNotice(message) {
       this.friendMessageNotice.visible = true;
       this.friendMessageNotice.message = normalizeFriendMessage(message);
@@ -245,13 +303,17 @@ export const useRealtimeStore = defineStore("realtime", {
         this.clearFriendMessageNotice();
       }, 4200);
     },
+    /**
+     * Handles clearFriendMessageNotice.
+     * ??clearFriendMessageNotice?
+     */
     clearFriendMessageNotice() {
       clearTimer(friendMessageTimer);
       friendMessageTimer = null;
       this.friendMessageNotice.visible = false;
       this.friendMessageNotice.message = null;
     },
-    async respondInvite(action) {
+        async respondInvite(action) {
       if (!this.incomingInvite || this.inviteActionLoading) return;
       const pkStore = usePkStore();
       const currentInvite = this.incomingInvite;
@@ -269,25 +331,23 @@ export const useRealtimeStore = defineStore("realtime", {
         if (resp?.error_message !== "success") {
           throw new Error(resp?.error_message || "Respond invite failed");
         }
-
         await this.fetchPendingInvites();
         syncFriendStoreRelationships();
         if (action === "accept") {
-          this.showInviteNotice("邀战已接受", `已接受 ${currentInvite.senderUsername} 的邀战。`, "success");
+          this.showInviteNotice("Invite accepted", `Accepted invite from ${currentInvite.senderUsername}`, "success");
         } else {
-          this.showInviteNotice("已拒绝邀战", `你已拒绝 ${currentInvite.senderUsername} 的邀战。`, "info");
+          this.showInviteNotice("Invite rejected", `Rejected invite from ${currentInvite.senderUsername}`, "info");
         }
       } catch (error) {
-        this.showInviteNotice("处理失败", error.message || "邀战响应失败。", "warn");
+        this.showInviteNotice("Action failed", error.message || "Invite response failed", "warn");
       } finally {
         this.inviteActionLoading = false;
       }
     },
-    async cancelOutgoingInvite(inviteId = this.outgoingInvite?.id) {
+        async cancelOutgoingInvite(inviteId = this.outgoingInvite?.id) {
       if (!inviteId || this.inviteActionLoading) return;
       const currentInvite = this.pendingInvites.find((invite) => invite.id === inviteId) || this.outgoingInvite;
       if (!currentInvite) return;
-
       this.inviteActionLoading = true;
       try {
         const resp = await apiRequest(API_PATHS.friendInviteRespond, {
@@ -303,13 +363,17 @@ export const useRealtimeStore = defineStore("realtime", {
         }
         await this.fetchPendingInvites();
         syncFriendStoreRelationships();
-        this.showInviteNotice("邀战已撤回", `已撤回发给 ${currentInvite.receiverUsername} 的邀战。`, "info");
+        this.showInviteNotice("Invite cancelled", `Cancelled invite to ${currentInvite.receiverUsername}`, "info");
       } catch (error) {
-        this.showInviteNotice("撤回失败", error.message || "邀战撤回失败。", "warn");
+        this.showInviteNotice("Cancel failed", error.message || "Invite cancel failed", "warn");
       } finally {
         this.inviteActionLoading = false;
       }
     },
+    /**
+     * Handles handleFriendChatMessage.
+     * ??handleFriendChatMessage?
+     */
     handleFriendChatMessage(message) {
       const normalized = normalizeFriendMessage(message);
       pushRealtimeChatMessage(normalized);
@@ -320,6 +384,10 @@ export const useRealtimeStore = defineStore("realtime", {
         this.showFriendMessageNotice(normalized);
       }
     },
+    /**
+     * Handles handleSocketMessage.
+     * ??handleSocketMessage?
+     */
     handleSocketMessage(raw) {
       const data = JSON.parse(raw);
       const pkStore = usePkStore();
@@ -377,23 +445,59 @@ export const useRealtimeStore = defineStore("realtime", {
         return;
       }
 
+      // 閳光偓閳光偓 閺傤厾鍤庨柌宥堢箾閺傛澘顤冩禍瀣╂ 閳光偓閳光偓
+      if (data.event === "game-resync") {
+        pkStore.updateGameSnapshot(data.snapshot);
+        // 婵″倹鐏?GameMap 瀹歌尙绮￠崚娑樼紦閿涘牏鏁ら幋鐤箲閸ョ偤銆夐棃銏℃閿涘绱濋棁鈧憰渚€鍣搁弬鐗堜划婢跺秷娉ч煬?
+        const gameObj = pkStore.gameObject;
+        if (gameObj && typeof gameObj.restoreFromSnapshot === "function") {
+          gameObj.restoreFromSnapshot();
+        }
+        return;
+      }
+
+      if (data.event === "no-active-game") {
+        pkStore.resetActiveGameState();
+        return;
+      }
+
+      if (data.event === "player-away") {
+        pkStore.markPlayerAway(data.user_id);
+        return;
+      }
+
+      if (data.event === "player-back") {
+        pkStore.markPlayerBack(data.user_id);
+        return;
+      }
+
+      if (data.event === "game-suspended") {
+        pkStore.updateAwaySuspended(true, data.suspended_by, data.reason);
+        return;
+      }
+
+      if (data.event === "game-resumed-from-away") {
+        pkStore.updateAwaySuspended(false, null, "");
+        return;
+      }
+
       if (data.event === "friend-request-received") {
         this.showFriendRequestNotice(data.request || {});
         syncFriendStoreRelationships();
         return;
       }
 
-      if (data.event === "friend-request-handled") {
+            if (data.event === "friend-request-handled") {
         if (data.status === "accepted") {
-          this.showInviteNotice("好友申请已通过", "你发出的好友申请已经被接受。", "success");
+          this.showInviteNotice("Friend request accepted", "Your friend request was accepted", "success");
         }
         syncFriendStoreRelationships();
         return;
       }
 
-      if (data.event === "friend-invite-received") {
+            if (data.event === "friend-invite-received") {
         const invite = normalizeInvite(data.invite || {});
-        this.showInviteNotice("收到好友邀战", `${invite.senderUsername} 向你发起了对战邀请。`, "success");
+        this.showInviteNotice("Challenge received", `${invite.senderUsername} invited you to a match`, "success");
         this.fetchPendingInvites().catch((error) => {
           console.error("refresh pending invites failed:", error);
         });
@@ -414,31 +518,35 @@ export const useRealtimeStore = defineStore("realtime", {
         this.handleFriendChatMessage(data.message || {});
       }
     },
-    handleInviteUpdated(data) {
+    /**
+     * Handles handleInviteUpdated.
+     * ??handleInviteUpdated?
+     */
+        handleInviteUpdated(data) {
       const status = data.status || "updated";
-
       if (this.incomingInvite && this.incomingInvite.id === data.invite_id) {
         const senderName = this.incomingInvite.senderUsername;
         if (status === "cancelled") {
-          this.showInviteNotice("邀战已取消", `${senderName} 取消了这次邀战。`, "info");
+          this.showInviteNotice("Invite cancelled", `${senderName} cancelled this invite`, "info");
         } else if (status === "expired") {
-          this.showInviteNotice("邀战已过期", `${senderName} 的邀战已失效。`, "warn");
+          this.showInviteNotice("Invite expired", `${senderName}'s invite expired`, "warn");
         }
         return;
       }
-
       if (this.outgoingInvite && this.outgoingInvite.id === data.invite_id) {
         const receiverName = this.outgoingInvite.receiverUsername;
         if (status === "accepted") {
-          this.showInviteNotice("对方已接受", `${receiverName} 已接受你的邀战。`, "success");
+          this.showInviteNotice("Invite accepted", `${receiverName} accepted your invite`, "success");
         } else if (status === "rejected") {
-          this.showInviteNotice("对方已拒绝", `${receiverName} 拒绝了这次邀战。`, "warn");
+          this.showInviteNotice("Invite rejected", `${receiverName} rejected your invite`, "warn");
         } else if (status === "cancelled") {
-          this.showInviteNotice("邀战已撤回", `你已撤回发给 ${receiverName} 的邀战。`, "info");
+          this.showInviteNotice("Invite cancelled", `You cancelled invite to ${receiverName}`, "info");
         } else if (status === "expired") {
-          this.showInviteNotice("邀战已过期", `发给 ${receiverName} 的邀战已过期。`, "warn");
+          this.showInviteNotice("Invite expired", `Invite to ${receiverName} expired`, "warn");
         }
       }
     },
   },
 });
+
+

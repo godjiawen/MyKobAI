@@ -15,10 +15,18 @@ public class Consumer extends Thread {
     private static final String RECEIVE_BOT_MOVE_URL = "http://127.0.0.1:3000/pk/receive/bot/move/";
 
     @Autowired
+    /**
+     * Handles setRestTemplate.
+     * ??setRestTemplate?
+     */
     public void setRestTemplate(RestTemplate restTemplate) {
         Consumer.restTemplate = restTemplate;
     }
 
+    /**
+     * Handles startTimeout.
+     * ??startTimeout?
+     */
     public void startTimeout(long timeout, Bot bot) {
         this.bot = bot;
         this.start();
@@ -43,6 +51,10 @@ public class Consumer extends Thread {
     }
 
     @Override
+    /**
+     * Handles run.
+     * ??run?
+     */
     public void run() {
         LanguageRunner runner = getRunner(bot.getLanguage());
         Integer direction;

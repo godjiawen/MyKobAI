@@ -16,14 +16,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 服务实现类。
+ * Service implementation for user login that authenticates credentials and returns a JWT token.
+ * 用户登录服务实现，验证凭据并返回JWT令牌。
  */
 @Service
 public class LoginServiceImpl implements LoginService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    /**
+     * Authenticates the user with the given credentials and returns a JWT token on success.
+     * 使用给定凭据对用户进行身份验证，成功时返回JWT令牌。
+     */
     @Override
+    /**
+     * Handles getToken.
+     * ??getToken?
+     */
     public Map<String, String> getToken(String username, String password) {
         Map<String, String> map = new HashMap<>();
         UsernamePasswordAuthenticationToken authenticationToken =

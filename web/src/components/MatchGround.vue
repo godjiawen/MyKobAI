@@ -1,41 +1,48 @@
-﻿<template>
-  <div class="matchground">
-    <div class="row">
-      <div class="col-4">
-        <div class="user-photo">
-          <img :src="userStore.photo" alt="" />
+<template>
+  <section class="match-shell kob-page-shell">
+    <div class="matchground kob-surface">
+      <header class="match-header">
+        <div>
+          <p class="kob-kicker">Match Center</p>
+          <h3 class="kob-headline">实时匹配</h3>
+          <p class="kob-subtitle">选择出战 Bot，开始匹配或取消匹配。</p>
         </div>
-        <div class="user-username">{{ userStore.username }}</div>
-      </div>
-      <div class="col-4">
-        <div class="user-select-bot">
-          <select v-model="selectedBot" class="form-select" aria-label="选择出战 Bot">
+      </header>
+
+      <div class="match-grid">
+        <article class="player-card">
+          <img :src="userStore.photo" alt="" class="player-avatar" />
+          <strong>{{ userStore.username }}</strong>
+          <span>当前玩家</span>
+        </article>
+
+        <article class="control-card">
+          <label class="control-label" for="bot-select">出战设置</label>
+          <select id="bot-select" v-model="selectedBot" class="form-select" aria-label="选择出战 Bot">
             <option value="-1">手动操作</option>
             <option v-for="bot in bots" :key="bot.id" :value="String(bot.id)">
               {{ bot.title }}
             </option>
           </select>
-        </div>
-      </div>
-      <div class="col-4">
-        <div class="user-photo">
-          <img :src="pkStore.opponent_photo" alt="" />
-        </div>
-        <div class="user-username">{{ pkStore.opponent_username }}</div>
-      </div>
-      <div class="col-12 match-action-row">
-        <button
-          type="button"
-          class="btn btn-warning btn-lg match-action-btn"
-          :disabled="isButtonDisabled"
-          @click="toggleMatch"
-        >
-          {{ matchButtonText }}
-        </button>
-        <p v-if="stateHint" class="match-state-hint">{{ stateHint }}</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-lg match-action-btn kob-pill-btn"
+            :disabled="isButtonDisabled"
+            @click="toggleMatch"
+          >
+            {{ matchButtonText }}
+          </button>
+          <p v-if="stateHint" class="match-state-hint">{{ stateHint }}</p>
+        </article>
+
+        <article class="player-card">
+          <img :src="pkStore.opponent_photo" alt="" class="player-avatar" />
+          <strong>{{ pkStore.opponent_username }}</strong>
+          <span>待匹配对手</span>
+        </article>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -94,6 +101,10 @@ const refreshBots = async () => {
   }
 };
 
+/**
+ * Handles sendStartMatching.
+ * ??sendStartMatching?
+ */
 const sendStartMatching = () => {
   const socket = pkStore.socket;
   if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -110,6 +121,10 @@ const sendStartMatching = () => {
   matchState.value = MATCH_STATES.MATCHING;
 };
 
+/**
+ * Handles sendStopMatching.
+ * ??sendStopMatching?
+ */
 const sendStopMatching = () => {
   const socket = pkStore.socket;
   if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -121,6 +136,10 @@ const sendStopMatching = () => {
   matchState.value = MATCH_STATES.IDLE;
 };
 
+/**
+ * Handles toggleMatch.
+ * ??toggleMatch?
+ */
 const toggleMatch = () => {
   if (matchState.value === MATCH_STATES.MATCHING) {
     sendStopMatching();
@@ -177,130 +196,99 @@ onMounted(() => {
 </script>
 
 <style scoped>
-div.matchground {
-  width: min(980px, 92vw);
-  min-height: 540px;
-  height: min(70vh, 740px);
-  margin: 34px auto;
-  border-radius: 24px;
-  border: 1px solid var(--kob-panel-border);
-  background: var(--kob-panel);
-  box-shadow: 0 24px 50px rgba(0, 50, 100, 0.08);
-  backdrop-filter: blur(12px);
-  animation: panel-enter 280ms ease;
+.matchground {
+  padding: 24px;
 }
 
-div.user-photo {
-  text-align: center;
-  padding-top: clamp(40px, 10vh, 96px);
+.match-header {
+  margin-bottom: 18px;
 }
 
-div.user-photo > img {
+.match-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.player-card,
+.control-card {
+  border-radius: var(--kob-radius-lg);
+  border: 1px solid rgba(90, 180, 255, 0.18);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: var(--kob-shadow-sm);
+}
+
+.player-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+}
+
+.player-avatar {
+  width: clamp(96px, 12vw, 140px);
+  height: clamp(96px, 12vw, 140px);
   border-radius: 50%;
-  width: clamp(120px, 20vh, 200px);
-  border: 4px solid #ffffff;
-  box-shadow: 0 0 24px rgba(90, 180, 255, 0.4);
+  border: 3px solid #fff;
+  box-shadow: 0 0 20px rgba(90, 180, 255, 0.35);
+  object-fit: cover;
 }
 
-div.user-username {
-  text-align: center;
-  font-size: 24px;
-  font-weight: 600;
+.player-card strong {
   color: var(--kob-text);
-  padding-top: 2vh;
+  font-size: 1.05rem;
 }
 
-div.user-select-bot {
-  padding-top: clamp(110px, 20vh, 180px);
+.player-card span {
+  color: var(--kob-muted);
+  font-size: 0.84rem;
 }
 
-div.user-select-bot > select {
-  width: 80%;
-  margin: 0 auto;
-  border-radius: 999px;
-  background-color: #ffffff;
-  border: 1px solid rgba(90, 180, 255, 0.4);
-  color: var(--kob-text);
+.control-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
 }
 
-.btn.btn-warning {
-  border-radius: 999px;
-  padding: 11px 36px;
+.control-label {
+  color: var(--kob-muted);
+  font-size: 0.84rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--kob-accent-strong), var(--kob-accent));
-  border: none;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.match-action-row {
-  text-align: center;
-  padding-top: clamp(26px, 15vh, 120px);
 }
 
 .match-action-btn {
-  min-width: 190px;
-}
-
-.match-action-btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+  margin-top: 6px;
 }
 
 .match-state-hint {
-  margin: 10px 0 0;
+  margin: 0;
   color: var(--kob-muted);
-  font-size: 0.9rem;
-}
-
-.btn.btn-warning:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(61, 174, 255, 0.4);
-}
-
-@keyframes panel-enter {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  font-size: 0.88rem;
 }
 
 @media (max-width: 991px) {
-  div.matchground {
-    width: min(94vw, 680px);
-    min-height: 0;
-    height: auto;
-    padding: 12px 8px 18px;
-    margin: 16px auto 24px;
+  .matchground {
+    padding: 18px;
   }
 
-  div.user-photo {
-    padding-top: 20px;
+  .match-grid {
+    grid-template-columns: 1fr;
   }
 
-  div.user-photo > img {
-    width: clamp(88px, 22vw, 128px);
-    border-width: 3px;
+  .player-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
   }
 
-  div.user-username {
-    font-size: 18px;
-    padding-top: 10px;
-  }
-
-  div.user-select-bot {
-    padding-top: 24px;
-  }
-
-  div.user-select-bot > select {
-    width: min(320px, 90%);
-  }
-
-  .match-action-row {
-    padding-top: 20px;
+  .player-avatar {
+    width: 80px;
+    height: 80px;
   }
 }
 </style>

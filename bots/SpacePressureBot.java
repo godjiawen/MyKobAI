@@ -39,11 +39,19 @@ class Bot implements java.util.function.Supplier<Integer> {
     private static final int OPP_PRESSURE_WEIGHT = 2;
     private static final int WALL_PENALTY = 3;
 
+    /**
+     * Handles isTailGrowing.
+     * ??isTailGrowing?
+     */
     private boolean isTailGrowing(int step) {
         if (step <= 10) return true;
         return step % 3 == 1;
     }
 
+    /**
+     * Handles buildSnakeCells.
+     * ??buildSnakeCells?
+     */
     private List<Cell> buildSnakeCells(int sx, int sy, String steps) {
         List<Cell> cells = new ArrayList<>();
         cells.add(new Cell(sx, sy));
@@ -63,6 +71,10 @@ class Bot implements java.util.function.Supplier<Integer> {
         return cells;
     }
 
+    /**
+     * Handles floodFillArea.
+     * ??floodFillArea?
+     */
     private int floodFillArea(int[][] g, int sx, int sy) {
         if (sx < 0 || sx >= ROWS || sy < 0 || sy >= COLS || g[sx][sy] != 0) return 0;
         boolean[][] vis = new boolean[ROWS][COLS];
@@ -85,6 +97,10 @@ class Bot implements java.util.function.Supplier<Integer> {
         return area;
     }
 
+    /**
+     * Handles countNextLegalMoves.
+     * ??countNextLegalMoves?
+     */
     private int countNextLegalMoves(int[][] g, int x, int y) {
         int cnt = 0;
         for (int d = 0; d < 4; d++) {
@@ -95,14 +111,26 @@ class Bot implements java.util.function.Supplier<Integer> {
         return cnt;
     }
 
+    /**
+     * Handles manhattan.
+     * ??manhattan?
+     */
     private int manhattan(int x1, int y1, int x2, int y2) {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
+    /**
+     * Handles inside.
+     * ??inside?
+     */
     private boolean inside(int x, int y) {
         return x >= 0 && x < ROWS && y >= 0 && y < COLS;
     }
 
+    /**
+     * Handles evaluateMove.
+     * ??evaluateMove?
+     */
     private int evaluateMove(int[][] g, int nx, int ny, Cell oppHead) {
         int area = floodFillArea(g, nx, ny);
         int futureMoves = countNextLegalMoves(g, nx, ny);
@@ -115,6 +143,10 @@ class Bot implements java.util.function.Supplier<Integer> {
                 - nearWall * WALL_PENALTY;
     }
 
+    /**
+     * Handles nextMove.
+     * ??nextMove?
+     */
     private Integer nextMove(String input) {
         String[] parts = input.split("#");
         String map = parts[0];
@@ -175,6 +207,10 @@ class Bot implements java.util.function.Supplier<Integer> {
     }
 
     @Override
+    /**
+     * Handles get.
+     * ??get?
+     */
     public Integer get() {
         try {
             Scanner sc = new Scanner(new File("input.txt"));

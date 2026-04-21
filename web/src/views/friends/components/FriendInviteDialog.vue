@@ -1,11 +1,11 @@
-<template>
+﻿<template>
   <div v-if="modelValue" class="invite-dialog-backdrop" @click.self="$emit('update:modelValue', false)">
     <section class="invite-dialog" role="dialog" aria-modal="true" aria-labelledby="friend-invite-title">
       <header class="invite-dialog__head">
         <div class="invite-dialog__title">
           <p class="invite-dialog__kicker">Challenge Setup</p>
           <h3 id="friend-invite-title">发起好友邀战</h3>
-          <p>先确认出战方式，再把邀请发给当前好友。这里支持手动操作和 Bot 出战。</p>
+          <p>选择出战方式后，立即发送邀请。</p>
         </div>
         <button type="button" class="invite-dialog__close" aria-label="关闭邀战设置" @click="$emit('update:modelValue', false)">
           ×
@@ -28,9 +28,9 @@
         <div class="invite-dialog__section-head">
           <div>
             <p class="invite-dialog__section-kicker">Bot Selection</p>
-            <h4>选择你的出战方式</h4>
+            <h4>选择出战方式</h4>
           </div>
-          <span class="invite-dialog__pill">{{ pendingInvite ? "已有邀请在等待回应" : "准备发送" }}</span>
+          <span class="invite-dialog__pill">{{ pendingInvite ? "邀请进行中" : "可发送" }}</span>
         </div>
 
         <div v-if="loading" class="invite-dialog__grid invite-dialog__grid--loading" aria-hidden="true">
@@ -46,7 +46,7 @@
           >
             <span class="invite-choice__eyebrow">Manual</span>
             <strong>手动操作</strong>
-            <p>你自己接管整场对局，适合临场练习和即时对战。</p>
+            <p>你亲自操作本局。</p>
           </button>
 
           <button
@@ -59,7 +59,7 @@
           >
             <span class="invite-choice__eyebrow">Bot</span>
             <strong>{{ bot.title }}</strong>
-            <p>{{ bot.description || "使用现有 Bot 配置直接出战。" }}</p>
+            <p>{{ bot.description || "使用该 Bot 自动出战。" }}</p>
           </button>
         </div>
 
@@ -83,7 +83,7 @@
           :disabled="submitting"
           @click="$emit('cancel-invite')"
         >
-          {{ submitting ? "处理中..." : "撤回当前邀战" }}
+          {{ submitting ? "处理中..." : "撤回邀战" }}
         </button>
         <button
           type="button"
@@ -91,7 +91,7 @@
           :disabled="submitting || loading || Boolean(pendingInvite)"
           @click="$emit('confirm')"
         >
-          {{ submitting ? "发送中..." : pendingInvite ? "邀请进行中" : "确认发起邀战" }}
+          {{ submitting ? "发送中..." : pendingInvite ? "邀请进行中" : "发送邀战" }}
         </button>
       </footer>
     </section>
@@ -144,7 +144,7 @@ const selectedBotLabel = computed(() => {
 .invite-dialog-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 3400;
+  z-index: var(--kob-z-friends-dialog);
   display: grid;
   place-items: center;
   padding: 24px;

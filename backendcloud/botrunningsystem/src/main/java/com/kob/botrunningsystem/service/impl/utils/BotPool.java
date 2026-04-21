@@ -10,6 +10,10 @@ public class BotPool extends Thread {
     private final Condition condition = lock.newCondition();
     private final Queue<Bot> bots = new LinkedList<>();
 
+    /**
+     * Handles addBot.
+     * ??addBot?
+     */
     public void addBot(Integer userId, String botCode, String input, String language) {
         lock.lock();
         try {
@@ -20,12 +24,20 @@ public class BotPool extends Thread {
         }
     }
 
+    /**
+     * Handles consume.
+     * ??consume?
+     */
     private void consume(Bot bot) {
         Consumer consumer = new Consumer();
         consumer.startTimeout(2000, bot);
     }
 
     @Override
+    /**
+     * Handles run.
+     * ??run?
+     */
     public void run() {
         while (true) {
             Bot bot;

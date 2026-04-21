@@ -21,6 +21,10 @@ public class GetRanklistServiceImpl implements GetRanklistService {
     private UserMapper userMapper;
 
     @Override
+    /**
+     * Handles getList.
+     * ??getList?
+     */
     public JSONObject getList(Integer page) {
         IPage<User> userIPage = new Page<>(page, 10);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();

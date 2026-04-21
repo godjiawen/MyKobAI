@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 服务实现类。
+ * Service implementation for adding a new bot to the current user's bot list.
+ * 向当前用户的机器人列表中添加新机器人的服务实现。
  */
 @Service
 public class AddServiceImpl implements AddService {
@@ -25,7 +26,15 @@ public class AddServiceImpl implements AddService {
     @Autowired
     private BotMapper botMapper;
 
+    /**
+     * Validates the bot data and inserts a new bot record for the current user.
+     * 校验机器人数据并为当前用户插入新的机器人记录。
+     */
     @Override
+    /**
+     * Handles add.
+     * ??add?
+     */
     public Map<String, String> add(Map<String, String> data) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

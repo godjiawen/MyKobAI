@@ -14,7 +14,7 @@
                 :class="{ active: friend.favorite }"
                 @click="$emit('toggle-favorite', friend.id)"
               >
-                {{ friend.favorite ? '已收藏' : '收藏好友' }}
+                {{ friend.favorite ? '已收藏' : '收藏' }}
               </button>
             </div>
             <p class="detail-signature">{{ friend.signature }}</p>
@@ -28,7 +28,7 @@
 
         <div class="detail-actions">
           <button type="button" class="btn btn-primary action-btn" @click="$emit('invite', friend.id)">
-            邀战设置
+            发起邀战
           </button>
           <button type="button" class="btn btn-outline-primary action-btn" @click="$emit('message', friend.id)">
             好友私聊
@@ -60,8 +60,8 @@
 
       <div class="detail-body-grid">
         <article class="detail-note-card">
-          <p class="card-kicker">关系备注</p>
-          <h4>当前适合如何互动</h4>
+          <p class="card-kicker">备注</p>
+          <h4>互动建议</h4>
           <p class="note-copy">{{ friend.note }}</p>
           <dl class="meta-grid">
             <div>
@@ -77,7 +77,7 @@
 
         <article class="detail-activity-card">
           <p class="card-kicker">Timeline</p>
-          <h4>最近互动摘要</h4>
+          <h4>最近互动</h4>
           <ul class="activity-list">
             <li v-for="item in friend.activity" :key="item.label">
               <span>{{ item.label }}</span>
@@ -89,8 +89,8 @@
     </div>
 
     <div v-else class="detail-empty">
-      <strong>还没有可展示的好友详情</strong>
-      <p>当前列表为空，或者筛选结果没有命中。可以去发现用户中发起新的好友申请。</p>
+      <strong>暂无好友详情</strong>
+      <p>先去发现用户，添加几位好友。</p>
       <button type="button" class="btn btn-primary" @click="$emit('open-discover')">
         去发现用户
       </button>

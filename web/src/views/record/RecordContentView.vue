@@ -39,11 +39,15 @@ const goBackToRecordList = async () => {
   await router.push({ name: "record_index" });
 };
 
+/**
+ * Handles stringTo2D.
+ * ??stringTo2D?
+ */
 const stringTo2D = (map) => {
   const graph = [];
-  for (let i = 0, k = 0; i < 13; i++) {
+  for (let i = 0, k = 0; i < 13; i += 1) {
     const line = [];
-    for (let j = 0; j < 14; j++, k++) {
+    for (let j = 0; j < 14; j += 1, k += 1) {
       line.push(map[k] === "0" ? 0 : 1);
     }
     graph.push(line);
@@ -52,14 +56,12 @@ const stringTo2D = (map) => {
 };
 
 onMounted(async () => {
-  // 如果状态仓库中已经有地图数据（从记录列表页跳转而来），则直接复用
   if (pkStore.gamemap) {
     recordStore.updateIsRecord(true);
     ready.value = true;
     return;
   }
 
-  // 否则（直接访问链接或刷新页面）时，根据记录编号从后端拉取数据
   const recordId = route.params.recordId;
   if (!recordId) {
     loadError.value = "无效的录像 ID";
@@ -77,21 +79,22 @@ onMounted(async () => {
       return;
     }
 
-    const r = resp.record;
+    const record = resp.record;
     recordStore.updateIsRecord(true);
     pkStore.updateGame({
-      map: stringTo2D(r.map),
-      a_id: r.aid,
-      a_sx: r.asx,
-      a_sy: r.asy,
-      b_id: r.bid,
-      b_sx: r.bsx,
-      b_sy: r.bsy,
+      map: stringTo2D(record.map),
+      a_id: record.aid,
+      a_sx: record.asx,
+      a_sy: record.asy,
+      b_id: record.bid,
+      b_sx: record.bsx,
+      b_sy: record.bsy,
     });
-    recordStore.updateSteps({ a_steps: r.asteps, b_steps: r.bsteps });
-    recordStore.updateRecordLoser(r.loser);
+    recordStore.updateSteps({ a_steps: record.asteps, b_steps: record.bsteps });
+    recordStore.updateRecordLoser(record.loser);
     ready.value = true;
-  } catch (e) {
+  } catch (error) {
+    console.error(error);
     loadError.value = "录像加载失败，请确认后端接口是否可用。";
   } finally {
     loading.value = false;

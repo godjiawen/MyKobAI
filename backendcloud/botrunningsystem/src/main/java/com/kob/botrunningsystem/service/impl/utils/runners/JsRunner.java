@@ -16,11 +16,19 @@ import java.io.File;
 public class JsRunner extends SubprocessRunner {
 
     @Override
+    /**
+     * Handles codeFileExtension.
+     * ??codeFileExtension?
+     */
     protected String codeFileExtension() {
         return ".js";
     }
 
     @Override
+    /**
+     * Handles buildProcess.
+     * ??buildProcess?
+     */
     protected ProcessBuilder buildProcess(File tmpDir) {
         return new ProcessBuilder("node", "bot.js");
     }

@@ -27,6 +27,10 @@ public class GetRecordListServiceImpl implements GetRecordListService {
     private UserMapper userMapper;
 
     @Override
+    /**
+     * Handles getList.
+     * ??getList?
+     */
     public JSONObject getList(Integer page) {
         IPage<Record> recordIPage = new Page<>(page, 10);
         QueryWrapper<Record> queryWrapper = new QueryWrapper<>();

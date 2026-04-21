@@ -16,14 +16,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 服务实现类。
+ * Service implementation for updating an existing bot's title, description, code and language.
+ * 更新现有机器人的标题、描述、代码和语言的服务实现。
  */
 @Service
 public class UpdateServiceImpl implements UpdateService {
     @Autowired
     private BotMapper botMapper;
 
+    /**
+     * Validates the updated bot data, checks ownership and persists the changes.
+     * 校验更新的机器人数据，检查所有权并持久化更改。
+     */
     @Override
+    /**
+     * Handles update.
+     * ??update?
+     */
     public Map<String, String> update(Map<String, String> data) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

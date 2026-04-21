@@ -12,6 +12,10 @@ public class BotRunningServiceImpl implements BotRunningService {
     public final static BotPool botpool = new BotPool();
 
     @Override
+    /**
+     * Handles addBot.
+     * ??addBot?
+     */
     public String addBot(Integer userId, String botCode, String input, String language) {
         System.out.println("add bot: " + userId + " lang=" + language);
         botpool.addBot(userId, botCode, input, language);

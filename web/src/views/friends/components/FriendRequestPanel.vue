@@ -6,7 +6,7 @@
           <div>
             <p class="panel-kicker">Inbox</p>
             <h3>收到的申请</h3>
-            <p class="column-copy">这里处理别人主动发来的关系请求，优先消化待决事项。</p>
+            <p class="column-copy">处理别人发来的好友申请。</p>
           </div>
           <span class="count-badge">{{ incomingRequests.length }}</span>
         </header>
@@ -39,8 +39,8 @@
         </div>
 
         <div v-else class="request-empty">
-          <strong>没有待处理的好友申请</strong>
-          <p>当其他用户向你发出好友请求时，这里会优先承载审批动作。</p>
+          <strong>暂无待处理申请</strong>
+          <p>新申请会在这里出现。</p>
         </div>
       </article>
 
@@ -49,7 +49,7 @@
           <div>
             <p class="panel-kicker">Outbox</p>
             <h3>你发出的申请</h3>
-            <p class="column-copy">外发申请集中放在这里，避免忘记已经建立过的接触动作。</p>
+            <p class="column-copy">你发出的申请都在这里。</p>
           </div>
           <span class="count-badge">{{ outgoingRequests.length }}</span>
         </header>
@@ -81,8 +81,8 @@
         </div>
 
         <div v-else class="request-empty">
-          <strong>还没有发出的申请</strong>
-          <p>发现到合适的用户后，可以在发现用户面板中直接发起好友申请。</p>
+          <strong>你还没有发出申请</strong>
+          <p>去发现用户里试试吧。</p>
         </div>
       </article>
     </div>

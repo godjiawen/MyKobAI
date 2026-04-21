@@ -59,6 +59,10 @@ public class ChatWebSocketServer {
     }
 
     @OnClose
+    /**
+     * Handles onClose.
+     * ??onClose?
+     */
     public void onClose() {
         if (roomId != null) {
             CopyOnWriteArraySet<ChatWebSocketServer> room = rooms.get(roomId);
@@ -73,6 +77,10 @@ public class ChatWebSocketServer {
     }
 
     @OnError
+    /**
+     * Handles onError.
+     * ??onError?
+     */
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
@@ -80,6 +88,10 @@ public class ChatWebSocketServer {
     // 消息收发
 
     @OnMessage
+    /**
+     * Handles onMessage.
+     * ??onMessage?
+     */
     public void onMessage(String message, Session session) {
         JSONObject data;
         try {
@@ -110,6 +122,10 @@ public class ChatWebSocketServer {
         }
     }
 
+    /**
+     * Handles sendMessage.
+     * ??sendMessage?
+     */
     public void sendMessage(String message) {
         synchronized (this.session) {
             try {

@@ -15,6 +15,10 @@ public class FriendChatController {
     private FriendChatService friendChatService;
 
     @GetMapping("/api/friends/chat/conversations/")
+    /**
+     * Handles conversations.
+     * ??conversations?
+     */
     public Map<String, Object> conversations() {
         return friendChatService.conversations();
     }
@@ -35,6 +39,10 @@ public class FriendChatController {
     }
 
     @PostMapping("/api/friends/chat/read/")
+    /**
+     * Handles read.
+     * ??read?
+     */
     public Map<String, Object> read(@RequestParam("friend_id") Integer friendId) {
         return friendChatService.read(friendId);
     }

@@ -14,14 +14,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 服务实现类。
+ * Service implementation for removing a bot owned by the current user.
+ * 删除当前用户所拥有机器人的服务实现。
  */
 @Service
 public class RemoveServiceImpl implements RemoveService {
     @Autowired
     private BotMapper botMapper;
 
+    /**
+     * Validates ownership and deletes the specified bot.
+     * 验证所有权后删除指定的机器人。
+     */
     @Override
+    /**
+     * Handles remove.
+     * ??remove?
+     */
     public Map<String, String> remove(Map<String, String> data) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

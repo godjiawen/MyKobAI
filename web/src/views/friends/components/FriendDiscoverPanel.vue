@@ -1,46 +1,5 @@
-<template>
+﻿<template>
   <section class="discover-panel" :class="{ 'is-loading': loading }">
-    <header class="discover-header-card">
-      <div class="discover-toolbar">
-        <div class="discover-copy">
-          <p class="panel-kicker">Discover</p>
-          <h3>发现新好友</h3>
-          <p class="discover-intro">
-            只保留当前最值得处理的一小组候选人，让搜索结果更干净，也让每张卡片都承载明确决策。
-          </p>
-        </div>
-
-        <label class="search-shell" for="discover-user-search">
-          <span>搜索用户</span>
-          <input
-            id="discover-user-search"
-            type="text"
-            class="form-control"
-            :value="keyword"
-            placeholder="搜索昵称、积分或状态"
-            @input="$emit('update:keyword', $event.target.value)"
-          />
-        </label>
-      </div>
-
-      <div class="discover-overview" role="status" aria-live="polite">
-        <article class="overview-pill">
-          <span>展示上限</span>
-          <strong>{{ displayLimit }} 位</strong>
-        </article>
-        <article class="overview-pill">
-          <span>当前展示</span>
-          <strong>{{ users.length }} 位</strong>
-        </article>
-        <article class="overview-pill">
-          <span>搜索命中</span>
-          <strong>{{ totalCountLabel }}</strong>
-        </article>
-      </div>
-
-      <p class="discover-helper">{{ helperText }}</p>
-    </header>
-
     <div v-if="loading" class="discover-grid discover-grid--loading" aria-hidden="true">
       <article v-for="index in skeletonCount" :key="`discover-skeleton-${index}`" class="discover-card skeleton-card">
         <div class="skeleton-card-head">
@@ -85,7 +44,7 @@
         </div>
 
         <div class="discover-meta">
-          <span>当前状态：{{ primaryTag(user) }}</span>
+          <span>状态：{{ primaryTag(user) }}</span>
           <span>{{ user.region }}</span>
         </div>
 
@@ -109,9 +68,9 @@
     </transition-group>
 
     <div v-else class="discover-empty">
-      <strong>没有匹配到用户</strong>
-      <p>尝试缩短关键词，或者只输入昵称片段。发现区会稳定展示最匹配的前 {{ displayLimit }} 位候选。</p>
-      <button type="button" class="btn btn-outline-primary empty-action" @click="$emit('update:keyword', '')">
+      <strong>没有找到匹配用户</strong>
+      <p>换个关键词再试试。</p>
+      <button type="button" class="btn btn-outline-primary empty-action" @click="$emit('clear-search')">
         清空搜索
       </button>
     </div>
@@ -121,13 +80,9 @@
 <script setup>
 import { computed } from "vue";
 
-const emit = defineEmits(["update:keyword", "send-request", "open-requests", "open-friend"]);
+const emit = defineEmits(["send-request", "open-requests", "open-friend", "clear-search"]);
 
 const props = defineProps({
-  keyword: {
-    type: String,
-    default: "",
-  },
   users: {
     type: Array,
     default: () => [],
@@ -148,24 +103,10 @@ const props = defineProps({
 
 const skeletonCount = computed(() => Math.min(props.displayLimit, 6));
 
-const totalCountLabel = computed(() => {
-  if (props.loading) return "检索中";
-  return `${props.totalCount} 位`;
-});
-
-const helperText = computed(() => {
-  if (props.loading) {
-    return `正在刷新候选池，展示窗口会稳定保留前 ${props.displayLimit} 位。`;
-  }
-  if (!props.totalCount) {
-    return `当前没有命中结果。发现区固定展示前 ${props.displayLimit} 位候选，避免长列表稀释决策。`;
-  }
-  if (props.totalCount > props.displayLimit) {
-    return `当前只展示最匹配的前 ${props.displayLimit} 位候选，仍有 ${props.totalCount - props.displayLimit} 位结果未展开。继续输入关键词可以更快收敛。`;
-  }
-  return `当前结果已经全部展开，共 ${props.totalCount} 位候选，可以直接完成筛选与申请动作。`;
-});
-
+/**
+ * Handles relationLabel.
+ * ??relationLabel?
+ */
 const relationLabel = (relation) => {
   const labels = {
     none: "可添加",
@@ -176,6 +117,10 @@ const relationLabel = (relation) => {
   return labels[relation] || "可添加";
 };
 
+/**
+ * Handles actionLabel.
+ * ??actionLabel?
+ */
 const actionLabel = (relation) => {
   const labels = {
     none: "添加好友",
@@ -186,6 +131,10 @@ const actionLabel = (relation) => {
   return labels[relation] || "添加好友";
 };
 
+/**
+ * Handles actionClass.
+ * ??actionClass?
+ */
 const actionClass = (relation) => {
   if (relation === "incoming") return "btn-outline-warning";
   if (relation === "pending") return "btn-outline-secondary";
@@ -195,16 +144,24 @@ const actionClass = (relation) => {
 
 const primaryTag = (user) => user.tags?.[0] || "离线";
 
+/**
+ * Handles decisionHint.
+ * ??decisionHint?
+ */
 const decisionHint = (relation) => {
   const hints = {
-    none: "关系尚未建立，可以直接发起一条好友申请，把潜在对手收进常用面板。",
-    pending: "申请已经发出，暂时不需要重复操作，等待对方回应即可。",
-    incoming: "对方已经先发起申请，切到申请中心处理能更快完成闭环。",
-    friend: "这位用户已经在好友列表中，可以直接进入详情继续互动。",
+    none: "可以直接发送好友申请。",
+    pending: "申请已发出，等对方回应。",
+    incoming: "对方已申请你，去申请页处理。",
+    friend: "已经是好友，可直接互动。",
   };
   return hints[relation] || hints.none;
 };
 
+/**
+ * Handles handleAction.
+ * ??handleAction?
+ */
 const handleAction = (user) => {
   if (user.relation === "incoming") {
     emit("open-requests");
@@ -224,119 +181,6 @@ const handleAction = (user) => {
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-
-.panel-kicker {
-  margin: 0 0 6px;
-  color: var(--kob-accent-strong);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.discover-header-card {
-  position: relative;
-  overflow: hidden;
-  padding: 22px;
-  border: 1px solid rgba(90, 180, 255, 0.2);
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at top right, rgba(255, 208, 93, 0.18), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(240, 248, 255, 0.9));
-  box-shadow: 0 16px 36px rgba(0, 50, 100, 0.08);
-}
-
-.discover-header-card::after {
-  content: "";
-  position: absolute;
-  inset: auto -18% -52% auto;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(61, 174, 255, 0.12), transparent 68%);
-  pointer-events: none;
-}
-
-.discover-toolbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-end;
-}
-
-.discover-copy,
-.search-shell,
-.discover-overview,
-.discover-helper {
-  position: relative;
-  z-index: 1;
-}
-
-.discover-toolbar h3 {
-  margin: 0;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.24rem;
-  color: var(--kob-text);
-}
-
-.discover-intro {
-  max-width: 54ch;
-  margin: 10px 0 0;
-  color: var(--kob-muted);
-  line-height: 1.65;
-}
-
-.search-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: min(100%, 320px);
-  color: var(--kob-muted);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.search-shell :deep(.form-control) {
-  min-height: 48px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.88);
-}
-
-.discover-overview {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.overview-pill {
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(90, 180, 255, 0.16);
-  background: rgba(255, 255, 255, 0.74);
-}
-
-.overview-pill span {
-  display: block;
-  color: var(--kob-muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.overview-pill strong {
-  display: block;
-  margin-top: 8px;
-  color: var(--kob-text);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.08rem;
-}
-
-.discover-helper {
-  margin: 14px 0 0;
-  color: var(--kob-text);
-  line-height: 1.7;
 }
 
 .discover-grid {
@@ -657,18 +501,9 @@ const handleAction = (user) => {
   .discover-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .discover-overview {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 767px) {
-  .discover-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .discover-grid {
     grid-template-columns: 1fr;
   }

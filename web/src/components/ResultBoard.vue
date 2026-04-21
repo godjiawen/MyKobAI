@@ -1,4 +1,3 @@
-<!-- 界面组件。 -->
 <template>
   <div class="result-board">
     <div class="result-board-text" v-if="pkStore.loser === 'all'">平局</div>
@@ -27,6 +26,10 @@ const isLose = computed(() => {
   );
 });
 
+/**
+ * Handles restart.
+ * ??restart?
+ */
 const restart = () => {
   pkStore.updateRoomId("");
   pkStore.updateStatus("matching");

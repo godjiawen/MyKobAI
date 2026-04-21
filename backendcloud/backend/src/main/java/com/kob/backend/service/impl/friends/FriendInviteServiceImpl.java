@@ -27,6 +27,10 @@ public class FriendInviteServiceImpl implements FriendInviteService {
 
     @Override
     @Transactional
+    /**
+     * Handles send.
+     * ??send?
+     */
     public Map<String, Object> send(Integer receiverId, Integer senderBotId, String gameMode) {
         User currentUser = friendDomainService.currentUser();
         if (receiverId == null) return error("receiver_id is required");
@@ -65,6 +69,10 @@ public class FriendInviteServiceImpl implements FriendInviteService {
 
     @Override
     @Transactional
+    /**
+     * Handles respond.
+     * ??respond?
+     */
     public Map<String, Object> respond(Integer inviteId, String action, Integer receiverBotId) {
         User currentUser = friendDomainService.currentUser();
         if (inviteId == null) return error("invite_id is required");
@@ -125,6 +133,10 @@ public class FriendInviteServiceImpl implements FriendInviteService {
     }
 
     @Override
+    /**
+     * Handles pending.
+     * ??pending?
+     */
     public Map<String, Object> pending() {
         User currentUser = friendDomainService.currentUser();
         friendDomainService.expirePendingInvitesForUser(currentUser.getId());
@@ -142,6 +154,10 @@ public class FriendInviteServiceImpl implements FriendInviteService {
         return resp;
     }
 
+    /**
+     * Handles buildInviteOnlyResponse.
+     * ??buildInviteOnlyResponse?
+     */
     private Map<String, Object> buildInviteOnlyResponse(FriendInvite invite) {
         Map<String, Object> resp = success();
         Map<String, Object> inviteData = new LinkedHashMap<>();
@@ -151,12 +167,20 @@ public class FriendInviteServiceImpl implements FriendInviteService {
         return resp;
     }
 
+    /**
+     * Handles success.
+     * ??success?
+     */
     private Map<String, Object> success() {
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("error_message", "success");
         return resp;
     }
 
+    /**
+     * Handles error.
+     * ??error?
+     */
     private Map<String, Object> error(String errorMessage) {
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("error_message", errorMessage);

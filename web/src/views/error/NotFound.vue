@@ -1,11 +1,10 @@
-<!-- 界面组件。 -->
 <template>
   <ContentField>
     <section class="notfound-wrap">
       <p class="code">404</p>
       <h1>页面在竞技场里迷路了</h1>
       <p class="desc">你访问的页面不存在，或已被移动到其他位置。</p>
-      <router-link class="btn btn-primary back-btn" :to="{ name: 'home' }">返回首页</router-link>
+      <router-link class="btn btn-primary back-btn kob-pill-btn" :to="{ name: 'home' }">返回首页</router-link>
     </section>
   </ContentField>
 </template>
@@ -16,7 +15,7 @@ import ContentField from "@/components/ContentField.vue";
 
 <style scoped>
 .notfound-wrap {
-  padding: 22px 10px;
+  padding: 26px 10px;
   text-align: center;
 }
 
@@ -36,16 +35,16 @@ h1 {
   margin: 10px 0 6px;
   font-family: "Space Grotesk", sans-serif;
   font-size: clamp(24px, 4vw, 34px);
+  color: var(--kob-text);
 }
 
 .desc {
   margin: 0 auto 18px;
   max-width: 580px;
-  color: #a9bfd3;
+  color: var(--kob-muted);
 }
 
 .back-btn {
-  border-radius: 999px;
   padding-inline: 22px;
 }
 </style>

@@ -1,32 +1,5 @@
 ﻿<template>
   <div class="friends-page">
-    <ContentField>
-      <section class="friends-hero">
-        <div class="friends-hero-copy">
-          <p class="hero-kicker">Social Lobby</p>
-          <h2>把常打的对手沉淀成一块可管理、可邀战、可扩展的关系面板</h2>
-          <p>
-            这一版已经切到真实好友接口。你可以在这里筛选好友、处理申请、发现新用户，并把最合适的候选人稳定收进一块
-            节奏更清晰的关系工作台里。
-          </p>
-          <div class="hero-actions">
-            <button type="button" class="btn btn-primary hero-btn" @click="friendStore.setActiveTab('request')">
-              处理申请
-            </button>
-            <button type="button" class="btn btn-outline-primary hero-btn" @click="friendStore.setActiveTab('discover')">
-              发现用户
-            </button>
-          </div>
-        </div>
-
-        <div class="friends-hero-aside">
-          <span class="aside-label">Discovery Window</span>
-          <strong>发现区默认只展示最匹配的前 {{ discoverDisplayLimit }} 位用户</strong>
-          <p>这样可以控制搜索噪音，让卡片密度更稳定，也为后续分页和筛选扩展留出空间。</p>
-        </div>
-      </section>
-    </ContentField>
-
     <section class="container friends-dashboard">
       <FriendsFeedbackBar :feedback="feedback" @close="friendStore.clearFeedback()" />
       <FriendsSummaryBar :cards="summaryCards" :loading="loading" />
@@ -49,23 +22,34 @@
           <header class="main-head">
             <div>
               <p class="panel-kicker">Workspace</p>
-              <h3>好友详情与关系操作台</h3>
-              <p class="main-description">
-                让常打对手、待处理申请和新增候选人在同一块面板里完成流转，减少反复切换时的认知负担。
-              </p>
+              <h3>好友中心</h3>
+              <p class="main-description">查看详情、处理申请、发现玩家。</p>
             </div>
-            <div class="main-tabs" role="tablist" aria-label="好友系统主面板切换">
-              <button
-                v-for="tab in tabs"
-                :key="tab.key"
-                type="button"
-                class="main-tab"
-                :class="{ active: activeTab === tab.key }"
-                :aria-selected="activeTab === tab.key"
-                @click="friendStore.setActiveTab(tab.key)"
-              >
-                {{ tab.label }}
-              </button>
+            <div class="main-controls">
+              <div class="main-tabs" role="tablist" aria-label="好友系统主面板切换">
+                <button
+                  v-for="tab in tabs"
+                  :key="tab.key"
+                  type="button"
+                  class="main-tab"
+                  :class="{ active: activeTab === tab.key }"
+                  :aria-selected="activeTab === tab.key"
+                  @click="friendStore.setActiveTab(tab.key)"
+                >
+                  {{ tab.label }}
+                </button>
+              </div>
+              <label v-if="activeTab === 'discover'" class="discover-search-shell" for="discover-main-search">
+                <span>搜索用户</span>
+                <input
+                  id="discover-main-search"
+                  type="text"
+                  class="form-control discover-search-input"
+                  :value="discoverKeyword"
+                  placeholder="输入昵称或积分"
+                  @input="friendStore.setDiscoverKeyword($event.target.value)"
+                />
+              </label>
             </div>
           </header>
 
@@ -103,12 +87,11 @@
             <FriendDiscoverPanel
               v-else
               :key="'discover'"
-              :keyword="discoverKeyword"
               :loading="discoverLoading"
               :users="filteredDiscoverUsers"
               :display-limit="discoverDisplayLimit"
               :total-count="discoverTotalCount"
-              @update:keyword="friendStore.setDiscoverKeyword($event)"
+              @clear-search="friendStore.setDiscoverKeyword('')"
               @send-request="friendStore.sendFriendRequest($event)"
               @open-requests="friendStore.setActiveTab('request')"
               @open-friend="friendStore.selectFriend($event)"
@@ -162,7 +145,6 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import ContentField from "@/components/ContentField.vue";
 import AppDialog from "@/components/AppDialog.vue";
 import { useFriendStore } from "@/store/friend";
 import { useRealtimeStore } from "@/store/realtime";
@@ -221,8 +203,8 @@ const segments = computed(() => [
 ]);
 
 const tabs = computed(() => [
-  { key: "detail", label: "好友详情" },
-  { key: "request", label: `申请中心 (${incomingRequests.value.length})` },
+  { key: "detail", label: "详情" },
+  { key: "request", label: `申请 (${incomingRequests.value.length})` },
   { key: "discover", label: "发现用户" },
 ]);
 
@@ -235,7 +217,7 @@ const removeDialogVisible = computed({
 
 const removeDialogMessage = computed(() => {
   if (!pendingRemoveFriend.value) return "";
-  return `确认将 ${pendingRemoveFriend.value.name} 从当前好友列表中移除吗？`;
+  return `确认删除好友 ${pendingRemoveFriend.value.name} 吗？`;
 });
 
 const inviteDialogPendingInvite = computed(() =>
@@ -250,9 +232,8 @@ onMounted(() => {
 <style scoped>
 .friends-page {
   position: relative;
-  padding-bottom: 18px;
-  --friends-surface: rgba(255, 255, 255, 0.84);
-  --friends-surface-strong: rgba(255, 255, 255, 0.94);
+  padding-top: clamp(20px, 2.8vw, 34px);
+  padding-bottom: 22px;
   --friends-border: rgba(90, 180, 255, 0.22);
   --friends-shadow: 0 18px 42px rgba(0, 50, 100, 0.08);
 }
@@ -260,27 +241,9 @@ onMounted(() => {
 .friends-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 22px;
+  gap: 22px;
 }
 
-.friends-hero {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
-  gap: 18px;
-  align-items: stretch;
-  padding: 12px;
-  border-radius: 32px;
-  border: 1px solid rgba(90, 180, 255, 0.16);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(240, 247, 255, 0.56)),
-    radial-gradient(circle at top left, rgba(255, 208, 93, 0.18), transparent 30%);
-  box-shadow: var(--friends-shadow);
-}
-
-.hero-kicker,
 .panel-kicker {
   margin: 0 0 8px;
   color: var(--kob-accent-strong);
@@ -290,75 +253,16 @@ onMounted(() => {
   text-transform: uppercase;
 }
 
-.friends-hero-copy h2,
 .main-head h3 {
   margin: 0;
   font-family: "Space Grotesk", sans-serif;
   color: var(--kob-text);
 }
 
-.friends-hero-copy {
-  position: relative;
-  z-index: 1;
-  padding: 18px 16px 18px 14px;
-}
-
-.friends-hero-copy p {
-  margin: 14px 0 0;
-  color: var(--kob-muted);
-  line-height: 1.75;
-  max-width: 60ch;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 22px;
-}
-
-.hero-btn {
-  min-width: 132px;
-  border-radius: 999px;
-}
-
-.friends-hero-aside {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8px;
-  padding: 22px;
-  border-radius: 26px;
-  border: 1px solid rgba(90, 180, 255, 0.18);
-  background:
-    linear-gradient(180deg, rgba(61, 174, 255, 0.12), rgba(255, 255, 255, 0.82)),
-    radial-gradient(circle at top right, rgba(255, 208, 93, 0.16), transparent 48%);
-}
-
-.aside-label {
-  color: var(--kob-muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.friends-hero-aside strong {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.2rem;
-  color: var(--kob-text);
-}
-
-.friends-hero-aside p {
-  margin: 0;
-  color: var(--kob-muted);
-  line-height: 1.65;
-}
-
 .friends-layout {
   display: grid;
   grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
-  gap: 18px;
+  gap: 22px;
   align-items: start;
 }
 
@@ -368,11 +272,10 @@ onMounted(() => {
 
 .friends-main {
   min-height: 100%;
-  padding: 22px;
+  padding: 26px;
   border-radius: 30px;
   border: 1px solid var(--friends-border);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 249, 255, 0.82));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 249, 255, 0.82));
   box-shadow: var(--friends-shadow);
   backdrop-filter: blur(10px);
 }
@@ -380,9 +283,9 @@ onMounted(() => {
 .main-head {
   display: flex;
   justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
   align-items: flex-start;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .main-description {
@@ -396,6 +299,28 @@ onMounted(() => {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.main-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.discover-search-shell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--kob-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.discover-search-input {
+  min-width: 260px;
+  min-height: 44px;
+  border-radius: 999px;
 }
 
 .main-tab {
@@ -498,25 +423,49 @@ onMounted(() => {
 }
 
 @media (max-width: 991px) {
-  .friends-hero {
-    grid-template-columns: 1fr;
+  .friends-page {
+    padding-top: 18px;
   }
 
   .main-head {
     flex-direction: column;
     align-items: stretch;
   }
+
+  .friends-main {
+    padding: 22px;
+  }
 }
 
 @media (max-width: 767px) {
-  .hero-actions,
+  .friends-page {
+    padding-top: 14px;
+  }
+
   .main-tabs {
     flex-direction: column;
   }
 
-  .hero-btn,
   .main-tab {
     width: 100%;
+  }
+
+  .main-controls {
+    align-items: stretch;
+  }
+
+  .discover-search-shell {
+    display: block;
+  }
+
+  .discover-search-shell span {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .discover-search-input {
+    width: 100%;
+    min-width: 0;
   }
 
   .friends-main {

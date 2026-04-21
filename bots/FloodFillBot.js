@@ -14,12 +14,19 @@ const ROWS = 13, COLS = 14;
 const DX = [-1, 0, 1, 0];
 const DY = [0,  1, 0, -1];
 
+/**
+ * Determines whether the snake tail should grow at the given step.
+ * 判断在给定步数时蛇尾是否应增长。
+ */
 function checkTailIncreasing(step) {
     if (step <= 10) return true;
     return step % 3 === 1;
 }
 
-/** 从起点 + 历史步骤重建蛇身，返回格子数组（index 0 = 蛇尾，最后 = 蛇头） */
+/**
+ * Rebuilds snake body cells from start position and step history.
+ * 根据起点和历史步骤重建蛇身格子。
+ */
 function getCells(sx, sy, steps) {
     const cells = [[sx, sy]];
     let x = sx, y = sy, step = 0;
@@ -33,7 +40,10 @@ function getCells(sx, sy, steps) {
     return cells;
 }
 
-/** BFS 计算从 (sx, sy) 出发能到达的空格数（含起点） */
+/**
+ * Runs BFS and returns reachable free-cell count from the given start cell.
+ * 运行BFS并返回从给定起点可到达的空白格数量。
+ */
 function floodFill(g, sx, sy) {
     if (g[sx][sy] !== 0) return 0;
     const visited = Array.from({ length: ROWS }, () => new Array(COLS).fill(false));
@@ -92,4 +102,3 @@ for (let d = 0; d < 4; d++) {
 }
 
 console.log(bestDir);
-

@@ -18,6 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Service implementation for uploading and updating the current user's avatar image.
+ * 上传并更新当前用户头像图片的服务实现。
+ */
 @Service
 public class UploadAvatarServiceImpl implements UploadAvatarService {
 
@@ -27,7 +31,15 @@ public class UploadAvatarServiceImpl implements UploadAvatarService {
     @Value("${kob.upload.dir}")
     private String uploadDir;
 
+    /**
+     * Validates, stores the uploaded image file and updates the user's photo URL in the database.
+     * 校验并存储上传的图片文件，同时更新数据库中用户的头像URL。
+     */
     @Override
+    /**
+     * Handles upload.
+     * ??upload?
+     */
     public Map<String, String> upload(MultipartFile file) {
         Map<String, String> map = new HashMap<>();
 

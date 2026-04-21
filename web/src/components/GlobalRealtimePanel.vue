@@ -7,7 +7,7 @@
           <div>
             <p class="realtime-kicker">好友邀战</p>
             <strong>{{ incomingInvite.senderUsername }} 正在等你应战</strong>
-            <p>{{ incomingInvite.senderBotTitle }} 发起邀请，当前将用 {{ selectedBotLabel }} 应战。</p>
+            <p>{{ incomingInvite.senderBotTitle }} 发起邀请。你将使用 {{ selectedBotLabel }} 应战。</p>
           </div>
         </div>
         <div class="realtime-actions">
@@ -17,7 +17,7 @@
           <button type="button" class="btn btn-outline-secondary realtime-btn" :disabled="inviteActionLoading" @click="realtimeStore.respondInvite('reject')">
             拒绝
           </button>
-          <button type="button" class="realtime-link" @click="goPk">去 PK 页</button>
+          <button type="button" class="realtime-link" @click="goPk">前往对局</button>
         </div>
       </section>
     </transition>
@@ -29,14 +29,14 @@
           <div>
             <p class="realtime-kicker">邀战进行中</p>
             <strong>已向 {{ outgoingInvite.receiverUsername }} 发出邀战</strong>
-            <p>邀请仍在等待回应，可以前往 PK 页查看实时状态。</p>
+            <p>正在等待对方回应。</p>
           </div>
         </div>
         <div class="realtime-actions">
           <button type="button" class="btn btn-outline-secondary realtime-btn" :disabled="inviteActionLoading" @click="realtimeStore.cancelOutgoingInvite()">
             {{ inviteActionLoading ? '处理中...' : '撤回邀战' }}
           </button>
-          <button type="button" class="realtime-link" @click="goPk">去 PK 页</button>
+          <button type="button" class="realtime-link" @click="goPk">前往对局</button>
         </div>
       </section>
     </transition>
@@ -65,7 +65,7 @@
           </div>
         </div>
         <div class="realtime-actions">
-          <button type="button" class="btn btn-outline-primary realtime-btn" @click="goFriends">去处理</button>
+          <button type="button" class="btn btn-outline-primary realtime-btn" @click="goFriends">去处理申请</button>
           <button type="button" class="realtime-link" @click="realtimeStore.clearFriendRequestNotice()">关闭</button>
         </div>
       </section>
@@ -82,7 +82,7 @@
           </div>
         </div>
         <div class="realtime-actions">
-          <button type="button" class="btn btn-outline-primary realtime-btn" @click="goFriends">去查看</button>
+          <button type="button" class="btn btn-outline-primary realtime-btn" @click="goFriends">查看消息</button>
           <button type="button" class="realtime-link" @click="realtimeStore.clearFriendMessageNotice()">关闭</button>
         </div>
       </section>
@@ -134,7 +134,7 @@ const goFriends = async () => {
   position: fixed;
   top: 94px;
   right: 18px;
-  z-index: 2500;
+  z-index: var(--kob-z-realtime);
   width: min(380px, calc(100vw - 24px));
   display: flex;
   flex-direction: column;

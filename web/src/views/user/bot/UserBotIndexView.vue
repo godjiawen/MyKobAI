@@ -1,15 +1,10 @@
-<!-- 界面组件。 -->
 <template>
-  <div class="container bot-page">
-    <div class="row g-3">
-      <div class="col-lg-3 col-md-4">
-        <ProfileCard />
-      </div>
-      <div class="col-lg-9 col-md-8">
-        <BotList />
-      </div>
+  <section class="kob-page-shell bot-page">
+    <div class="bot-layout">
+      <ProfileCard />
+      <BotList />
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -18,7 +13,16 @@ import BotList from "./components/BotList.vue";
 </script>
 
 <style scoped>
-.bot-page {
-  margin-top: 20px;
+.bot-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 991px) {
+  .bot-layout {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

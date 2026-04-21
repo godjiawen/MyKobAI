@@ -20,6 +20,10 @@ public class MatchingController {
     private MatchingService matchingService;
 
     @PostMapping("/player/add/")
+    /**
+     * Handles addPlayer.
+     * ??addPlayer?
+     */
     public String addPlayer(@RequestParam MultiValueMap<String, String> data) {
         Integer userId = Integer.parseInt(Objects.requireNonNull(data.getFirst("user_id")));
         Integer rating = Integer.parseInt(Objects.requireNonNull(data.getFirst("rating")));
@@ -28,6 +32,10 @@ public class MatchingController {
     }
 
     @PostMapping("/player/remove/")
+    /**
+     * Handles removePlayer.
+     * ??removePlayer?
+     */
     public String removePlayer(@RequestParam MultiValueMap<String, String> data) {
         Integer userId = Integer.parseInt(Objects.requireNonNull(data.getFirst("user_id")));
         return matchingService.removePlayer(userId);

@@ -1,23 +1,23 @@
-<!-- 界面组件。 -->
 <template>
   <ContentField>
     <section class="auth-wrap">
       <div class="auth-head">
-        <h2>创建账号</h2>
-        <p>完成注册后即可开始冲榜。</p>
+        <p class="kob-kicker">Register</p>
+        <h2 class="kob-headline">创建账号</h2>
+        <p class="kob-subtitle">完成注册后即可进入对局和好友系统。</p>
       </div>
       <div class="row justify-content-md-center">
-        <div class="col-lg-5 col-md-7 col-12">
+        <div class="col-lg-6 col-md-8 col-12">
           <form class="auth-form" @submit.prevent="register">
             <div class="mb-3">
               <label for="username" class="form-label">用户名</label>
               <input id="username" v-model="username" type="text" class="form-control" placeholder="请输入用户名" />
-              <div class="rule-tip">6-12位，仅字母/数字/下划线</div>
+              <div class="rule-tip">6-12 位，仅允许字母、数字和下划线。</div>
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">密码</label>
               <input id="password" v-model="password" type="password" class="form-control" placeholder="请输入密码" />
-              <div class="rule-tip">8-16位，且至少包含两类字符：大写字母/小写字母/数字/特殊字符</div>
+              <div class="rule-tip">8-16 位，至少包含大写/小写/数字/特殊字符中的两类。</div>
             </div>
             <div class="mb-3">
               <label for="confirmedPassword" class="form-label">确认密码</label>
@@ -46,17 +46,21 @@ const password = ref("");
 const confirmedPassword = ref("");
 const errorMessage = ref("");
 
+/**
+ * Handles validateRegisterForm.
+ * ??validateRegisterForm?
+ */
 const validateRegisterForm = () => {
   const usernameValue = username.value.trim();
   const passwordValue = password.value;
   const confirmedValue = confirmedPassword.value;
 
   if (!/^[A-Za-z0-9_]{6,12}$/.test(usernameValue)) {
-    return "用户名需为6-12位，只能包含字母、数字和下划线";
+    return "用户名需为 6-12 位，仅允许字母、数字和下划线。";
   }
 
   if (passwordValue.length < 8 || passwordValue.length > 16) {
-    return "密码长度需为8-16位";
+    return "密码长度需为 8-16 位。";
   }
 
   let score = 0;
@@ -65,11 +69,11 @@ const validateRegisterForm = () => {
   if (/\d/.test(passwordValue)) score += 1;
   if (/[^A-Za-z0-9]/.test(passwordValue)) score += 1;
   if (score < 2) {
-    return "密码至少包含大写字母、小写字母、数字、特殊字符中的两项";
+    return "密码至少包含大写字母、小写字母、数字、特殊字符中的两类。";
   }
 
   if (passwordValue !== confirmedValue) {
-    return "两次输入的密码不一致";
+    return "两次输入的密码不一致。";
   }
 
   return "";
@@ -108,7 +112,7 @@ const register = async () => {
 
 <style scoped>
 .auth-wrap {
-  padding: 6px 4px;
+  padding: 8px 4px;
 }
 
 .auth-head {
@@ -116,42 +120,30 @@ const register = async () => {
   margin-bottom: 20px;
 }
 
-.auth-head h2 {
-  margin: 0;
-  font-family: "Space Grotesk", sans-serif;
-  font-weight: 700;
-  color: var(--kob-text);
-}
-
-.auth-head p {
-  margin: 8px 0 0;
-  color: var(--kob-muted);
-}
-
 .auth-form {
-  padding: 20px;
-  border: 1px solid rgba(90, 180, 255, 0.3);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.6);
+  padding: 22px;
+  border: 1px solid rgba(90, 180, 255, 0.28);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .auth-btn {
   width: 100%;
   margin-top: 4px;
   border-radius: 12px;
-  padding: 10px 0;
+  min-height: 44px;
   font-weight: 600;
   color: #ffffff;
 }
 
 div.error-message {
   min-height: 22px;
-  color: #e74c3c;
+  color: #d14343;
 }
 
 .rule-tip {
   margin-top: 6px;
   color: var(--kob-muted);
-  font-size: 12px;
+  font-size: 0.8rem;
 }
 </style>

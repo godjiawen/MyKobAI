@@ -16,6 +16,10 @@ public class GetRecordServiceImpl implements GetRecordService {
     private RecordMapper recordMapper;
 
     @Override
+    /**
+     * Handles getRecord.
+     * ??getRecord?
+     */
     public JSONObject getRecord(Integer recordId) {
         JSONObject resp = new JSONObject();
 

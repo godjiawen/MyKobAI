@@ -18,12 +18,20 @@ public class UpdateAccountController {
     private UpdateAccountService updateAccountService;
 
     @PostMapping("/api/user/account/update/username/")
+    /**
+     * Handles updateUsername.
+     * ??updateUsername?
+     */
     public Map<String, String> updateUsername(@RequestParam Map<String, String> data) {
         String newUsername = data.get("new_username");
         return updateAccountService.updateUsername(newUsername);
     }
 
     @PostMapping("/api/user/account/update/password/")
+    /**
+     * Handles updatePassword.
+     * ??updatePassword?
+     */
     public Map<String, String> updatePassword(@RequestParam Map<String, String> data) {
         String oldPassword = data.get("old_password");
         String newPassword = data.get("new_password");

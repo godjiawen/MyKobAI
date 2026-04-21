@@ -17,6 +17,10 @@ public class RemoveController {
     private RemoveService removeService;
 
     @PostMapping("/api/user/bot/remove/")
+    /**
+     * Handles remove.
+     * ??remove?
+     */
     public Map<String, String> remove(@RequestParam Map<String, String> data) {
         return removeService.remove(data);
     }

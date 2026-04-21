@@ -14,14 +14,23 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 服务实现类。
+ * Service implementation for retrieving all bots owned by the current user.
+ * 获取当前用户所拥有所有机器人列表的服务实现。
  */
 @Service
 public class GetListServiceImpl implements GetListService {
     @Autowired
     private BotMapper botMapper;
 
+    /**
+     * Returns all bots belonging to the currently authenticated user.
+     * 返回当前已认证用户的所有机器人。
+     */
     @Override
+    /**
+     * Handles getList.
+     * ??getList?
+     */
     public List<Bot> getList() {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

@@ -1,39 +1,20 @@
-<!-- 界面组件。 -->
 <template>
-  <div class="container content-field">
-    <div class="card content-card">
-      <div class="card-body">
-        <slot></slot>
-      </div>
+  <section class="kob-page-shell content-field">
+    <div class="kob-surface content-surface">
+      <slot></slot>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-div.content-field {
-  margin-top: 22px;
-  animation: card-in 320ms ease;
+.content-surface {
+  padding: 24px;
 }
 
-.content-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.content-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(130deg, rgba(90, 209, 255, 0.11), transparent 34%, rgba(255, 191, 71, 0.08));
-}
-
-@keyframes card-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+@media (max-width: 991px) {
+  .content-surface {
+    padding: 18px;
+    border-radius: 24px;
   }
 }
 </style>

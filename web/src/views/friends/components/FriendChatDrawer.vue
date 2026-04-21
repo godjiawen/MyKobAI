@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div v-if="modelValue" class="chat-drawer-backdrop" @click.self="$emit('update:modelValue', false)">
     <section class="chat-drawer" role="dialog" aria-modal="true" aria-labelledby="friend-chat-title">
       <aside class="chat-drawer__rail">
@@ -31,7 +31,7 @@
                 <strong>{{ conversation.name }}</strong>
                 <span>{{ conversation.lastMessageAt }}</span>
               </div>
-              <p>{{ conversation.lastMessage || "还没有私聊消息，先打个招呼。" }}</p>
+              <p>{{ conversation.lastMessage || "还没有消息，先打个招呼吧。" }}</p>
               <div class="chat-conversation__meta">
                 <span>{{ conversation.statusLabel }}</span>
                 <span v-if="conversation.unreadCount > 0" class="chat-conversation__badge">
@@ -42,8 +42,8 @@
           </button>
 
           <div v-if="!conversations.length" class="chat-conversation__empty">
-            <strong>还没有私聊会话</strong>
-            <p>从好友详情进入后，这里会形成稳定的聊天侧栏。</p>
+            <strong>还没有会话</strong>
+            <p>从好友详情里打开私聊后，这里会显示会话列表。</p>
           </div>
         </div>
       </aside>
@@ -70,7 +70,7 @@
         <div v-else ref="messagesEl" class="chat-thread__body">
           <div v-if="!messages.length" class="chat-thread__empty">
             <strong>还没有聊天记录</strong>
-            <p>发送第一条消息，让好友私聊真正接入关系系统。</p>
+            <p>发送第一条消息吧。</p>
           </div>
 
           <article
@@ -102,7 +102,7 @@
               class="chat-thread__input"
               rows="3"
               maxlength="500"
-              placeholder="写点什么。比如约一场训练、复盘刚才的对局，或者直接问一句现在能不能打。"
+              placeholder="输入消息..."
               @input="$emit('update:draft', $event.target.value)"
               @keydown.enter.exact.prevent="$emit('send')"
             ></textarea>
@@ -110,7 +110,7 @@
           <div class="chat-thread__actions">
             <small>Enter 发送，Shift + Enter 换行</small>
             <button type="button" class="btn btn-primary chat-thread__send" :disabled="sending || !draft.trim()" @click="$emit('send')">
-              {{ sending ? "发送中..." : "发送私聊" }}
+              {{ sending ? "发送中..." : "发送" }}
             </button>
           </div>
         </footer>

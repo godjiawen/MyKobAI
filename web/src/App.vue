@@ -12,23 +12,13 @@
       </section>
 
       <router-view v-else v-slot="{ Component, route }">
-        <!--
-          不使用 mode="out-in"：该模式与 keep-alive 存在 Vue 3 兼容性问题，
-          会导致 keep-alive 拦截 unmounted 钩子后 leave 信号永远不触发，新组件无法挂载。
-          改用 CSS position:absolute 让离开的组件脱离文档流，进入的组件天然渲染在正确位置。
-        -->
-        <transition name="route-fade" appear>
-          <keep-alive v-if="route.meta.keepAlive" include="RecordIndexView,RanklistIndexView">
+        <transition name="route-fade" mode="out-in">
+          <keep-alive include="RecordIndexView,RanklistIndexView">
             <component
               :is="Component"
-              :key="route.name"
+              :key="getRouteKey(route)"
             />
           </keep-alive>
-          <component
-            v-else
-            :is="Component"
-            :key="route.fullPath"
-          />
         </transition>
       </router-view>
     </main>
@@ -48,9 +38,15 @@ const renderError = ref("");
 const userStore = useUserStore();
 const realtimeStore = useRealtimeStore();
 
+/**
+ * Handles resetRenderError.
+ * ??resetRenderError?
+ */
 const resetRenderError = () => {
   renderError.value = "";
 };
+
+const getRouteKey = (route) => (route.meta?.keepAlive ? route.name : route.fullPath);
 
 onErrorCaptured((error) => {
   console.error(error);
@@ -92,6 +88,14 @@ onBeforeUnmount(() => {
   --motion-fast: 140ms;
   --motion-medium: 260ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --kob-z-navbar: 2100;
+  --kob-z-navbar-menu: 2200;
+  --kob-z-realtime: 2500;
+  --kob-z-bs-backdrop: 3000;
+  --kob-z-bs-modal: 3010;
+  --kob-z-app-dialog: 3300;
+  --kob-z-friends-dialog: 3400;
 }
 
 * {
@@ -147,29 +151,22 @@ body {
 
 .route-fade-enter-active,
 .route-fade-leave-active {
-  transition: opacity var(--motion-medium) var(--ease-out);
+  transition:
+    opacity var(--motion-medium) var(--ease-out),
+    transform var(--motion-medium) var(--ease-out);
   will-change: opacity;
-}
-
-/*
- * 离开时将组件移出文档流（position: absolute），使进入的组件立即渲染在正确位置，
- * 避免两个组件同时在文档流中导致进入组件被挤到错误的位置后再弹回（位移抖动）。
- * pointer-events: none 防止正在淡出的组件遮挡新页面的交互。
- */
-.route-fade-leave-active {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
 }
 
 .route-fade-enter-from,
 .route-fade-leave-to {
   opacity: 0;
+  transform: translateY(6px);
 }
 
 .route-fade-enter-to,
 .route-fade-leave-from {
   opacity: 1;
+  transform: translateY(0);
 }
 
 .app-error-panel {
@@ -192,11 +189,11 @@ body {
 }
 
 .modal-backdrop {
-  z-index: 3000 !important;
+  z-index: var(--kob-z-bs-backdrop) !important;
 }
 
 .modal {
-  z-index: 3010 !important;
+  z-index: var(--kob-z-bs-modal) !important;
 }
 
 .content-field .card {

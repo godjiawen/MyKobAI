@@ -28,11 +28,19 @@ const requestStatusLabelMap = {
 
 const normalizeKeyword = (value) => (value || "").trim().toLowerCase();
 
+/**
+ * Handles matchesKeyword.
+ * ??matchesKeyword?
+ */
 const matchesKeyword = (keyword, fields) => {
   if (!keyword) return true;
   return fields.some((field) => String(field || "").toLowerCase().includes(keyword));
 };
 
+/**
+ * Handles mapOnlineStatus.
+ * ??mapOnlineStatus?
+ */
 const mapOnlineStatus = (status) => {
   if (status === "in_game" || status === "busy") return "busy";
   if (status === "online") return "online";
@@ -41,6 +49,10 @@ const mapOnlineStatus = (status) => {
 
 const buildStatusLabel = (status) => statusLabelMap[status] || "离线";
 
+/**
+ * Handles isToday.
+ * ??isToday?
+ */
 const isToday = (value) => {
   if (!value) return false;
   const target = new Date(value.replace(/-/g, "/"));
@@ -59,6 +71,10 @@ const normalizeBotOption = (bot = {}) => ({
   description: bot.description || "",
 });
 
+/**
+ * Handles buildFriendTags.
+ * ??buildFriendTags?
+ */
 const buildFriendTags = (item, uiStatus) => {
   const tags = [];
   if (item.is_favorite) tags.push("常用好友");
@@ -69,6 +85,10 @@ const buildFriendTags = (item, uiStatus) => {
   return tags.slice(0, 3).length ? tags.slice(0, 3) : ["等待建立互动"]; 
 };
 
+/**
+ * Handles mapFriendItem.
+ * ??mapFriendItem?
+ */
 const mapFriendItem = (item) => {
   const status = mapOnlineStatus(item.online_status);
   const tags = buildFriendTags(item, status);
@@ -80,10 +100,10 @@ const mapFriendItem = (item) => {
     statusLabel: buildStatusLabel(status),
     signature: item.last_match_at
       ? `最近一次共同对局：${item.last_match_at}`
-      : "还没有共同对局记录，适合从一场练习赛开始。",
+      : "还没有共同对局，来一场吧。",
     note: item.match_count > 0
-      ? `你们目前累计共同对局 ${item.match_count} 场，可直接从详情面板发起邀战。`
-      : "关系刚建立或尚未开打，建议先发起第一场训练。",
+      ? `已共同对局 ${item.match_count} 场。`
+      : "刚成为好友，适合先热身一局。",
     rating: item.friend_rating,
     commonMatches: item.match_count || 0,
     winRate: item.match_count > 0 ? `已记录 ${item.match_count} 场` : "待建立",
@@ -101,6 +121,10 @@ const mapFriendItem = (item) => {
   };
 };
 
+/**
+ * Handles mapRequestItem.
+ * ??mapRequestItem?
+ */
 const mapRequestItem = (item, perspective) => {
   const isReceived = perspective === "received";
   const userPrefix = isReceived ? "sender" : "receiver";
@@ -113,7 +137,7 @@ const mapRequestItem = (item, perspective) => {
     status,
     statusLabel: buildStatusLabel(status),
     signature: `${item[`${userPrefix}_username`]} 当前积分 ${item[`${userPrefix}_rating`]}`,
-    message: item.message || "来打一局？",
+    message: item.message || "来一局吗？",
     rating: item[`${userPrefix}_rating`] || 0,
     region: "暂未公开",
     timeLabel: safeDateLabel(item.created_at, "刚刚"),
@@ -122,6 +146,10 @@ const mapRequestItem = (item, perspective) => {
   };
 };
 
+/**
+ * Handles mapDiscoverItem.
+ * ??mapDiscoverItem?
+ */
 const mapDiscoverItem = (item) => {
   const relationMap = {
     none: "none",
@@ -143,6 +171,10 @@ const mapDiscoverItem = (item) => {
   };
 };
 
+/**
+ * Handles mapChatConversation.
+ * ??mapChatConversation?
+ */
 const mapChatConversation = (item) => {
   const status = mapOnlineStatus(item.online_status);
   return {
@@ -180,6 +212,10 @@ const createDefaultStats = () => ({
   today_new_count: 0,
 });
 
+/**
+ * Handles ensureSuccess.
+ * ??ensureSuccess?
+ */
 const ensureSuccess = (resp, fallbackMessage) => {
   if (!resp || resp.error_message !== "success") {
     throw new Error(resp?.error_message || fallbackMessage);
@@ -228,30 +264,38 @@ export const useFriendStore = defineStore("friend", {
     discoverUsers: [],
   }),
   getters: {
+    /**
+     * Handles summaryCards.
+     * ??summaryCards?
+     */
     summaryCards(state) {
       return [
         {
           label: "好友总数",
           value: state.stats.friends_count,
-          footnote: "好友关系主表",
+          footnote: "当前好友",
         },
         {
           label: "在线好友",
           value: state.stats.online_count,
-          footnote: "可直接发起互动",
+          footnote: "可立即开打",
         },
         {
           label: "待处理申请",
           value: state.stats.pending_received_count,
-          footnote: "需要你主动决策",
+          footnote: "等你处理",
         },
         {
           label: "今日新增",
           value: state.stats.today_new_count,
-          footnote: "今日新增好友关系",
+          footnote: "今天新加",
         },
       ];
     },
+    /**
+     * Handles segmentCounts.
+     * ??segmentCounts?
+     */
     segmentCounts(state) {
       return {
         all: state.friends.length,
@@ -260,6 +304,10 @@ export const useFriendStore = defineStore("friend", {
         favorite: state.friends.filter((friend) => friend.favorite).length,
       };
     },
+    /**
+     * Handles filteredFriends.
+     * ??filteredFriends?
+     */
     filteredFriends(state) {
       const keyword = normalizeKeyword(state.sidebarKeyword);
       let friends = [...state.friends];
@@ -285,15 +333,31 @@ export const useFriendStore = defineStore("friend", {
         return right.rating - left.rating;
       });
     },
+    /**
+     * Handles selectedFriend.
+     * ??selectedFriend?
+     */
     selectedFriend(state) {
       return state.friends.find((friend) => friend.id === state.selectedFriendId) || state.friends[0] || null;
     },
+    /**
+     * Handles pendingRemoveFriend.
+     * ??pendingRemoveFriend?
+     */
     pendingRemoveFriend(state) {
       return state.friends.find((friend) => friend.id === state.pendingRemoveFriendId) || null;
     },
+    /**
+     * Handles inviteDialogFriend.
+     * ??inviteDialogFriend?
+     */
     inviteDialogFriend(state) {
       return state.friends.find((friend) => friend.id === state.inviteDialogFriendId) || null;
     },
+    /**
+     * Handles filteredDiscoverUsers.
+     * ??filteredDiscoverUsers?
+     */
     filteredDiscoverUsers(state) {
       const keyword = normalizeKeyword(state.discoverKeyword);
       return state.discoverUsers
@@ -305,16 +369,28 @@ export const useFriendStore = defineStore("friend", {
         })
         .slice(0, state.discoverDisplayLimit);
     },
+    /**
+     * Handles activeChatFriend.
+     * ??activeChatFriend?
+     */
     activeChatFriend(state) {
       const targetId = state.chatActiveFriendId || state.selectedFriendId;
       return state.friends.find((friend) => friend.id === targetId) || null;
     },
+    /**
+     * Handles activeChatConversation.
+     * ??activeChatConversation?
+     */
     activeChatConversation(state) {
       const targetId = state.chatActiveFriendId || state.selectedFriendId;
       return state.chatConversations.find((conversation) => conversation.friendId === targetId) || null;
     },
   },
   actions: {
+    /**
+     * Handles getToken.
+     * ??getToken?
+     */
     getToken() {
       const userStore = useUserStore();
       return userStore.token || localStorage.getItem("jwt_token") || "";
@@ -335,7 +411,7 @@ export const useFriendStore = defineStore("friend", {
       } catch (error) {
         this.showFeedback({
           title: "好友系统加载失败",
-          message: error.message || "请检查后端服务和数据库表是否已经创建。",
+          message: error.message || "加载失败，请稍后重试。",
           type: "warn",
         });
         throw error;
@@ -467,15 +543,31 @@ export const useFriendStore = defineStore("friend", {
         this.chatHistoryLoading = false;
       }
     },
+    /**
+     * Handles setActiveSegment.
+     * ??setActiveSegment?
+     */
     setActiveSegment(segment) {
       this.activeSegment = segment;
     },
+    /**
+     * Handles setActiveTab.
+     * ??setActiveTab?
+     */
     setActiveTab(tab) {
       this.activeTab = tab;
     },
+    /**
+     * Handles setSidebarKeyword.
+     * ??setSidebarKeyword?
+     */
     setSidebarKeyword(keyword) {
       this.sidebarKeyword = keyword;
     },
+    /**
+     * Handles setDiscoverKeyword.
+     * ??setDiscoverKeyword?
+     */
     setDiscoverKeyword(keyword) {
       this.discoverKeyword = keyword;
       if (discoverSearchTimer) clearTimeout(discoverSearchTimer);
@@ -484,18 +576,26 @@ export const useFriendStore = defineStore("friend", {
         this.searchUsers(this.discoverKeyword).catch((error) => {
           this.showFeedback({
             title: "搜索失败",
-            message: error.message || "用户搜索接口调用失败。",
+            message: error.message || "搜索失败，请稍后重试。",
             type: "warn",
           });
         });
       }, 280);
     },
+    /**
+     * Handles selectFriend.
+     * ??selectFriend?
+     */
     selectFriend(friendId) {
       const target = this.friends.find((friend) => friend.id === friendId);
       if (!target) return;
       this.selectedFriendId = friendId;
       this.activeTab = "detail";
     },
+    /**
+     * Handles showFeedback.
+     * ??showFeedback?
+     */
     showFeedback({ title, message, type = "info" }) {
       this.feedback = { visible: true, title, message, type };
       if (feedbackTimer) clearTimeout(feedbackTimer);
@@ -503,6 +603,10 @@ export const useFriendStore = defineStore("friend", {
         this.clearFeedback();
       }, 2600);
     },
+    /**
+     * Handles clearFeedback.
+     * ??clearFeedback?
+     */
     clearFeedback() {
       if (feedbackTimer) {
         clearTimeout(feedbackTimer);
@@ -510,6 +614,10 @@ export const useFriendStore = defineStore("friend", {
       }
       this.feedback.visible = false;
     },
+    /**
+     * Handles getOutgoingInviteForFriend.
+     * ??getOutgoingInviteForFriend?
+     */
     getOutgoingInviteForFriend(friendId) {
       return useRealtimeStore().getPendingInviteWithFriend(friendId);
     },
@@ -525,16 +633,24 @@ export const useFriendStore = defineStore("friend", {
       } catch (error) {
         this.showFeedback({
           title: "邀战信息加载失败",
-          message: error.message || "无法加载出战配置。",
+          message: error.message || "暂时无法加载出战配置。",
           type: "warn",
         });
       }
     },
+    /**
+     * Handles closeInviteDialog.
+     * ??closeInviteDialog?
+     */
     closeInviteDialog() {
       this.inviteDialogVisible = false;
       this.inviteDialogFriendId = null;
       this.inviteDialogSubmitting = false;
     },
+    /**
+     * Handles setInviteDialogBot.
+     * ??setInviteDialogBot?
+     */
     setInviteDialogBot(botId) {
       this.inviteDialogBotId = String(botId ?? "-1");
     },
@@ -565,7 +681,7 @@ export const useFriendStore = defineStore("friend", {
       } catch (error) {
         this.showFeedback({
           title: "邀战发送失败",
-          message: error.message || "请检查对方是否在线。",
+          message: error.message || "发送失败，请稍后再试。",
           type: "warn",
         });
       } finally {
@@ -597,6 +713,10 @@ export const useFriendStore = defineStore("friend", {
       if (!nextFriendId) return;
       await this.setActiveChatFriend(nextFriendId);
     },
+    /**
+     * Handles closeChatDrawer.
+     * ??closeChatDrawer?
+     */
     closeChatDrawer() {
       this.chatDrawerVisible = false;
       this.chatDraft = "";
@@ -607,15 +727,27 @@ export const useFriendStore = defineStore("friend", {
       await this.fetchChatHistory(friendId);
       await this.markChatConversationRead(friendId);
     },
+    /**
+     * Handles setChatDraft.
+     * ??setChatDraft?
+     */
     setChatDraft(value) {
       this.chatDraft = value;
     },
+    /**
+     * Handles markLocalConversationRead.
+     * ??markLocalConversationRead?
+     */
     markLocalConversationRead(friendId) {
       const target = this.chatConversations.find((item) => item.friendId === friendId);
       if (target) {
         target.unreadCount = 0;
       }
     },
+    /**
+     * Handles upsertConversationFromMessage.
+     * ??upsertConversationFromMessage?
+     */
     upsertConversationFromMessage(message) {
       const currentUserId = Number.parseInt(useUserStore().id, 10);
       const friendId = message.senderId === currentUserId ? message.receiverId : message.senderId;
@@ -662,6 +794,10 @@ export const useFriendStore = defineStore("friend", {
         ...this.chatConversations,
       ];
     },
+    /**
+     * Handles upsertChatMessage.
+     * ??upsertChatMessage?
+     */
     upsertChatMessage(message) {
       if (this.chatMessages.some((item) => item.id === message.id)) return;
       if (!this.chatActiveFriendId) return;
@@ -709,13 +845,17 @@ export const useFriendStore = defineStore("friend", {
       } catch (error) {
         this.showFeedback({
           title: "发送失败",
-          message: error.message || "私聊消息发送失败。",
+          message: error.message || "消息发送失败，请重试。",
           type: "warn",
         });
       } finally {
         this.chatSending = false;
       }
     },
+    /**
+     * Handles receivePrivateChatMessage.
+     * ??receivePrivateChatMessage?
+     */
     receivePrivateChatMessage(message) {
       const normalizedMessage = mapChatMessage(message);
       this.upsertConversationFromMessage(normalizedMessage);
@@ -747,20 +887,28 @@ export const useFriendStore = defineStore("friend", {
         await this.fetchStats();
         this.showFeedback({
           title: friend.favorite ? "已收藏好友" : "已取消收藏",
-          message: `${friend.name} 的常用状态已经同步到后端。`,
+          message: friend.favorite ? `${friend.name} 已加入收藏。` : `${friend.name} 已取消收藏。`,
           type: friend.favorite ? "success" : "info",
         });
       } catch (error) {
         this.showFeedback({
           title: "更新失败",
-          message: error.message || "收藏状态更新失败。",
+          message: error.message || "操作失败，请稍后重试。",
           type: "warn",
         });
       }
     },
+    /**
+     * Handles openRemoveDialog.
+     * ??openRemoveDialog?
+     */
     openRemoveDialog(friendId) {
       this.pendingRemoveFriendId = friendId;
     },
+    /**
+     * Handles closeRemoveDialog.
+     * ??closeRemoveDialog?
+     */
     closeRemoveDialog() {
       this.pendingRemoveFriendId = null;
     },

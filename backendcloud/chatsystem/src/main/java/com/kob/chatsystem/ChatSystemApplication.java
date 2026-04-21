@@ -8,6 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class ChatSystemApplication {
+    /**
+     * Handles main.
+     * ??main?
+     */
     public static void main(String[] args) {
         SpringApplication.run(ChatSystemApplication.class, args);
     }

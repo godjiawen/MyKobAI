@@ -4,7 +4,7 @@
       <div>
         <p class="panel-kicker">Roster</p>
         <h3>好友列表</h3>
-        <p class="sidebar-copy">优先把在线、常用和最近互动对象保留在这块名册里，减少无效滚动。</p>
+        <p class="sidebar-copy">在线、常用、最近互动，一眼可见。</p>
       </div>
       <button type="button" class="ghost-pill" @click="$emit('open-discover')">
         发现用户
@@ -18,7 +18,7 @@
         type="text"
         class="form-control sidebar-search"
         :value="searchValue"
-        placeholder="搜索昵称、备注、地区"
+        placeholder="搜索昵称或状态"
         @input="$emit('update:search', $event.target.value)"
       />
     </label>
@@ -55,8 +55,8 @@
     </div>
 
     <div v-else class="sidebar-empty">
-      <strong>当前筛选没有结果</strong>
-      <p>可以切换分组，或者去发现用户里发起新的好友申请。</p>
+      <strong>没有匹配结果</strong>
+      <p>试试切换分组，或去发现用户添加好友。</p>
       <button type="button" class="btn btn-outline-primary" @click="$emit('open-discover')">
         去发现用户
       </button>

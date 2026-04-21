@@ -1,7 +1,15 @@
 import { AcGameObject } from "./AcGameObject";
 import { Cell } from "./Cell";
 
+/**
+ * Snake game object that handles movement, growth, rendering and eye drawing.
+ * 蛇游戏对象，处理移动、生长、渲染和眼睛绘制。
+ */
 export class Snake extends AcGameObject {
+    /**
+     * Initializes the snake with id, color, starting position, speed and direction state.
+     * 初始化蛇的id、颜色、起始位置、速度和方向状态。
+     */
     constructor(info, gamemap) {
         super();
 
@@ -38,21 +46,36 @@ export class Snake extends AcGameObject {
         ];
     }
 
+    /**
+     * Lifecycle hook called once at start; no initialization needed for Snake.
+     * 启动时调用一次的生命周期钩子；Snake无需额外初始化。
+     */
     start() {
 
     }
 
+    /**
+     * Sets the queued movement direction for the next step.
+     * 设置下一步的预定移动方向。
+     */
     set_direction(d) {
         this.direction = d;
     }
 
+    /**
+     * Returns true if the snake's length should increase during the current step.
+     * 若当前步骤蛇的长度应增长则返回true。
+     */
     check_tail_increasing() {  // 检测当前回合，蛇的长度是否增加
         if (this.step <= 10) return true;
         if (this.step % 3 === 1) return true;
         return false;
     }
 
-
+    /**
+     * Advances the snake to the next cell in the queued direction and starts the move animation.
+     * 将蛇移动到预定方向的下一格并启动移动动画。
+     */
     next_step() { // 将蛇的状态变为走下一步
         const d = this.direction;
         this.next_cell = new Cell(this.cells[0].r + this.dr[d], this.cells[0].c + this.dc[d]);
@@ -66,6 +89,10 @@ export class Snake extends AcGameObject {
         }
     }
 
+    /**
+     * Smoothly animates the snake's head and tail toward their target positions each frame.
+     * 每帧平滑地将蛇头和蛇尾向目标位置移动。
+     */
     update_move() {
         const dx = this.next_cell.x - this.cells[0].x;
         const dy = this.next_cell.y - this.cells[0].y;
@@ -96,7 +123,10 @@ export class Snake extends AcGameObject {
         }
     }
 
-
+    /**
+     * Per-frame update: animates movement if moving, then renders the snake.
+     * 每帧更新：若在移动中则执行动画，然后渲染蛇。
+     */
     update() {  // 每一帧执行一次
         if (this.status === 'move') {
             this.update_move();
@@ -105,7 +135,10 @@ export class Snake extends AcGameObject {
         this.render();
     }
 
-
+    /**
+     * Draws the snake body segments and eyes on the canvas.
+     * 在画布上绘制蛇的身体段和眼睛。
+     */
     render() {
         const L = this.gamemap.L;
         const ctx = this.gamemap.ctx;

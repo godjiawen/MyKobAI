@@ -13,14 +13,17 @@ DX = [-1, 0, 1, 0]
 DY = [0, 1, 0, -1]
 
 
+# 判断在给定步数时蛇尾是否应增长。
+# Determines whether the snake tail should grow at the given step.
 def check_tail_increasing(step: int) -> bool:
     if step <= 10:
         return True
     return step % 3 == 1
 
 
+# 根据起点和历史步骤重建蛇身格子。
+# Rebuilds snake body cells from start position and step history.
 def get_cells(sx: int, sy: int, steps: str):
-    """从起点 + 历史步骤重建蛇身，返回格子列表（index 0 = 蛇尾，最后 = 蛇头）"""
     cells = [[sx, sy]]
     x, y, step = sx, sy, 0
     for c in steps:
@@ -34,8 +37,9 @@ def get_cells(sx: int, sy: int, steps: str):
     return cells
 
 
+# 运行BFS并返回从给定起点可到达的空白格数量。
+# Runs BFS and returns reachable free-cell count from the given start cell.
 def flood_fill(g, sx: int, sy: int) -> int:
-    """BFS 计算从 (sx, sy) 出发能到达的空格数（含起点）"""
     if g[sx][sy] != 0:
         return 0
     queue = deque([[sx, sy]])
@@ -92,4 +96,3 @@ for d in range(4):
         best_dir = d
 
 print(best_dir)
-

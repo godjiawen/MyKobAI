@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * Service implementation for user registration with input validation and password encoding.
+ * 用户注册服务实现，包含输入校验和密码编码。
+ */
 @Service
 public class RegisterServiceImpl implements RegisterService {
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{6,12}$");
@@ -23,7 +27,15 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Validates inputs and registers a new user account; returns success or an error message.
+     * 校验输入并注册新用户账户；返回成功消息或错误信息。
+     */
     @Override
+    /**
+     * Handles register.
+     * ??register?
+     */
     public Map<String, String> register(String username, String password, String confirmePassword) {
         Map<String, String> map = new HashMap<>();
 
@@ -88,6 +100,10 @@ public class RegisterServiceImpl implements RegisterService {
         return map;
     }
 
+    /**
+     * Calculates a complexity score (0-4) based on character type variety in the password.
+     * 根据密码中字符类型的多样性计算复杂度分数（0-4）。
+     */
     private int passwordComplexityScore(String password) {
         int score = 0;
         if (password.chars().anyMatch(Character::isUpperCase)) score++;
@@ -97,6 +113,10 @@ public class RegisterServiceImpl implements RegisterService {
         return score;
     }
 
+    /**
+     * Returns true if the text contains any whitespace character.
+     * 若文本包含任意空白字符则返回true。
+     */
     private boolean containsWhitespace(String text) {
         return text.chars().anyMatch(Character::isWhitespace);
     }

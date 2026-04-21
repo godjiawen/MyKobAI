@@ -19,6 +19,10 @@ public class UploadAvatarController {
     private UploadAvatarService uploadAvatarService;
 
     @PostMapping("/api/user/account/avatar/upload/")
+    /**
+     * Handles uploadAvatar.
+     * ??uploadAvatar?
+     */
     public Map<String, String> uploadAvatar(@RequestParam("file") MultipartFile file) {
         return uploadAvatarService.upload(file);
     }

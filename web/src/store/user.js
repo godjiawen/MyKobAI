@@ -1,5 +1,4 @@
-// 状态仓库模块。
-import { defineStore } from "pinia";
+﻿import { defineStore } from "pinia";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 
@@ -15,21 +14,41 @@ const createDefaultState = () => ({
 export const useUserStore = defineStore("user", {
   state: createDefaultState,
   actions: {
+    /**
+     * Handles updateUser.
+     * ??updateUser?
+     */
     updateUser(user) {
       this.id = user.id;
       this.username = user.username;
       this.photo = user.photo;
       this.is_login = user.is_login;
     },
+    /**
+     * Handles updateToken.
+     * ??updateToken?
+     */
     updateToken(token) {
       this.token = token;
     },
+    /**
+     * Handles updatePhoto.
+     * ??updatePhoto?
+     */
     updatePhoto(photoUrl) {
       this.photo = photoUrl;
     },
+    /**
+     * Handles updateUsername.
+     * ??updateUsername?
+     */
     updateUsername(newUsername) {
       this.username = newUsername;
     },
+    /**
+     * Handles clearUserSession.
+     * ??clearUserSession?
+     */
     clearUserSession() {
       this.id = "";
       this.photo = "";
@@ -37,6 +56,10 @@ export const useUserStore = defineStore("user", {
       this.token = "";
       this.is_login = false;
     },
+    /**
+     * Handles updatePullingInfo.
+     * ??updatePullingInfo?
+     */
     updatePullingInfo(pullingInfo) {
       this.pulling_info = pullingInfo;
     },
@@ -52,7 +75,14 @@ export const useUserStore = defineStore("user", {
 
       localStorage.setItem("jwt_token", resp.token);
       this.updateToken(resp.token);
-      return resp;
+
+      try {
+        return await this.getinfo();
+      } catch (error) {
+        localStorage.removeItem("jwt_token");
+        this.clearUserSession();
+        throw error;
+      }
     },
     async getinfo() {
       const resp = await apiRequest(API_PATHS.userInfo, {
@@ -69,6 +99,10 @@ export const useUserStore = defineStore("user", {
       });
       return resp;
     },
+    /**
+     * Handles logout.
+     * ??logout?
+     */
     logout() {
       localStorage.removeItem("jwt_token");
       this.clearUserSession();
@@ -94,3 +128,4 @@ export const useUserStore = defineStore("user", {
     },
   },
 });
+

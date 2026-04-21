@@ -31,6 +31,10 @@ public class FriendInviteController {
     }
 
     @GetMapping("/api/friends/invite/pending/")
+    /**
+     * Handles pending.
+     * ??pending?
+     */
     public Map<String, Object> pending() {
         return friendInviteService.pending();
     }

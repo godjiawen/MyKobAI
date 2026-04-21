@@ -17,6 +17,10 @@ public class GetListController {
     private GetListService getListService;
 
     @GetMapping("/api/user/bot/getlist/")
+    /**
+     * Handles getList.
+     * ??getList?
+     */
     public List<Bot> getList() {
         return getListService.getList();
     }

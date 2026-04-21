@@ -26,6 +26,10 @@ public class FriendController {
     }
 
     @GetMapping("/api/friends/stats/")
+    /**
+     * Handles stats.
+     * ??stats?
+     */
     public Map<String, Object> stats() {
         return friendService.stats();
     }
@@ -39,11 +43,19 @@ public class FriendController {
     }
 
     @PostMapping("/api/friends/remove/")
+    /**
+     * Handles remove.
+     * ??remove?
+     */
     public Map<String, Object> remove(@RequestParam("friend_id") Integer friendId) {
         return friendService.remove(friendId);
     }
 
     @PostMapping("/api/friends/favorite/toggle/")
+    /**
+     * Handles toggleFavorite.
+     * ??toggleFavorite?
+     */
     public Map<String, Object> toggleFavorite(@RequestParam("friend_id") Integer friendId) {
         return friendService.toggleFavorite(friendId);
     }

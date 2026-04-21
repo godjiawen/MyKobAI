@@ -1,11 +1,15 @@
 <template>
-  <div class="card bot-main-card">
-    <div class="card-header bot-main-header">
-      <span class="title">我的 Bot</span>
-      <button type="button" class="btn btn-primary" @click="openBotModal(null)">新建 Bot</button>
+  <div class="kob-panel bot-main-card">
+    <div class="bot-main-header">
+      <div>
+        <p class="kob-kicker">Bot Lab</p>
+        <h3 class="kob-headline">我的 Bot</h3>
+      </div>
+      <button type="button" class="btn btn-primary kob-pill-btn" @click="openBotModal(null)">新建 Bot</button>
     </div>
-    <div class="card-body">
-      <table class="table table-striped table-hover">
+
+    <div class="kob-table-wrap mt-3">
+      <table class="table table-striped table-hover align-middle bot-table">
         <thead>
           <tr>
             <th>名称</th>
@@ -19,13 +23,13 @@
             <td class="align-middle">{{ bot.title }}</td>
             <td class="align-middle">
               <span :class="['lang-badge', 'lang-' + (bot.language || 'java')]">
-                {{ (bot.language || 'java').toUpperCase() }}
+                {{ (bot.language || "java").toUpperCase() }}
               </span>
             </td>
             <td class="align-middle">{{ bot.createtime }}</td>
             <td>
-              <button type="button" class="btn btn-secondary me-2" @click="openBotModal(bot)">编辑</button>
-              <button type="button" class="btn btn-danger" @click="removeBot(bot)">删除</button>
+              <button type="button" class="btn btn-secondary me-2 kob-pill-btn btn-sm" @click="openBotModal(bot)">编辑</button>
+              <button type="button" class="btn btn-danger kob-pill-btn btn-sm" @click="removeBot(bot)">删除</button>
             </td>
           </tr>
           <tr v-if="bots.length === 0">
@@ -36,52 +40,54 @@
     </div>
   </div>
 
-  <div class="modal fade" ref="botModalRef" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{{ botDraft.id ? "编辑 Bot" : "新建 Bot" }}</h5>
-          <button type="button" class="btn-close" @click="closeModal(botModalRef)"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">名称 <span class="text-danger">*</span></label>
-            <input v-model="botDraft.title" type="text" class="form-control" placeholder="请输入 Bot 名称" />
+  <teleport to="body">
+    <div class="modal fade" ref="botModalRef" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content bot-modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ botDraft.id ? "编辑 Bot" : "新建 Bot" }}</h5>
+            <button type="button" class="btn-close" @click="closeModal(botModalRef)"></button>
           </div>
-          <div class="mb-3">
-            <label class="form-label">语言 <span class="text-danger">*</span></label>
-            <select v-model="botDraft.language" class="form-select" @change="onLanguageChange">
-              <option value="java">Java</option>
-              <option value="python">Python</option>
-              <option value="cpp">C++</option>
-              <option value="javascript">JavaScript</option>
-            </select>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">名称 <span class="text-danger">*</span></label>
+              <input v-model="botDraft.title" type="text" class="form-control" placeholder="请输入 Bot 名称" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">语言 <span class="text-danger">*</span></label>
+              <select v-model="botDraft.language" class="form-select" @change="onLanguageChange">
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="javascript">JavaScript</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">描述</label>
+              <textarea v-model="botDraft.description" class="form-control" rows="3" placeholder="简要描述 Bot 思路"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">代码 <span class="text-danger">*</span></label>
+              <VAceEditor
+                v-model:value="botDraft.content"
+                :lang="aceLang"
+                theme="chrome"
+                style="height: 400px; border: 1px solid rgba(90, 180, 255, 0.25); border-radius: 10px;"
+                :options="{ fontSize: 14, showPrintMargin: false }"
+              />
+            </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">描述</label>
-            <textarea v-model="botDraft.description" class="form-control" rows="3" placeholder="简要描述 Bot 思路"></textarea>
+          <div class="modal-footer">
+            <div class="error-message me-auto">{{ botDraft.error_message }}</div>
+            <button type="button" class="btn btn-primary kob-pill-btn" @click="saveBot" :disabled="isSubmitting">
+              {{ isSubmitting ? "保存中..." : "保存" }}
+            </button>
+            <button type="button" class="btn btn-secondary kob-pill-btn" @click="closeModal(botModalRef)">取消</button>
           </div>
-          <div class="mb-3">
-            <label class="form-label">代码 <span class="text-danger">*</span></label>
-            <VAceEditor
-              v-model:value="botDraft.content"
-              :lang="aceLang"
-              theme="chrome"
-              style="height: 400px; border: 1px solid #ddd; border-radius: 4px;"
-              :options="{ fontSize: 14, showPrintMargin: false }"
-            />
-          </div>
-        </div>
-        <div class="modal-footer">
-          <div class="error-message me-auto">{{ botDraft.error_message }}</div>
-          <button type="button" class="btn btn-primary" @click="saveBot" :disabled="isSubmitting">
-            {{ isSubmitting ? "保存中..." : "保存" }}
-          </button>
-          <button type="button" class="btn btn-secondary" @click="closeModal(botModalRef)">取消</button>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 
   <AppDialog
     v-model="dialogState.visible"
@@ -140,21 +146,72 @@ const aceLang = computed(() => {
   return map[botDraft.language] || "java";
 });
 
+/**
+ * Handles openModal.
+ * ??openModal?
+ */
 const openModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).show();
 };
 
+/**
+ * Handles closeModal.
+ * ??closeModal?
+ */
 const closeModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).hide();
 };
 
-const openDialog = ({
+const closeModalAndWait = (modalRef) => new Promise((resolve) => {
+  if (!modalRef) {
+    resolve();
+    return;
+  }
+
+  const instance = Modal.getOrCreateInstance(modalRef);
+  if (!modalRef.classList.contains("show")) {
+    resolve();
+    return;
+  }
+
+  let settled = false;
+  const cleanup = () => {
+    if (settled) return;
+    settled = true;
+    modalRef.removeEventListener("hidden.bs.modal", cleanup);
+    resolve();
+  };
+
+  modalRef.addEventListener("hidden.bs.modal", cleanup, { once: true });
+  instance.hide();
+  setTimeout(cleanup, 420);
+});
+
+const cleanupDanglingBackdrop = () => {
+  const hasVisibleModal = document.querySelector(".modal.show");
+  if (hasVisibleModal) return;
+
+  document.querySelectorAll(".modal-backdrop").forEach((node) => {
+    node.remove();
+  });
+  document.body.classList.remove("modal-open");
+  document.body.style.removeProperty("padding-right");
+};
+
+const prepareDialogLayer = async () => {
+  await closeModalAndWait(botModalRef.value);
+  cleanupDanglingBackdrop();
+};
+
+const openDialog = async ({
   title = "提示",
   message = "",
   confirmText = "确定",
   cancelText = "取消",
   showCancel = false,
-} = {}) => new Promise((resolve) => {
+} = {}) => {
+  await prepareDialogLayer();
+  return new Promise((resolve) => {
   if (dialogResolver) {
     const previousResolve = dialogResolver;
     dialogResolver = null;
@@ -167,8 +224,13 @@ const openDialog = ({
   dialogState.showCancel = showCancel;
   dialogState.visible = true;
   dialogResolver = resolve;
-});
+  });
+};
 
+/**
+ * Handles settleDialog.
+ * ??settleDialog?
+ */
 const settleDialog = (result) => {
   dialogState.visible = false;
   const resolve = dialogResolver;
@@ -195,6 +257,10 @@ onMounted(() => {
   refreshBots().catch(() => {});
 });
 
+/**
+ * Handles openBotModal.
+ * ??openBotModal?
+ */
 const openBotModal = (bot = null) => {
   if (bot) {
     Object.assign(botDraft, { ...bot, error_message: "" });
@@ -218,7 +284,7 @@ const saveBot = async () => {
     return;
   }
   if (!botDraft.content.trim()) {
-    botDraft.error_message = "Bot代码不能为空。";
+    botDraft.error_message = "Bot 代码不能为空。";
     return;
   }
 
@@ -305,6 +371,10 @@ const removeBot = async (bot) => {
   }
 };
 
+/**
+ * Handles onLanguageChange.
+ * ??onLanguageChange?
+ */
 const onLanguageChange = () => {
   if (botDraft.id) return;
   const placeholders = [
@@ -318,6 +388,10 @@ const onLanguageChange = () => {
   }
 };
 
+/**
+ * Handles codePlaceholder.
+ * ??codePlaceholder?
+ */
 const codePlaceholder = (lang) => {
   const map = {
     java: `import java.util.Scanner;\nimport java.io.File;\n\npublic class Bot implements java.util.function.Supplier<Integer> {\n    @Override\n    public Integer get() {\n        // 返回方向：0=上，1=右，2=下，3=左\n        return 0;\n    }\n}`,
@@ -330,38 +404,28 @@ const codePlaceholder = (lang) => {
 </script>
 
 <style scoped>
-.bot-main-card {
-  background: var(--kob-panel);
-  border: 1px solid var(--kob-panel-border);
-  box-shadow: 0 10px 30px rgba(0, 50, 100, 0.08);
-  backdrop-filter: blur(12px);
-}
-
 .bot-main-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.bot-main-header .title {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--kob-text);
+.bot-table {
+  margin: 0;
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
+  --bs-table-hover-bg: rgba(90, 180, 255, 0.1);
 }
 
-.modal-content {
+.bot-modal-content {
   background: #fff;
   border: 1px solid rgba(90, 180, 255, 0.3);
   color: var(--kob-text);
 }
 
-.modal-header .btn-close {
-  filter: none;
-}
-
 .error-message {
-  color: #e74c3c;
+  color: #d14343;
   min-height: 20px;
 }
 
@@ -392,5 +456,12 @@ const codePlaceholder = (lang) => {
 .lang-javascript {
   background: rgba(202, 163, 10, 0.15);
   color: #8a6800;
+}
+
+@media (max-width: 767px) {
+  .bot-main-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>

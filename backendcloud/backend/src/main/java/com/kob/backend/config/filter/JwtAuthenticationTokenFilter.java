@@ -20,14 +20,23 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 配置类。
+ * Filter that validates the JWT Bearer token on each request and populates the Spring Security context.
+ * 每次请求时验证JWT Bearer令牌并填充Spring Security上下文的过滤器。
  */
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * Extracts the JWT from the Authorization header, validates it, loads the user and sets the authentication context.
+     * 从Authorization请求头提取JWT，验证后加载用户并设置认证上下文。
+     */
     @Override
+    /**
+     * Handles doFilterInternal.
+     * ??doFilterInternal?
+     */
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
 
@@ -61,4 +70,3 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

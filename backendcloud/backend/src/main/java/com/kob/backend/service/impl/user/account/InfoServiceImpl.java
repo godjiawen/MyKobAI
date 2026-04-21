@@ -11,11 +11,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 服务实现类。
+ * Service implementation for retrieving the current authenticated user's account information.
+ * 用于获取当前已认证用户账户信息的服务实现类。
  */
 @Service
 public class InfoServiceImpl implements InfoService {
+    /**
+     * Returns a map containing the current user's id, username and photo URL.
+     * 返回包含当前用户id、用户名和头像URL的Map。
+     */
     @Override
+    /**
+     * Handles getinfo.
+     * ??getinfo?
+     */
     public Map<String, String> getinfo() {
         UsernamePasswordAuthenticationToken authentication =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

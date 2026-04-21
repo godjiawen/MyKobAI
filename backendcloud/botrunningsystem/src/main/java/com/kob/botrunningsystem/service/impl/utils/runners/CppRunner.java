@@ -24,11 +24,19 @@ public class CppRunner extends SubprocessRunner {
             System.getProperty("os.name", "").toLowerCase().contains("win");
 
     @Override
+    /**
+     * Handles codeFileExtension.
+     * ??codeFileExtension?
+     */
     protected String codeFileExtension() {
         return ".cpp";
     }
 
     @Override
+    /**
+     * Handles buildProcess.
+     * ??buildProcess?
+     */
     protected ProcessBuilder buildProcess(File tmpDir) throws Exception {
         // 第 1 步：编译（最多 10 秒）
         String outputBinary = IS_WINDOWS ? "bot.exe" : "bot";

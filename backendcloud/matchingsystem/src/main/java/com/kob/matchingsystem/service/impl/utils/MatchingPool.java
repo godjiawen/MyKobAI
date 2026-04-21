@@ -18,10 +18,18 @@ public class MatchingPool extends Thread{
     private final static String startGameUrl = "http://127.0.0.1:3000/pk/start/game/";
 
     @Autowired
+    /**
+     * Handles setRestTemplate.
+     * ??setRestTemplate?
+     */
     public void setRestTemplate(RestTemplate restTemplate) {
         MatchingPool.restTemplate = restTemplate;
     }
 
+    /**
+     * Handles addPlayer.
+     * ??addPlayer?
+     */
     public void addPlayer(Integer userId, Integer rating, Integer botId) {
         lock.lock();
         try {
@@ -31,6 +39,10 @@ public class MatchingPool extends Thread{
         }
     }
 
+    /**
+     * Handles removePlayer.
+     * ??removePlayer?
+     */
     public void removePlayer(Integer userId) {
         lock.lock();
         try {
@@ -94,6 +106,10 @@ public class MatchingPool extends Thread{
     }
 
     @Override
+    /**
+     * Handles run.
+     * ??run?
+     */
     public void run() {
         while (true) {
             try {

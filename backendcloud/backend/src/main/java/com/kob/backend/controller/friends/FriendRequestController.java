@@ -38,16 +38,28 @@ public class FriendRequestController {
     }
 
     @PostMapping("/api/friends/request/accept/")
+    /**
+     * Handles accept.
+     * ??accept?
+     */
     public Map<String, Object> accept(@RequestParam("request_id") Integer requestId) {
         return friendRequestService.accept(requestId);
     }
 
     @PostMapping("/api/friends/request/ignore/")
+    /**
+     * Handles ignore.
+     * ??ignore?
+     */
     public Map<String, Object> ignore(@RequestParam("request_id") Integer requestId) {
         return friendRequestService.ignore(requestId);
     }
 
     @PostMapping("/api/friends/request/cancel/")
+    /**
+     * Handles cancel.
+     * ??cancel?
+     */
     public Map<String, Object> cancel(@RequestParam("request_id") Integer requestId) {
         return friendRequestService.cancel(requestId);
     }

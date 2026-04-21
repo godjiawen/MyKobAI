@@ -1,7 +1,6 @@
-<!-- 界面组件。 -->
 <template>
-  <div class="card bot-profile-card">
-    <div class="card-body photo-section">
+  <div class="kob-panel bot-profile-card">
+    <div class="photo-section">
       <div class="avatar-wrap" @click="triggerUpload">
         <img :src="userStore.photo" alt="avatar" class="profile-avatar" />
         <div class="avatar-overlay">
@@ -11,65 +10,69 @@
       </div>
       <p class="profile-name">{{ userStore.username }}</p>
       <div class="profile-actions mt-3">
-        <button class="btn btn-sm btn-outline-primary mb-2 w-100" @click="openModal(usernameModalRef)">修改用户名</button>
-        <button class="btn btn-sm btn-outline-warning w-100" @click="openModal(passwordModalRef)">修改密码</button>
+        <button class="btn btn-sm btn-outline-primary mb-2 w-100 kob-pill-btn" @click="openModal(usernameModalRef)">修改用户名</button>
+        <button class="btn btn-sm btn-outline-warning w-100 kob-pill-btn" @click="openModal(passwordModalRef)">修改密码</button>
       </div>
       <input type="file" ref="fileInput" @change="uploadAvatar" accept="image/png, image/jpeg, image/jpg" style="display: none;" />
     </div>
   </div>
 
-  <div class="modal fade" ref="usernameModalRef" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">修改用户名</h5>
-          <button type="button" class="btn-close" @click="closeModal(usernameModalRef)"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">新用户名</label>
-            <input v-model="accountDraft.new_username" type="text" class="form-control" placeholder="6-12位，字母/数字/下划线" />
+  <teleport to="body">
+    <div class="modal fade" ref="usernameModalRef" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content profile-modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">修改用户名</h5>
+            <button type="button" class="btn-close" @click="closeModal(usernameModalRef)"></button>
           </div>
-          <div class="error-message">{{ accountDraft.username_error }}</div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="updateUsername" :disabled="isSubmitting">保存</button>
-          <button type="button" class="btn btn-secondary" @click="closeModal(usernameModalRef)">取消</button>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">新用户名</label>
+              <input v-model="accountDraft.new_username" type="text" class="form-control" placeholder="6-12位，字母/数字/下划线" />
+            </div>
+            <div class="error-message">{{ accountDraft.username_error }}</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary kob-pill-btn" @click="updateUsername" :disabled="isSubmitting">保存</button>
+            <button type="button" class="btn btn-secondary kob-pill-btn" @click="closeModal(usernameModalRef)">取消</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 
-  <div class="modal fade" ref="passwordModalRef" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">修改密码</h5>
-          <button type="button" class="btn-close" @click="closeModal(passwordModalRef)"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">当前密码</label>
-            <input v-model="accountDraft.old_password" type="password" class="form-control" placeholder="请输入当前密码" />
+  <teleport to="body">
+    <div class="modal fade" ref="passwordModalRef" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content profile-modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">修改密码</h5>
+            <button type="button" class="btn-close" @click="closeModal(passwordModalRef)"></button>
           </div>
-          <div class="mb-3">
-            <label class="form-label">新密码</label>
-            <input v-model="accountDraft.new_password" type="password" class="form-control" placeholder="请输入新密码" />
-            <div class="form-text">8-16位，至少包含大写字母/小写字母/数字/特殊字符中的两类。</div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">当前密码</label>
+              <input v-model="accountDraft.old_password" type="password" class="form-control" placeholder="请输入当前密码" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">新密码</label>
+              <input v-model="accountDraft.new_password" type="password" class="form-control" placeholder="请输入新密码" />
+              <div class="form-text">8-16 位，至少包含大写/小写/数字/特殊字符中的两类。</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">确认新密码</label>
+              <input v-model="accountDraft.confirmed_password" type="password" class="form-control" placeholder="请再次输入新密码" />
+            </div>
+            <div class="error-message">{{ accountDraft.password_error }}</div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">确认新密码</label>
-            <input v-model="accountDraft.confirmed_password" type="password" class="form-control" placeholder="请再次输入新密码" />
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary kob-pill-btn" @click="updatePassword" :disabled="isSubmitting">保存</button>
+            <button type="button" class="btn btn-secondary kob-pill-btn" @click="closeModal(passwordModalRef)">取消</button>
           </div>
-          <div class="error-message">{{ accountDraft.password_error }}</div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="updatePassword" :disabled="isSubmitting">保存</button>
-          <button type="button" class="btn btn-secondary" @click="closeModal(passwordModalRef)">取消</button>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 
   <AppDialog
     v-model="dialogState.visible"
@@ -121,21 +124,75 @@ const dialogState = reactive({
 });
 let dialogResolver = null;
 
+/**
+ * Handles openModal.
+ * ??openModal?
+ */
 const openModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).show();
 };
 
+/**
+ * Handles closeModal.
+ * ??closeModal?
+ */
 const closeModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).hide();
 };
 
-const openDialog = ({
+const closeModalAndWait = (modalRef) => new Promise((resolve) => {
+  if (!modalRef) {
+    resolve();
+    return;
+  }
+
+  const instance = Modal.getOrCreateInstance(modalRef);
+  if (!modalRef.classList.contains("show")) {
+    resolve();
+    return;
+  }
+
+  let settled = false;
+  const cleanup = () => {
+    if (settled) return;
+    settled = true;
+    modalRef.removeEventListener("hidden.bs.modal", cleanup);
+    resolve();
+  };
+
+  modalRef.addEventListener("hidden.bs.modal", cleanup, { once: true });
+  instance.hide();
+  setTimeout(cleanup, 420);
+});
+
+const cleanupDanglingBackdrop = () => {
+  const hasVisibleModal = document.querySelector(".modal.show");
+  if (hasVisibleModal) return;
+
+  document.querySelectorAll(".modal-backdrop").forEach((node) => {
+    node.remove();
+  });
+  document.body.classList.remove("modal-open");
+  document.body.style.removeProperty("padding-right");
+};
+
+const prepareDialogLayer = async () => {
+  await Promise.all([
+    closeModalAndWait(usernameModalRef.value),
+    closeModalAndWait(passwordModalRef.value),
+  ]);
+  cleanupDanglingBackdrop();
+};
+
+const openDialog = async ({
   title = "提示",
   message = "",
   confirmText = "确定",
   cancelText = "取消",
   showCancel = false,
-} = {}) => new Promise((resolve) => {
+} = {}) => {
+  await prepareDialogLayer();
+  return new Promise((resolve) => {
   if (dialogResolver) {
     const previousResolve = dialogResolver;
     dialogResolver = null;
@@ -148,8 +205,13 @@ const openDialog = ({
   dialogState.showCancel = showCancel;
   dialogState.visible = true;
   dialogResolver = resolve;
-});
+  });
+};
 
+/**
+ * Handles settleDialog.
+ * ??settleDialog?
+ */
 const settleDialog = (result) => {
   dialogState.visible = false;
   const resolve = dialogResolver;
@@ -160,6 +222,10 @@ const settleDialog = (result) => {
 const handleDialogConfirm = () => settleDialog(true);
 const handleDialogCancel = () => settleDialog(false);
 
+/**
+ * Handles triggerUpload.
+ * ??triggerUpload?
+ */
 const triggerUpload = () => {
   if (fileInput.value) fileInput.value.click();
 };
@@ -253,7 +319,7 @@ const updatePassword = async () => {
     return;
   }
   if (accountDraft.new_password.length < 8 || accountDraft.new_password.length > 16) {
-    accountDraft.password_error = "新密码长度需为8-16位。";
+    accountDraft.password_error = "新密码长度需为 8-16 位。";
     return;
   }
 
@@ -263,7 +329,7 @@ const updatePassword = async () => {
   if (/\d/.test(accountDraft.new_password)) score += 1;
   if (/[^A-Za-z0-9]/.test(accountDraft.new_password)) score += 1;
   if (score < 2) {
-    accountDraft.password_error = "新密码至少包含大写字母、小写字母、数字、特殊字符中的两项。";
+    accountDraft.password_error = "新密码至少包含大写字母、小写字母、数字、特殊字符中的两类。";
     return;
   }
 
@@ -303,13 +369,6 @@ const updatePassword = async () => {
 </script>
 
 <style scoped>
-.bot-profile-card {
-  background: var(--kob-panel);
-  border: 1px solid var(--kob-panel-border);
-  box-shadow: 0 10px 30px rgba(0, 50, 100, 0.08);
-  backdrop-filter: blur(12px);
-}
-
 .photo-section {
   text-align: center;
 }
@@ -318,7 +377,7 @@ const updatePassword = async () => {
   position: relative;
   display: inline-block;
   width: 100%;
-  border-radius: 14px;
+  border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
 }
@@ -326,30 +385,27 @@ const updatePassword = async () => {
 .profile-avatar {
   width: 100%;
   display: block;
-  border-radius: 14px;
-  border: 2px solid rgba(90, 180, 255, 0.3);
-  transition: filter 0.3s;
+  border-radius: 18px;
+  border: 2px solid rgba(90, 180, 255, 0.28);
+  transition: filter var(--motion-fast) var(--ease-out);
 }
 
 .avatar-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(6, 20, 32, 0.44);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity var(--motion-fast) var(--ease-out);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .avatar-wrap:hover .profile-avatar {
-  filter: brightness(0.8);
+  filter: brightness(0.82);
 }
 
 .avatar-wrap:hover .avatar-overlay {
@@ -358,23 +414,19 @@ const updatePassword = async () => {
 
 .profile-name {
   margin: 14px 0 0;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
   color: var(--kob-text);
 }
 
-.modal-content {
+.profile-modal-content {
   background: #fff;
-  border: 1px solid rgba(90, 180, 255, 0.3);
+  border: 1px solid rgba(90, 180, 255, 0.28);
   color: var(--kob-text);
 }
 
-.modal-header .btn-close {
-  filter: none;
-}
-
 .error-message {
-  color: #e74c3c;
+  color: #d14343;
   min-height: 20px;
 }
 </style>

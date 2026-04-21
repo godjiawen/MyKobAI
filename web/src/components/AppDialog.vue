@@ -1,43 +1,44 @@
-<!-- 界面组件。 -->
 <template>
-  <div v-if="modelValue" class="app-dialog-backdrop" @click.self="handleCancel">
-    <div
-      ref="dialogRef"
-      class="app-dialog"
-      role="dialog"
-      aria-modal="true"
-      :aria-labelledby="titleId"
-      :aria-describedby="messageId"
-    >
-      <div class="app-dialog-header">
-        <h5 :id="titleId" class="app-dialog-title">{{ title }}</h5>
-        <button
-          ref="closeButtonRef"
-          type="button"
-          class="app-dialog-close"
-          aria-label="关闭弹窗"
-          @click="handleCancel"
-        >
-          ×
-        </button>
-      </div>
-      <div :id="messageId" class="app-dialog-body">{{ message }}</div>
-      <div class="app-dialog-footer">
-        <button
-          v-if="showCancel"
-          ref="cancelButtonRef"
-          type="button"
-          class="btn-cancel"
-          @click="handleCancel"
-        >
-          {{ cancelText }}
-        </button>
-        <button ref="confirmButtonRef" type="button" class="btn-confirm" @click="handleConfirm">
-          {{ confirmText }}
-        </button>
+  <teleport to="body">
+    <div v-if="modelValue" class="app-dialog-backdrop" @click.self="handleCancel">
+      <div
+        ref="dialogRef"
+        class="app-dialog"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="titleId"
+        :aria-describedby="messageId"
+      >
+        <div class="app-dialog-header">
+          <h5 :id="titleId" class="app-dialog-title">{{ title }}</h5>
+          <button
+            ref="closeButtonRef"
+            type="button"
+            class="app-dialog-close"
+            aria-label="关闭弹窗"
+            @click="handleCancel"
+          >
+            ×
+          </button>
+        </div>
+        <div :id="messageId" class="app-dialog-body">{{ message }}</div>
+        <div class="app-dialog-footer">
+          <button
+            v-if="showCancel"
+            ref="cancelButtonRef"
+            type="button"
+            class="btn-cancel"
+            @click="handleCancel"
+          >
+            {{ cancelText }}
+          </button>
+          <button ref="confirmButtonRef" type="button" class="btn-confirm" @click="handleConfirm">
+            {{ confirmText }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script setup>
@@ -64,6 +65,10 @@ const uid = Math.random().toString(36).slice(2, 10);
 const titleId = computed(() => `app-dialog-title-${uid}`);
 const messageId = computed(() => `app-dialog-message-${uid}`);
 
+/**
+ * Handles getFocusableElements.
+ * ??getFocusableElements?
+ */
 const getFocusableElements = () => {
   const root = dialogRef.value;
   if (!root) return [];
@@ -82,6 +87,10 @@ const focusPreferredButton = async () => {
   }
 };
 
+/**
+ * Handles handleKeydown.
+ * ??handleKeydown?
+ */
 const handleKeydown = (event) => {
   if (!props.modelValue) return;
 
@@ -108,16 +117,28 @@ const handleKeydown = (event) => {
   }
 };
 
+/**
+ * Handles close.
+ * ??close?
+ */
 const close = () => {
   if (!props.modelValue) return;
   emit("update:modelValue", false);
 };
 
+/**
+ * Handles handleConfirm.
+ * ??handleConfirm?
+ */
 const handleConfirm = () => {
   emit("confirm");
   close();
 };
 
+/**
+ * Handles handleCancel.
+ * ??handleCancel?
+ */
 const handleCancel = () => {
   emit("cancel");
   close();
@@ -153,7 +174,7 @@ onBeforeUnmount(() => {
 .app-dialog-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 3200;
+  z-index: var(--kob-z-app-dialog);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,18 +211,19 @@ onBeforeUnmount(() => {
 
 .app-dialog-close {
   border: 0;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(61, 174, 255, 0.12);
   color: var(--kob-text);
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
 }
 
 .app-dialog-body {
   padding: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
   white-space: pre-line;
   color: var(--kob-text);
 }
@@ -217,6 +239,7 @@ onBeforeUnmount(() => {
 .btn-confirm {
   border: 0;
   border-radius: 999px;
+  min-height: 40px;
   padding: 8px 16px;
   font-weight: 600;
   cursor: pointer;

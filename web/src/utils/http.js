@@ -1,9 +1,12 @@
-import { API_BASE_URL } from "@/config/env";
+﻿import { API_BASE_URL } from "@/config/env";
 
+/**
+ * Handles toQueryString.
+ * ??toQueryString?
+ */
 const toQueryString = (params) => {
   const searchParams = new URLSearchParams();
   Object.entries(params || {}).forEach(([key, value]) => {
-    // 与后端约定：忽略 空值，避免发送空字符串污染查询参数。
     if (value !== undefined && value !== null) {
       searchParams.append(key, String(value));
     }
@@ -11,11 +14,30 @@ const toQueryString = (params) => {
   return searchParams.toString();
 };
 
+/**
+ * Handles buildUrl.
+ * ??buildUrl?
+ */
 const buildUrl = (path, params) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const url = `${API_BASE_URL}${normalizedPath}`;
   if (!params || Object.keys(params).length === 0) return url;
   return `${url}?${toQueryString(params)}`;
+};
+
+/**
+ * Handles handleUnauthorized.
+ * ??handleUnauthorized?
+ */
+const handleUnauthorized = () => {
+  localStorage.removeItem("jwt_token");
+  const pathname = window.location.pathname || "";
+  const isAuthPage =
+    pathname.startsWith("/user/account/login") || pathname.startsWith("/user/account/register");
+
+  if (!isAuthPage) {
+    window.location.assign("/user/account/login/");
+  }
 };
 
 export const apiRequest = async (path, options = {}) => {
@@ -25,11 +47,11 @@ export const apiRequest = async (path, options = {}) => {
     data,
     token,
     headers = {},
+    payloadType = "form",
     responseType = "json",
   } = options;
 
   const upperMethod = method.toUpperCase();
-  // GET 请求参数拼接到地址栏；非 GET 请求的数据放入请求体。
   const url = buildUrl(path, upperMethod === "GET" ? data || query : query);
 
   const requestHeaders = {
@@ -39,10 +61,11 @@ export const apiRequest = async (path, options = {}) => {
   let body;
   if (upperMethod !== "GET" && data) {
     if (data instanceof FormData) {
-      // 表单数据让浏览器自动设置 multipart 边界。
       body = data;
+    } else if (payloadType === "json") {
+      body = JSON.stringify(data);
+      requestHeaders["Content-Type"] = "application/json;charset=UTF-8";
     } else {
-      // 与后端表单接口兼容：x-www-form-urlencoded。
       body = toQueryString(data);
       requestHeaders["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
     }
@@ -59,6 +82,12 @@ export const apiRequest = async (path, options = {}) => {
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      handleUnauthorized();
+      const unauthorizedError = new Error("Unauthorized");
+      unauthorizedError.status = 401;
+      throw unauthorizedError;
+    }
     throw new Error(`HTTP ${response.status}`);
   }
 
@@ -68,3 +97,4 @@ export const apiRequest = async (path, options = {}) => {
 
   return response.json();
 };
+

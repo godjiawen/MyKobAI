@@ -1,13 +1,17 @@
-<!-- 界面组件。 -->
 <template>
   <ContentField>
-    <section class="list-panel">
-      <div class="panel-header">
-        <h2>对局记录</h2>
-        <p>回放历史对局，复盘每一步决策。</p>
-      </div>
-      <div class="table-wrap">
-        <table class="table table-striped table-hover list-table" style="text-align: center;" :aria-busy="loading">
+    <section class="record-view">
+      <header class="view-head">
+        <div>
+          <p class="kob-kicker">Replay Center</p>
+          <h2 class="kob-headline">对局记录</h2>
+          <p class="kob-subtitle">复盘每一场对局，查看双方结果与时间轴。</p>
+        </div>
+        <span class="stats-badge">总记录 {{ totalRecords }}</span>
+      </header>
+
+      <div class="kob-table-wrap">
+        <table class="table table-hover align-middle list-table" :aria-busy="loading">
           <thead>
             <tr>
               <th>玩家 A</th>
@@ -18,29 +22,27 @@
             </tr>
           </thead>
           <tbody v-if="loading">
-            <tr v-for="row in skeletonRows" :key="`record-skeleton-${row}`" class="skeleton-row">
+            <tr v-for="row in skeletonRows" :key="`record-skeleton-${row}`">
               <td colspan="5">
-                <div class="skeleton-line"></div>
+                <div class="skeleton-line kob-shimmer"></div>
               </td>
             </tr>
           </tbody>
           <tbody v-else>
             <tr v-for="record in records" :key="record.id">
               <td>
-                <img :src="record.a_photo || fallbackPhoto" alt="" class="record-user-photo" />
-                &nbsp;
-                <span class="record-user-username">{{ record.a_username || "-" }}</span>
+                <img :src="record.a_photo || fallbackPhoto" alt="" class="kob-avatar-36" />
+                <span class="username">{{ record.a_username || "-" }}</span>
               </td>
               <td>
-                <img :src="record.b_photo || fallbackPhoto" alt="" class="record-user-photo" />
-                &nbsp;
-                <span class="record-user-username">{{ record.b_username || "-" }}</span>
+                <img :src="record.b_photo || fallbackPhoto" alt="" class="kob-avatar-36" />
+                <span class="username">{{ record.b_username || "-" }}</span>
               </td>
               <td>{{ record.result || "-" }}</td>
               <td>{{ record.record?.createtime || "-" }}</td>
               <td>
-                <button @click="openRecordContent(record.record?.id)" type="button" class="btn btn-secondary replay-btn">
-                  回放
+                <button @click="openRecordContent(record.record?.id)" type="button" class="btn btn-primary kob-pill-btn replay-btn">
+                  查看回放
                 </button>
               </td>
             </tr>
@@ -50,9 +52,11 @@
           </tbody>
         </table>
       </div>
-      <p v-if="loading" class="state-tip">回放列表加载中...</p>
-      <p v-if="errorMessage" class="state-tip state-error">{{ errorMessage }}</p>
-      <nav aria-label="pagination" class="pager-wrap">
+
+      <p v-if="loading" class="kob-status-inline">回放列表加载中...</p>
+      <p v-if="errorMessage" class="kob-status-inline kob-status-error">{{ errorMessage }}</p>
+
+      <nav aria-label="回放分页" class="pager-wrap">
         <ul class="pagination">
           <li :class="['page-item', { disabled: loading || !canPrev }]">
             <button class="page-link page-btn" type="button" :disabled="loading || !canPrev" @click="clickPage(-2)">
@@ -109,6 +113,10 @@ const maxPages = computed(() => Math.ceil(totalRecords.value / 10));
 const canPrev = computed(() => currentPage.value > 1);
 const canNext = computed(() => currentPage.value < maxPages.value);
 
+/**
+ * Handles updatePages.
+ * ??updatePages?
+ */
 const updatePages = () => {
   const nextPages = [];
 
@@ -153,6 +161,10 @@ const pullPage = async (page, { force = false } = {}) => {
   }
 };
 
+/**
+ * Handles clickPage.
+ * ??clickPage?
+ */
 const clickPage = (page) => {
   if (loading.value) return;
 
@@ -165,6 +177,10 @@ const clickPage = (page) => {
   }
 };
 
+/**
+ * Handles stringTo2D.
+ * ??stringTo2D?
+ */
 const stringTo2D = (map) => {
   const graph = [];
   for (let i = 0, k = 0; i < 13; i += 1) {
@@ -177,6 +193,10 @@ const stringTo2D = (map) => {
   return graph;
 };
 
+/**
+ * Handles openRecordContent.
+ * ??openRecordContent?
+ */
 const openRecordContent = (recordId) => {
   if (!recordId) return;
   const targetRecord = records.value.find((item) => item.record.id === recordId);
@@ -216,36 +236,62 @@ onActivated(() => {
 </script>
 
 <style scoped>
-.panel-header {
+.record-view {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.panel-header h2 {
-  margin: 0;
-  font-family: "Space Grotesk", sans-serif;
+.view-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.stats-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(61, 174, 255, 0.12);
+  color: var(--kob-accent-strong);
   font-weight: 700;
+}
+
+.list-table {
+  margin: 0;
+  min-width: 760px;
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
+  --bs-table-hover-bg: rgba(90, 180, 255, 0.1);
+}
+
+.username {
+  margin-left: 10px;
+  font-weight: 600;
   color: var(--kob-text);
 }
 
-.panel-header p {
-  margin: 0;
+.replay-btn {
+  min-height: 38px;
+  padding-inline: 16px;
+}
+
+.skeleton-line {
+  width: 100%;
+  height: 22px;
+  border-radius: 999px;
+}
+
+.empty-row {
   color: var(--kob-muted);
 }
 
 .pager-wrap {
   display: flex;
   justify-content: flex-end;
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-.table-wrap .table {
-  min-width: 720px;
 }
 
 .page-btn {
@@ -256,79 +302,14 @@ onActivated(() => {
   cursor: not-allowed;
 }
 
-.skeleton-row td {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.skeleton-line {
-  width: 100%;
-  height: 22px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, rgba(90, 180, 255, 0.12), rgba(90, 180, 255, 0.28), rgba(90, 180, 255, 0.12));
-  background-size: 240% 100%;
-  animation: skeleton-wave 1.25s ease-in-out infinite;
-}
-
-.replay-btn {
-  border-radius: 999px;
-  background-color: var(--kob-accent);
-  border: none;
-  color: #fff;
-}
-
-.replay-btn:hover {
-  background-color: var(--kob-accent-strong);
-}
-
-img.record-user-photo {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid rgba(90, 180, 255, 0.45);
-}
-
-.record-user-username {
-  font-weight: 600;
-  color: var(--kob-text);
-}
-
-.state-tip {
-  margin: 10px 0 0;
-  color: var(--kob-muted);
-}
-
-.state-error {
-  color: #e74c3c;
-}
-
-.empty-row {
-  color: var(--kob-muted);
-}
-
-@keyframes skeleton-wave {
-  from {
-    background-position: 100% 0;
-  }
-  to {
-    background-position: -100% 0;
-  }
-}
-
 @media (max-width: 991px) {
-  .panel-header {
-    align-items: flex-start;
+  .view-head {
     flex-direction: column;
-    gap: 6px;
+    align-items: stretch;
   }
 
-  .table-wrap .table {
-    min-width: 660px;
-    font-size: 0.92rem;
-  }
-
-  .record-user-username {
-    font-size: 0.88rem;
+  .list-table {
+    min-width: 680px;
   }
 
   .pager-wrap {

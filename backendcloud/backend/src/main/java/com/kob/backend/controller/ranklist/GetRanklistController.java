@@ -18,6 +18,10 @@ public class GetRanklistController {
     private GetRanklistService getRanklistService;
 
     @GetMapping("/api/ranklist/getlist/")
+    /**
+     * Handles getList.
+     * ??getList?
+     */
     public JSONObject getList(@RequestParam Map<String, String> data) {
         Integer page = Integer.parseInt(data.get("page"));
         return getRanklistService.getList(page);

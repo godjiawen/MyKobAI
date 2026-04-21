@@ -21,6 +21,10 @@ public abstract class SubprocessRunner implements LanguageRunner {
     protected abstract String codeFileExtension();
 
     @Override
+    /**
+     * Handles run.
+     * ??run?
+     */
     public Integer run(String code, String input, long timeoutMs) {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"),
                 "kob_bot_" + UUID.randomUUID());
@@ -105,6 +109,10 @@ public abstract class SubprocessRunner implements LanguageRunner {
         }
     }
 
+    /**
+     * Handles deleteDir.
+     * ??deleteDir?
+     */
     private void deleteDir(File dir) {
         if (dir == null || !dir.exists()) return;
         File[] files = dir.listFiles();

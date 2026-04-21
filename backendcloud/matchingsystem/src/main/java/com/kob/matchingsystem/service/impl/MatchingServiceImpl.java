@@ -13,6 +13,10 @@ public class MatchingServiceImpl implements MatchingService {
     public final static MatchingPool matchingPool = new MatchingPool();
 
     @Override
+    /**
+     * Handles addPlayer.
+     * ??addPlayer?
+     */
     public String addPlayer(Integer userId, Integer rating, Integer botId) {
         System.out.println("add player: " + userId + " " + rating);
         matchingPool.addPlayer(userId, rating, botId);
@@ -20,6 +24,10 @@ public class MatchingServiceImpl implements MatchingService {
     }
 
     @Override
+    /**
+     * Handles removePlayer.
+     * ??removePlayer?
+     */
     public String removePlayer(Integer userId) {
         System.out.println("remove player: " + userId);
         matchingPool.removePlayer(userId);

@@ -14,6 +14,10 @@ public class WebConfig implements WebMvcConfigurer {
     private String uploadDir;
 
     @Override
+    /**
+     * Handles addResourceHandlers.
+     * ??addResourceHandlers?
+     */
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         File dir = new File(uploadDir);
         if (!dir.exists()) {

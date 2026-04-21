@@ -15,11 +15,19 @@ public class JwtUtil {
 
     public static final String JWT_KEY = "SDFGjhdsfqazwsxeddsjkdsfds121232131afasdfac";
 
+    /**
+     * Handles generalKey.
+     * ??generalKey?
+     */
     public static SecretKey generalKey() {
         byte[] encodeKey = Base64.getDecoder().decode(JWT_KEY);
         return new SecretKeySpec(encodeKey, 0, encodeKey.length, "HmacSHA256");
     }
 
+    /**
+     * Handles parseJWT.
+     * ??parseJWT?
+     */
     public static Claims parseJWT(String jwt) throws Exception {
         SecretKey secretKey = generalKey();
         return Jwts.parserBuilder()
@@ -29,6 +37,10 @@ public class JwtUtil {
                 .getBody();
     }
 
+    /**
+     * Handles getUserId.
+     * ??getUserId?
+     */
     public static Integer getUserId(String token) {
         try {
             Claims claims = parseJWT(token);

@@ -19,6 +19,10 @@ public class JavaRunner implements LanguageRunner {
     private static final String BOT_PACKAGE = "com.kob.botrunningsystem.utils";
     private static final Pattern BOT_CLASS_PATTERN = Pattern.compile("\\bpublic\\s+class\\s+Bot\\b");
 
+    /**
+     * Handles buildBotSource.
+     * ??buildBotSource?
+     */
     private static String buildBotSource(String code, String uid) {
         Matcher matcher = BOT_CLASS_PATTERN.matcher(code);
         if (!matcher.find()) {
@@ -34,11 +38,19 @@ public class JavaRunner implements LanguageRunner {
         return "package " + BOT_PACKAGE + ";\n" + normalized;
     }
 
+    /**
+     * Handles buildWrapperSource.
+     * ??buildWrapperSource?
+     */
     private static String buildWrapperSource(String uid) {
         return """
                 package %s;
 
                 public class RunnerMain {
+                    /**
+                     * Handles main.
+                     * ??main?
+                     */
                     public static void main(String[] args) {
                         System.out.println(new Bot%s().get());
                     }
@@ -46,6 +58,10 @@ public class JavaRunner implements LanguageRunner {
                 """.formatted(BOT_PACKAGE, uid);
     }
 
+    /**
+     * Handles readStream.
+     * ??readStream?
+     */
     private static void readStream(Process process, StringBuilder buffer, boolean errorStream) {
         Thread reader = new Thread(() -> {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -66,6 +82,10 @@ public class JavaRunner implements LanguageRunner {
         }
     }
 
+    /**
+     * Handles parseDirection.
+     * ??parseDirection?
+     */
     private static Integer parseDirection(String output, String stderr) {
         String trimmed = output.trim();
         if (trimmed.isEmpty()) {
@@ -88,6 +108,10 @@ public class JavaRunner implements LanguageRunner {
     }
 
     @Override
+    /**
+     * Handles run.
+     * ??run?
+     */
     public Integer run(String code, String input, long timeoutMs) {
         String uid = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
         File tmpDir = new File(System.getProperty("java.io.tmpdir"), "kob_java_bot_" + UUID.randomUUID());
@@ -153,6 +177,10 @@ public class JavaRunner implements LanguageRunner {
         }
     }
 
+    /**
+     * Handles deleteDir.
+     * ??deleteDir?
+     */
     private void deleteDir(File dir) {
         if (dir == null || !dir.exists()) return;
         File[] files = dir.listFiles();

@@ -12,7 +12,7 @@
         data-bs-target="#navbarText"
         aria-controls="navbarText"
         aria-expanded="false"
-        aria-label="Toggle navigation"
+        aria-label="切换导航"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -20,7 +20,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <router-link :class="routeName === 'pk_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'pk_index' }">
-              PK
+              对局
             </router-link>
           </li>
           <li class="nav-item">
@@ -30,7 +30,7 @@
           </li>
           <li class="nav-item">
             <router-link :class="routeName === 'record_index' ? 'nav-link kob-link active' : 'nav-link kob-link'" :to="{ name: 'record_index' }">
-              对局记录
+              记录
             </router-link>
           </li>
           <li class="nav-item">
@@ -87,14 +87,26 @@ const routeName = computed(() => route.name);
 const isUserMenuOpen = ref(false);
 const userMenuRef = ref(null);
 
+/**
+ * Handles closeUserMenu.
+ * ??closeUserMenu?
+ */
 const closeUserMenu = () => {
   isUserMenuOpen.value = false;
 };
 
+/**
+ * Handles toggleUserMenu.
+ * ??toggleUserMenu?
+ */
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
 };
 
+/**
+ * Handles handleOutsideClick.
+ * ??handleOutsideClick?
+ */
 const handleOutsideClick = (event) => {
   if (!isUserMenuOpen.value) return;
   if (!userMenuRef.value?.contains(event.target)) {
@@ -125,10 +137,10 @@ onBeforeUnmount(() => {
 <style scoped>
 .kob-navbar {
   position: relative;
-  z-index: 2100;
-  margin: 16px 14px 0;
+  z-index: var(--kob-z-navbar);
+  margin: 16px 14px 10px;
   padding: 10px 6px;
-  border: 1px solid rgba(90, 180, 255, 0.3);
+  border: 1px solid rgba(90, 180, 255, 0.28);
   border-radius: 16px;
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.85));
   backdrop-filter: blur(12px);
@@ -162,9 +174,9 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   color: var(--kob-muted);
   transition:
-    color 180ms ease,
-    background-color 180ms ease,
-    transform 180ms ease;
+    color var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
 }
 
 .kob-link:hover,
@@ -193,16 +205,12 @@ onBeforeUnmount(() => {
   border: 0;
 }
 
-.user-menu-trigger::after {
-  margin-left: 0.45rem;
-}
-
 .kob-dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   min-width: 170px;
-  z-index: 2200;
+  z-index: var(--kob-z-navbar-menu);
   padding: 8px 0;
   margin: 0;
   list-style: none;

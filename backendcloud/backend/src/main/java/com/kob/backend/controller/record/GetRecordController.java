@@ -16,6 +16,10 @@ public class GetRecordController {
     private GetRecordService getRecordService;
 
     @GetMapping("/api/record/get/")
+    /**
+     * Handles getRecord.
+     * ??getRecord?
+     */
     public JSONObject getRecord(@RequestParam("record_id") Integer recordId) {
         return getRecordService.getRecord(recordId);
     }

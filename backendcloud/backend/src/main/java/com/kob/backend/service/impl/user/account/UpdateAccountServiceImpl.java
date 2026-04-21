@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * 服务实现类。
+ * Service implementation for updating user account information (username and password).
+ * 用户账户信息更新服务实现（用户名和密码）。
  */
 @Service
 public class UpdateAccountServiceImpl implements UpdateAccountService {
@@ -30,7 +31,15 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Validates and updates the current user's username.
+     * 校验并更新当前用户的用户名。
+     */
     @Override
+    /**
+     * Handles updateUsername.
+     * ??updateUsername?
+     */
     public Map<String, String> updateUsername(String newUsername) {
         Map<String, String> map = new HashMap<>();
 
@@ -76,7 +85,15 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
         return map;
     }
 
+    /**
+     * Validates and updates the current user's password after verifying the old password.
+     * 验证原密码后校验并更新当前用户的密码。
+     */
     @Override
+    /**
+     * Handles updatePassword.
+     * ??updatePassword?
+     */
     public Map<String, String> updatePassword(String oldPassword, String newPassword, String confirmedPassword) {
         Map<String, String> map = new HashMap<>();
 
@@ -128,6 +145,10 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
         return map;
     }
 
+    /**
+     * Calculates a complexity score (0-4) based on character type variety in the password.
+     * 根据密码中字符类型的多样性计算复杂度分数（0-4）。
+     */
     private int passwordComplexityScore(String password) {
         int score = 0;
         if (password.chars().anyMatch(Character::isUpperCase)) score++;
@@ -137,6 +158,10 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
         return score;
     }
 
+    /**
+     * Returns true if the text contains any whitespace character.
+     * 若文本包含任意空白字符则返回true。
+     */
     private boolean containsWhitespace(String text) {
         return text.chars().anyMatch(Character::isWhitespace);
     }

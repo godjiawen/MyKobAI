@@ -47,16 +47,15 @@ div.gamemap {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 16px;
+  border-radius: var(--kob-radius-sm);
   background:
-    radial-gradient(500px 200px at 50% -10%, rgba(90, 180, 255, 0.15), transparent 70%),
-    rgba(220, 235, 250, 0.6);
+    radial-gradient(500px 200px at 50% -10%, rgba(90, 180, 255, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(220, 235, 250, 0.6), rgba(233, 243, 252, 0.58));
 }
 
 canvas {
-  border-radius: 10px;
+  border-radius: 12px;
   outline: 1px solid rgba(90, 180, 255, 0.3);
   box-shadow: inset 0 0 0 1px rgba(90, 180, 255, 0.15), 0 14px 26px rgba(0, 50, 100, 0.12);
 }
 </style>
-
