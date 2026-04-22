@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ReceiveBotMoveServiceImpl implements ReceiveBotMoveService {
-    @Override
     /**
-     * Handles receiveBotMove.
-     * ??receiveBotMove?
+     * 处理 receiveBotMove 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of receiveBotMove with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @param direction 输入参数；Input parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
+    @Override
     public String receiveBotMove(Integer userId, Integer direction) {
         System.out.println("receive bot move: " + userId + " " + direction + " ");
         if (WebSocketServer.users.get(userId) != null) {

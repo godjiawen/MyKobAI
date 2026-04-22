@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class MybatisConfig {
-    @Bean
     /**
-     * Handles mybatisPlusInterceptor.
-     * ??mybatisPlusInterceptor?
+     * 处理 mybatisPlusInterceptor 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of mybatisPlusInterceptor with controlled input and output handling.
+     *
+     * @return 返回 MybatisPlusInterceptor 类型结果；Returns a result of type MybatisPlusInterceptor.
      */
+    @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));

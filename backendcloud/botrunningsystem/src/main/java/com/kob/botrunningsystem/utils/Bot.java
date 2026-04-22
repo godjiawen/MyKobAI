@@ -21,8 +21,13 @@ public class Bot implements java.util.function.Supplier<Integer> {
     }
 
     /**
-     * Handles getCells.
-     * ??getCells?
+     * 查询并返回 getCells 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getCells with controlled input and output handling.
+     *
+     * @param sx 输入参数；Input parameter.
+     * @param sy 输入参数；Input parameter.
+     * @param steps 输入参数；Input parameter.
+     * @return 返回集合结果；Returns a collection result.
      */
     public List<Cell> getCells(int sx, int sy, String steps) {
         steps = steps.substring(1, steps.length() - 1);
@@ -46,8 +51,11 @@ public class Bot implements java.util.function.Supplier<Integer> {
 
 
     /**
-     * Handles nextMove.
-     * ??nextMove?
+     * 处理 nextMove 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of nextMove with controlled input and output handling.
+     *
+     * @param input 输入参数；Input parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
     public Integer nextMove(String input) {
         String[] strs = input.split("#");
@@ -81,11 +89,13 @@ public class Bot implements java.util.function.Supplier<Integer> {
         return 0;
     }
 
-    @Override
     /**
-     * Handles get.
-     * ??get?
+     * 查询并返回 get 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of get with controlled input and output handling.
+     *
+     * @return 返回数值结果；Returns a numeric result.
      */
+    @Override
     public Integer get() {
         File file = new File("input.txt");
 

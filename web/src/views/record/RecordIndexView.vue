@@ -114,8 +114,8 @@ const canPrev = computed(() => currentPage.value > 1);
 const canNext = computed(() => currentPage.value < maxPages.value);
 
 /**
- * Handles updatePages.
- * ??updatePages?
+ * 处理 updatePages 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of updatePages, including state updates, interaction orchestration, and error branches.
  */
 const updatePages = () => {
   const nextPages = [];
@@ -132,6 +132,13 @@ const updatePages = () => {
   pages.value = nextPages;
 };
 
+/**
+ * 处理 pullPage 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of pullPage with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ * @param page 输入参数；Input parameter.
+ * @param force 输入参数；Input parameter.
+ */
 const pullPage = async (page, { force = false } = {}) => {
   if (loading.value && !force) return;
 
@@ -162,8 +169,8 @@ const pullPage = async (page, { force = false } = {}) => {
 };
 
 /**
- * Handles clickPage.
- * ??clickPage?
+ * 处理 clickPage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of clickPage, including state updates, interaction orchestration, and error branches.
  */
 const clickPage = (page) => {
   if (loading.value) return;
@@ -178,8 +185,8 @@ const clickPage = (page) => {
 };
 
 /**
- * Handles stringTo2D.
- * ??stringTo2D?
+ * 处理 stringTo2D 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of stringTo2D, including state updates, interaction orchestration, and error branches.
  */
 const stringTo2D = (map) => {
   const graph = [];
@@ -194,8 +201,8 @@ const stringTo2D = (map) => {
 };
 
 /**
- * Handles openRecordContent.
- * ??openRecordContent?
+ * 处理 openRecordContent 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of openRecordContent, including state updates, interaction orchestration, and error branches.
  */
 const openRecordContent = (recordId) => {
   if (!recordId) return;

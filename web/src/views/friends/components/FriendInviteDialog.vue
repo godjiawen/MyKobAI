@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="modelValue" class="invite-dialog-backdrop" @click.self="$emit('update:modelValue', false)">
     <section class="invite-dialog" role="dialog" aria-modal="true" aria-labelledby="friend-invite-title">
       <header class="invite-dialog__head">

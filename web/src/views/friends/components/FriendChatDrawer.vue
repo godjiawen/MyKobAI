@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="modelValue" class="chat-drawer-backdrop" @click.self="$emit('update:modelValue', false)">
     <section class="chat-drawer" role="dialog" aria-modal="true" aria-labelledby="friend-chat-title">
       <aside class="chat-drawer__rail">
@@ -169,6 +169,11 @@ const messagesEl = ref(null);
 const currentUserId = computed(() => Number.parseInt(userStore.id, 10));
 const currentUserPhoto = computed(() => userStore.photo);
 
+/**
+ * 处理 scrollToBottom 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of scrollToBottom with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const scrollToBottom = async () => {
   await nextTick();
   if (messagesEl.value) {

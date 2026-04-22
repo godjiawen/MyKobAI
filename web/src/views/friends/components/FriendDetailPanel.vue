@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="detail-panel">
     <div v-if="friend" class="detail-shell">
       <header class="detail-hero">

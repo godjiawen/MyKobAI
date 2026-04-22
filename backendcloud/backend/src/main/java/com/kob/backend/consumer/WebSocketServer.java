@@ -50,53 +50,55 @@ public class WebSocketServer {
     private static final String removePlayerUrl = "http://127.0.0.1:3001/player/remove/";
 
     /**
-     * Injects UserMapper as a static dependency for shared access.
-     * 娉ㄥ叆UserMapper浣滀负闈欐€佷緷璧栦互渚垮叡浜闂€?
+     * 更新 setUserMapper 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setUserMapper with controlled input and output handling.
+     *
+     * @param userMapper 用户相关参数；User-related parameter.
      */
     @Autowired
-    /**
-     * Handles setUserMapper.
-     * ??setUserMapper?
-     */
     public void setUserMapper(UserMapper userMapper) {
         WebSocketServer.userMapper = userMapper;
     }
 
     /**
-     * Injects RecordMapper as a static dependency for shared access.
-     * 娉ㄥ叆RecordMapper浣滀负闈欐€佷緷璧栦互渚垮叡浜闂€?
+     * 更新 setRecordMapper 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setRecordMapper with controlled input and output handling.
+     *
+     * @param recordMapper 映射参数；Map parameter.
      */
     @Autowired
-    /**
-     * Handles setRecordMapper.
-     * ??setRecordMapper?
-     */
     public void setRecordMapper(RecordMapper recordMapper) {
         WebSocketServer.recordMapper = recordMapper;
     }
 
     /**
-     * Injects BotMapper as a static dependency for shared access.
-     * 娉ㄥ叆BotMapper浣滀负闈欐€佷緷璧栦互渚垮叡浜闂€?
+     * 更新 setBotMapper 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setBotMapper with controlled input and output handling.
+     *
+     * @param botMapper 机器人相关参数；Bot-related parameter.
      */
     @Autowired
-    /**
-     * Handles setBotMapper.
-     * ??setBotMapper?
-     */
     public void setBotMapper(BotMapper botMapper) {
         WebSocketServer.botMapper = botMapper;
     }
 
     /**
-     * Injects RestTemplate as a static dependency for shared access.
-     * 娉ㄥ叆RestTemplate浣滀负闈欐€佷緷璧栦互渚垮叡浜闂€?
+     * 更新 setRestTemplate 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setRestTemplate with controlled input and output handling.
+     *
+     * @param restTemplate 输入参数；Input parameter.
      */
     @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
         WebSocketServer.restTemplate = restTemplate;
     }
 
+    /**
+     * 更新 setGameSnapshotService 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setGameSnapshotService with controlled input and output handling.
+     *
+     * @param gameSnapshotService 对局相关参数；Game-related parameter.
+     */
     @Autowired
     public void setGameSnapshotService(GameSnapshotService gameSnapshotService) {
         WebSocketServer.gameSnapshotService = gameSnapshotService;
@@ -104,8 +106,12 @@ public class WebSocketServer {
     }
 
     /**
-     * Called when a new WebSocket connection is established; validates token and registers user.
-     * 寤虹珛鏂癢ebSocket杩炴帴鏃惰皟鐢紱楠岃瘉token骞舵敞鍐岀敤鎴枫€?
+     * 处理 PathParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of PathParam with controlled input and output handling.
+     *
+     * @param session 输入参数；Input parameter.
+     * @param token 令牌参数；Token parameter.
+     * @return 返回 void onOpen(Session session, @ 类型结果；Returns a result of type void onOpen(Session session, @.
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
@@ -132,8 +138,9 @@ public class WebSocketServer {
     }
 
     /**
-     * Called when the WebSocket connection is closed; removes user from the active users map.
-     * WebSocket杩炴帴鍏抽棴鏃惰皟鐢紱浠庡湪绾跨敤鎴锋槧灏勪腑绉婚櫎璇ョ敤鎴枫€?
+     * 处理 onClose 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of onClose with controlled input and output handling.
+     *
      */
     @OnClose
     public void onClose() {
@@ -148,8 +155,13 @@ public class WebSocketServer {
     }
 
     /**
-     * Creates and starts a game between two matched players, then notifies both via WebSocket.
-     * 涓轰袱鍚嶅尮閰嶇殑鐜╁鍒涘缓骞跺惎鍔ㄦ父鎴忥紝鐒跺悗閫氳繃WebSocket閫氱煡鍙屾柟銆?
+     * 创建或保存 startGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of startGame with controlled input and output handling.
+     *
+     * @param aId 标识参数；Identifier value.
+     * @param aBotId 标识参数；Identifier value.
+     * @param bId 标识参数；Identifier value.
+     * @param bBotId 标识参数；Identifier value.
      */
     public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId) {
         User a = userMapper.selectById(aId);
@@ -203,16 +215,22 @@ public class WebSocketServer {
     }
 
     /**
-     * Returns whether the user with the given ID is currently connected.
-     * 杩斿洖鎸囧畾ID鐨勭敤鎴峰綋鍓嶆槸鍚﹀凡杩炴帴銆?
+     * 校验或判断 isUserOnline 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of isUserOnline with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     public static boolean isUserOnline(Integer userId) {
         return userId != null && users.containsKey(userId);
     }
 
     /**
-     * Returns whether the user with the given ID is currently in a game.
-     * 杩斿洖鎸囧畾ID鐨勭敤鎴峰綋鍓嶆槸鍚﹀湪娓告垙涓€?
+     * 校验或判断 isUserInGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of isUserInGame with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     public static boolean isUserInGame(Integer userId) {
         if (userId == null) return false;
@@ -221,8 +239,11 @@ public class WebSocketServer {
     }
 
     /**
-     * Returns the online status string of a user: "offline", "in_game" or "online".
-     * 杩斿洖鐢ㄦ埛鐨勫湪绾跨姸鎬佸瓧绗︿覆锛?offline"銆?in_game"鎴?online"銆?
+     * 查询并返回 getUserOnlineStatus 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getUserOnlineStatus with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
      */
     public static String getUserOnlineStatus(Integer userId) {
         if (!isUserOnline(userId)) return "offline";
@@ -231,8 +252,10 @@ public class WebSocketServer {
     }
 
     /**
-     * Clears the game reference for a single user.
-     * 娓呴櫎鍗曚釜鐢ㄦ埛鐨勬父鎴忓紩鐢ㄣ€?
+     * 删除或清理 clearGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of clearGame with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
      */
     public static void clearGame(Integer userId) {
         WebSocketServer server = users.get(userId);
@@ -244,6 +267,12 @@ public class WebSocketServer {
         }
     }
 
+    /**
+     * 删除或清理 clearGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of clearGame with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     */
     public static void clearGame(Game game) {
         if (game == null) return;
         activeGames.remove(game.getGameId(), game);
@@ -252,8 +281,11 @@ public class WebSocketServer {
     }
 
     /**
-     * Clears the game reference for both players after a game ends.
-     * 娓告垙缁撴潫鍚庢竻闄ゅ弻鏂圭帺瀹剁殑娓告垙寮曠敤銆?
+     * 删除或清理 clearGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of clearGame with controlled input and output handling.
+     *
+     * @param leftUserId 标识参数；Identifier value.
+     * @param rightUserId 标识参数；Identifier value.
      */
     public static void clearGame(Integer leftUserId, Integer rightUserId) {
         clearGame(leftUserId);
@@ -261,8 +293,11 @@ public class WebSocketServer {
     }
 
     /**
-     * Sends a JSON event message to a specific user via WebSocket.
-     * 閫氳繃WebSocket鍚戠壒瀹氱敤鎴峰彂閫丣SON浜嬩欢娑堟伅銆?
+     * 发送或通知 sendEvent 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendEvent with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @param event 输入参数；Input parameter.
      */
     public static void sendEvent(Integer userId, JSONObject event) {
         if (userId == null || event == null) return;
@@ -273,8 +308,10 @@ public class WebSocketServer {
     }
 
     /**
-     * Adds the current user to the matching queue with the specified bot ID.
-     * 灏嗗綋鍓嶇敤鎴蜂互鎸囧畾鏈哄櫒浜篒D鍔犲叆鍖归厤闃熷垪銆?
+     * 创建或保存 startMatching 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of startMatching with controlled input and output handling.
+     *
+     * @param botId 标识参数；Identifier value.
      */
     private void startMatching(Integer botId) {
         System.out.println("start matching!");
@@ -286,8 +323,9 @@ public class WebSocketServer {
     }
 
     /**
-     * Removes the current user from the matching queue.
-     * 灏嗗綋鍓嶇敤鎴蜂粠鍖归厤闃熷垪涓Щ闄ゃ€?
+     * 删除或清理 stopMatching 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of stopMatching with controlled input and output handling.
+     *
      */
     private void stopMatching() {
         System.out.println("stop matching");
@@ -297,8 +335,10 @@ public class WebSocketServer {
     }
 
     /**
-     * Processes a move direction input from a human player during a game.
-     * 澶勭悊娓告垙涓汉绫荤帺瀹惰緭鍏ョ殑绉诲姩鏂瑰悜銆?
+     * 处理 move 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of move with controlled input and output handling.
+     *
+     * @param direction 输入参数；Input parameter.
      */
     private void move(int direction) {
         if (game == null) return;
@@ -311,8 +351,10 @@ public class WebSocketServer {
     }
 
     /**
-     * Broadcasts a message to both players in the current game.
-     * 鍚戝綋鍓嶆父鎴忎腑鐨勫弻鏂圭帺瀹跺箍鎾秷鎭€?
+     * 处理 broadcastToGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of broadcastToGame with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
      */
     private void broadcastToGame(String message) {
         Integer aId = game.getPlayerA().getId();
@@ -322,8 +364,9 @@ public class WebSocketServer {
     }
 
     /**
-     * Pauses the current game and notifies both players who triggered the pause.
-     * 鏆傚仠褰撳墠娓告垙骞堕€氱煡鍙屾柟鐜╁鏆傚仠瑙﹀彂鏂广€?
+     * 处理 pause 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of pause with controlled input and output handling.
+     *
      */
     private void pause() {
         if (game == null) return;
@@ -345,8 +388,9 @@ public class WebSocketServer {
     }
 
     /**
-     * Resumes the current game if the requesting player is the one who paused it.
-     * 鑻ヨ姹傛柟鏄殏鍋滄父鎴忕殑鐜╁锛屽垯鎭㈠娓告垙銆?
+     * 处理 resume 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of resume with controlled input and output handling.
+     *
      */
     private void resume() {
         if (game == null) return;
@@ -369,8 +413,11 @@ public class WebSocketServer {
     }
 
     /**
-     * 浠庡唴瀛樹腑鐨?Game 瀵硅薄鏋勫缓蹇収 JSONObject锛屼娇鐢ㄤ笌 start-matching 涓€鑷寸殑 snake_case 瀛楁鍚嶃€?
-     * 杩欐牱鍗充娇 Redis 涓嶅彲鐢紝涔熻兘姝ｇ‘涓嬪彂蹇収缁欏墠绔€?
+     * 构建或转换 buildSnapshotJSON 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildSnapshotJSON with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     * @return 返回 JSONObject 类型结果；Returns a result of type JSONObject.
      */
     private static JSONObject buildSnapshotJSON(Game game) {
         JSONObject snap = new JSONObject();
@@ -402,7 +449,12 @@ public class WebSocketServer {
         return snap;
     }
 
-    /** 鍚戝綋鍓嶇敤鎴蜂笅鍙?game-resync锛堜紭鍏堜粠鍐呭瓨 Game 鏋勫缓锛屽厹搴曟煡 Redis锛?*/
+    /**
+     * 查询并返回 loadSnapshotForCurrentUser 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of loadSnapshotForCurrentUser with controlled input and output handling.
+     *
+     * @return 返回 GameSnapshot 类型结果；Returns a result of type GameSnapshot.
+     */
     private GameSnapshot loadSnapshotForCurrentUser() {
         if (user == null || gameSnapshotService == null) return null;
         try {
@@ -412,6 +464,13 @@ public class WebSocketServer {
             return null;
         }
     }
+    /**
+     * 处理 bindGameFromSnapshot 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of bindGameFromSnapshot with controlled input and output handling.
+     *
+     * @param snap 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
+     */
     private boolean bindGameFromSnapshot(GameSnapshot snap) {
         if (snap == null || user == null || this.game != null) return this.game != null;
         Game active = activeGames.get(snap.getGameId());
@@ -424,6 +483,11 @@ public class WebSocketServer {
         return true;
     }
 
+    /**
+     * 处理 syncGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of syncGame with controlled input and output handling.
+     *
+     */
     private void syncGame() {
         if (user == null) return;
         // Prefer in-memory game state to avoid stale snapshot gaps.
@@ -479,7 +543,11 @@ public class WebSocketServer {
         sendMessage(resp.toJSONString());
     }
 
-    /** 鐜╁杩斿洖 PK 椤甸潰锛氫粠 away 鍒楄〃绉婚櫎锛岃嫢鍙屾柟閮藉湪鍒欒В闄ゆ寕璧?*/
+    /**
+     * 处理 gameEnter 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of gameEnter with controlled input and output handling.
+     *
+     */
     private void gameEnter() {
         if (game == null) {
             bindGameFromSnapshot(loadSnapshotForCurrentUser());
@@ -519,7 +587,14 @@ public class WebSocketServer {
         }
     }
 
-    /** 鐜╁绂诲紑 PK 椤甸潰鎴栨柇绾匡細鏍囪鏆傜锛屾寕璧峰灞€ */
+    /**
+     * 处理 markPlayerLeave 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of markPlayerLeave with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     * @param userId 标识参数；Identifier value.
+     * @param reason 输入参数；Input parameter.
+     */
     private static void markPlayerLeave(Game game, Integer userId, String reason) {
         game.addAwayPlayer(userId);
         game.setSuspended(true, userId, reason);
@@ -549,25 +624,35 @@ public class WebSocketServer {
         sendEvent(bId, suspended);
     }
 
+    /**
+     * 处理 gameLeave 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of gameLeave with controlled input and output handling.
+     *
+     * @param reason 输入参数；Input parameter.
+     */
     private void gameLeave(String reason) {
         if (game == null) return;
         markPlayerLeave(game, user.getId(), reason);
     }
 
-    /** onOpen 鏃惰嚜鍔ㄦ煡 Redis锛屽鏈夎繘琛屼腑瀵瑰眬鍒欎笅鍙?game-resync */
+    /**
+     * 处理 autoSyncGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of autoSyncGame with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     */
     private void autoSyncGame(Integer userId) {
         syncGame();
     }
 
     /**
-     * Handles incoming WebSocket messages and dispatches to the appropriate handler by event type.
-     * 澶勭悊浼犲叆鐨刉ebSocket娑堟伅锛屽苟鎸変簨浠剁被鍨嬪垎鍙戝埌瀵瑰簲澶勭悊鍣ㄣ€?
+     * 处理 onMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of onMessage with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
+     * @param session 输入参数；Input parameter.
      */
     @OnMessage
-    /**
-     * Handles onMessage.
-     * ??onMessage?
-     */
     public void onMessage(String message, Session session) {
         System.out.println("receive message!");
         JSONObject data = JSONObject.parseObject(message);
@@ -592,21 +677,22 @@ public class WebSocketServer {
     }
 
     /**
-     * Handles WebSocket errors by printing the stack trace.
-     * 閫氳繃鎵撳嵃鍫嗘爤璺熻釜澶勭悊WebSocket閿欒銆?
+     * 处理 onError 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of onError with controlled input and output handling.
+     *
+     * @param session 输入参数；Input parameter.
+     * @param error 输入参数；Input parameter.
      */
     @OnError
-    /**
-     * Handles onError.
-     * ??onError?
-     */
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
 
     /**
-     * Sends a text message to the connected client synchronously.
-     * 鍚屾鍚戝凡杩炴帴瀹㈡埛绔彂閫佹枃鏈秷鎭€?
+     * 发送或通知 sendMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendMessage with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
      */
     public void sendMessage(String message) {
         synchronized (this.session) {
@@ -618,6 +704,4 @@ public class WebSocketServer {
         }
     }
 }
-
-
 

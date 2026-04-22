@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <transition name="feedback-pop">
     <section v-if="feedback?.visible" class="feedback-bar" :class="feedback.type" aria-live="polite">
       <div>

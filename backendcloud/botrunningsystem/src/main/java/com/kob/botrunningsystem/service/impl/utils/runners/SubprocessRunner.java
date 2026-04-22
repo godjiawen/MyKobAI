@@ -14,17 +14,33 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class SubprocessRunner implements LanguageRunner {
 
-    /** 子类返回在 tmpDir 内运行的 ProcessBuilder（工作目录已设置） */
+    /**
+     * 构建或转换 buildProcess 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildProcess with controlled input and output handling.
+     *
+     * @param tmpDir 输入参数；Input parameter.
+     * @return 返回 ProcessBuilder 类型结果；Returns a result of type ProcessBuilder.
+     */
     protected abstract ProcessBuilder buildProcess(File tmpDir) throws Exception;
 
-    /** 代码文件的扩展名，如 ".py" ".js" ".cpp" */
+    /**
+     * 处理 codeFileExtension 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of codeFileExtension with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
+     */
     protected abstract String codeFileExtension();
 
-    @Override
     /**
-     * Handles run.
-     * ??run?
+     * 执行或处理 run 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of run with controlled input and output handling.
+     *
+     * @param code 代码内容参数；Code content parameter.
+     * @param input 输入参数；Input parameter.
+     * @param timeoutMs 时间参数；Time parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
+    @Override
     public Integer run(String code, String input, long timeoutMs) {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"),
                 "kob_bot_" + UUID.randomUUID());
@@ -110,8 +126,10 @@ public abstract class SubprocessRunner implements LanguageRunner {
     }
 
     /**
-     * Handles deleteDir.
-     * ??deleteDir?
+     * 删除或清理 deleteDir 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of deleteDir with controlled input and output handling.
+     *
+     * @param dir 输入参数；Input parameter.
      */
     private void deleteDir(File dir) {
         if (dir == null || !dir.exists()) return;
@@ -120,4 +138,3 @@ public abstract class SubprocessRunner implements LanguageRunner {
         dir.delete();
     }
 }
-

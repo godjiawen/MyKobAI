@@ -33,14 +33,35 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
 
     // ──────────────── private helpers ────────────────
 
+    /**
+     * 处理 snapshotKey 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of snapshotKey with controlled input and output handling.
+     *
+     * @param gameId 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
+     */
     private String snapshotKey(String gameId) {
         return String.format(KEY_SNAPSHOT, gameId);
     }
 
+    /**
+     * 处理 userGameKey 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of userGameKey with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
+     */
     private String userGameKey(Integer userId) {
         return String.format(KEY_USER_GAME, userId);
     }
 
+    /**
+     * 构建或转换 resolvePausedBy 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of resolvePausedBy with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     * @return 返回字符串结果；Returns a string result.
+     */
     private String resolvePausedBy(Game game) {
         String by = game.getPausedBy();
         if ("A".equals(by)) return String.valueOf(game.getPlayerA().getId());
@@ -48,6 +69,13 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
         return by;
     }
 
+    /**
+     * 构建或转换 buildSnapshot 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildSnapshot with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     * @return 返回 GameSnapshot 类型结果；Returns a result of type GameSnapshot.
+     */
     private GameSnapshot buildSnapshot(Game game) {
         Player a = game.getPlayerA();
         Player b = game.getPlayerB();
@@ -81,6 +109,12 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
         return snap;
     }
 
+    /**
+     * 处理 writeSnapshot 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of writeSnapshot with controlled input and output handling.
+     *
+     * @param snap 输入参数；Input parameter.
+     */
     private void writeSnapshot(GameSnapshot snap) {
         try {
             String gameId = snap.getGameId();
@@ -97,26 +131,56 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
 
     // ──────────────── public API ────────────────
 
+    /**
+     * 创建或保存 saveInitial 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of saveInitial with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     */
     @Override
     public void saveInitial(Game game) {
         writeSnapshot(buildSnapshot(game));
     }
 
+    /**
+     * 创建或保存 saveStep 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of saveStep with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     */
     @Override
     public void saveStep(Game game) {
         writeSnapshot(buildSnapshot(game));
     }
 
+    /**
+     * 创建或保存 savePause 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of savePause with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     */
     @Override
     public void savePause(Game game) {
         writeSnapshot(buildSnapshot(game));
     }
 
+    /**
+     * 创建或保存 savePresence 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of savePresence with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     */
     @Override
     public void savePresence(Game game) {
         writeSnapshot(buildSnapshot(game));
     }
 
+    /**
+     * 删除或清理 deleteGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of deleteGame with controlled input and output handling.
+     *
+     * @param game 对局相关参数；Game-related parameter.
+     */
     @Override
     public void deleteGame(Game game) {
         try {
@@ -129,6 +193,13 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
         }
     }
 
+    /**
+     * 查询并返回 getByUserId 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getByUserId with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @return 返回 GameSnapshot 类型结果；Returns a result of type GameSnapshot.
+     */
     @Override
     public GameSnapshot getByUserId(Integer userId) {
         try {
@@ -141,6 +212,13 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
         }
     }
 
+    /**
+     * 查询并返回 getByGameId 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getByGameId with controlled input and output handling.
+     *
+     * @param gameId 标识参数；Identifier value.
+     * @return 返回 GameSnapshot 类型结果；Returns a result of type GameSnapshot.
+     */
     @Override
     public GameSnapshot getByGameId(String gameId) {
         try {
@@ -153,4 +231,3 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
         }
     }
 }
-

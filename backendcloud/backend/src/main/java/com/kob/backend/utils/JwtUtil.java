@@ -22,16 +22,21 @@ public class JwtUtil {
     public static final String JWT_KEY = "SDFGjhdsfqazwsxeddsjkdsfds121232131afasdfac";
 
     /**
-     * Generates a random UUID string without hyphens for use as a JWT ID.
-     * 生成不含连字符的随机UUID字符串，用作JWT的ID。
+     * 查询并返回 getUUID 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getUUID with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
      */
     public static String getUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     /**
-     * Creates a JWT token with the given subject and the default TTL.
-     * 使用给定主题和默认有效期创建JWT令牌。
+     * 创建或保存 createJWT 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of createJWT with controlled input and output handling.
+     *
+     * @param subject 输入参数；Input parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
     public static String createJWT(String subject) {
         JwtBuilder builder = getJwtBuilder(subject, null, getUUID());
@@ -39,8 +44,13 @@ public class JwtUtil {
     }
 
     /**
-     * Builds a JWT builder configured with subject, TTL, UUID, issuer and signing key.
-     * 构建配置了主题、有效期、UUID、签发者和签名密钥的JWT构建器。
+     * 查询并返回 getJwtBuilder 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getJwtBuilder with controlled input and output handling.
+     *
+     * @param subject 输入参数；Input parameter.
+     * @param ttlMillis 输入参数；Input parameter.
+     * @param uuid 标识参数；Identifier value.
+     * @return 返回 JwtBuilder 类型结果；Returns a result of type JwtBuilder.
      */
     private static JwtBuilder getJwtBuilder(String subject, Long ttlMillis, String uuid) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -63,8 +73,10 @@ public class JwtUtil {
     }
 
     /**
-     * Generates the HMAC-SHA256 secret key from the base64-encoded key constant.
-     * 从Base64编码的密钥常量生成HMAC-SHA256密钥。
+     * 处理 generalKey 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of generalKey with controlled input and output handling.
+     *
+     * @return 返回 SecretKey 类型结果；Returns a result of type SecretKey.
      */
     public static SecretKey generalKey() {
         byte[] encodeKey = Base64.getDecoder().decode(JwtUtil.JWT_KEY);
@@ -72,8 +84,11 @@ public class JwtUtil {
     }
 
     /**
-     * Parses and validates a JWT string, returning its claims payload.
-     * 解析并验证JWT字符串，返回其Claims载荷。
+     * 构建或转换 parseJWT 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of parseJWT with controlled input and output handling.
+     *
+     * @param jwt 输入参数；Input parameter.
+     * @return 返回 Claims 类型结果；Returns a result of type Claims.
      */
     public static Claims parseJWT(String jwt) throws Exception {
         SecretKey secretKey = generalKey();

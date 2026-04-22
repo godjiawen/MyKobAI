@@ -17,14 +17,12 @@ import java.util.Map;
 @Service
 public class InfoServiceImpl implements InfoService {
     /**
-     * Returns a map containing the current user's id, username and photo URL.
-     * 返回包含当前用户id、用户名和头像URL的Map。
+     * 查询并返回 getinfo 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getinfo with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles getinfo.
-     * ??getinfo?
-     */
     public Map<String, String> getinfo() {
         UsernamePasswordAuthenticationToken authentication =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -40,4 +38,3 @@ public class InfoServiceImpl implements InfoService {
         return map;
     }
 }
-

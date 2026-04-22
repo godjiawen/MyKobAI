@@ -8,14 +8,12 @@
           <p class="kob-subtitle">选择出战 Bot，开始匹配或取消匹配。</p>
         </div>
       </header>
-
       <div class="match-grid">
         <article class="player-card">
           <img :src="userStore.photo" alt="" class="player-avatar" />
           <strong>{{ userStore.username }}</strong>
           <span>当前玩家</span>
         </article>
-
         <article class="control-card">
           <label class="control-label" for="bot-select">出战设置</label>
           <select id="bot-select" v-model="selectedBot" class="form-select" aria-label="选择出战 Bot">
@@ -34,55 +32,49 @@
           </button>
           <p v-if="stateHint" class="match-state-hint">{{ stateHint }}</p>
         </article>
-
         <article class="player-card">
-          <img :src="pkStore.opponent_photo" alt="" class="player-avatar" />
-          <strong>{{ pkStore.opponent_username }}</strong>
+          <img :src="opponentPhoto" alt="" class="player-avatar" />
+          <strong>{{ opponentName }}</strong>
           <span>待匹配对手</span>
         </article>
       </div>
     </div>
   </section>
 </template>
-
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useUserStore } from "@/store/user";
 import { usePkStore } from "@/store/pk";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
-
+import defaultAvatar from "@/assets/images/default-avatar.svg";
 const MATCH_STATES = {
   IDLE: "idle",
   MATCHING: "matching",
   MATCHED: "matched",
   ERROR: "error",
 };
-
 const userStore = useUserStore();
 const pkStore = usePkStore();
-
 const bots = ref([]);
 const selectedBot = ref("-1");
 const matchState = ref(MATCH_STATES.IDLE);
-
 const isSocketReady = computed(
   () => pkStore.socket && pkStore.socket.readyState === WebSocket.OPEN
 );
-
+const opponentName = computed(() => pkStore.opponent_username || "匹配对手");
+const opponentPhoto = computed(() => pkStore.opponent_photo || defaultAvatar);
 const matchButtonText = computed(() => {
   if (matchState.value === MATCH_STATES.MATCHING) return "取消匹配";
   if (matchState.value === MATCH_STATES.MATCHED) return "匹配成功";
   if (matchState.value === MATCH_STATES.ERROR) return "连接异常，重试匹配";
   return "开始匹配";
 });
-
 const stateHint = computed(() => {
   if (matchState.value === MATCH_STATES.MATCHING) return "正在为你寻找对手...";
   if (matchState.value === MATCH_STATES.ERROR) return "连接已断开，请等待自动重连后重试。";
   return "";
 });
-
 const isButtonDisabled = computed(() => {
   if (matchState.value === MATCH_STATES.MATCHED) return true;
   if (matchState.value === MATCH_STATES.IDLE || matchState.value === MATCH_STATES.ERROR) {
@@ -90,7 +82,11 @@ const isButtonDisabled = computed(() => {
   }
   return false;
 });
-
+/**
+ * 处理 refreshBots 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of refreshBots with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const refreshBots = async () => {
   try {
     bots.value = await apiRequest(API_PATHS.botList, {
@@ -100,10 +96,10 @@ const refreshBots = async () => {
     console.error(error);
   }
 };
-
 /**
- * Handles sendStartMatching.
- * ??sendStartMatching?
+ * 处理 sendStartMatching 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of sendStartMatching with async flow control, including state updates, interaction orchestration, and error branches.
+ *
  */
 const sendStartMatching = () => {
   const socket = pkStore.socket;
@@ -111,7 +107,6 @@ const sendStartMatching = () => {
     matchState.value = MATCH_STATES.ERROR;
     return;
   }
-
   socket.send(
     JSON.stringify({
       event: "start-matching",
@@ -120,10 +115,10 @@ const sendStartMatching = () => {
   );
   matchState.value = MATCH_STATES.MATCHING;
 };
-
 /**
- * Handles sendStopMatching.
- * ??sendStopMatching?
+ * 处理 sendStopMatching 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of sendStopMatching with async flow control, including state updates, interaction orchestration, and error branches.
+ *
  */
 const sendStopMatching = () => {
   const socket = pkStore.socket;
@@ -131,25 +126,22 @@ const sendStopMatching = () => {
     matchState.value = MATCH_STATES.ERROR;
     return;
   }
-
   socket.send(JSON.stringify({ event: "stop-matching" }));
   matchState.value = MATCH_STATES.IDLE;
 };
-
 /**
- * Handles toggleMatch.
- * ??toggleMatch?
+ * 处理 toggleMatch 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of toggleMatch with async flow control, including state updates, interaction orchestration, and error branches.
+ *
  */
 const toggleMatch = () => {
   if (matchState.value === MATCH_STATES.MATCHING) {
     sendStopMatching();
     return;
   }
-
   if (matchState.value === MATCH_STATES.MATCHED) return;
   sendStartMatching();
 };
-
 watch(
   () => pkStore.status,
   (status) => {
@@ -157,14 +149,12 @@ watch(
       matchState.value = MATCH_STATES.MATCHED;
       return;
     }
-
     if (status === "matching" && matchState.value === MATCH_STATES.MATCHED) {
       matchState.value = MATCH_STATES.IDLE;
     }
   },
   { immediate: true }
 );
-
 watch(
   () => pkStore.socket,
   (socket) => {
@@ -174,13 +164,11 @@ watch(
       }
       return;
     }
-
     if (matchState.value === MATCH_STATES.ERROR) {
       matchState.value = MATCH_STATES.IDLE;
     }
   }
 );
-
 watch(
   selectedBot,
   (value) => {
@@ -188,29 +176,24 @@ watch(
   },
   { immediate: true }
 );
-
 onMounted(() => {
   selectedBot.value = pkStore.selectedBotId || "-1";
   refreshBots();
 });
 </script>
-
 <style scoped>
 .matchground {
   padding: 24px;
 }
-
 .match-header {
   margin-bottom: 18px;
 }
-
 .match-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   align-items: stretch;
 }
-
 .player-card,
 .control-card {
   border-radius: var(--kob-radius-lg);
@@ -218,7 +201,6 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.8);
   box-shadow: var(--kob-shadow-sm);
 }
-
 .player-card {
   display: flex;
   flex-direction: column;
@@ -227,7 +209,6 @@ onMounted(() => {
   gap: 10px;
   padding: 20px;
 }
-
 .player-avatar {
   width: clamp(96px, 12vw, 140px);
   height: clamp(96px, 12vw, 140px);
@@ -236,17 +217,14 @@ onMounted(() => {
   box-shadow: 0 0 20px rgba(90, 180, 255, 0.35);
   object-fit: cover;
 }
-
 .player-card strong {
   color: var(--kob-text);
   font-size: 1.05rem;
 }
-
 .player-card span {
   color: var(--kob-muted);
   font-size: 0.84rem;
 }
-
 .control-card {
   padding: 20px;
   display: flex;
@@ -254,38 +232,31 @@ onMounted(() => {
   justify-content: center;
   gap: 12px;
 }
-
 .control-label {
   color: var(--kob-muted);
   font-size: 0.84rem;
   font-weight: 700;
 }
-
 .match-action-btn {
   margin-top: 6px;
 }
-
 .match-state-hint {
   margin: 0;
   color: var(--kob-muted);
   font-size: 0.88rem;
 }
-
 @media (max-width: 991px) {
   .matchground {
     padding: 18px;
   }
-
   .match-grid {
     grid-template-columns: 1fr;
   }
-
   .player-card {
     flex-direction: row;
     justify-content: flex-start;
     gap: 14px;
   }
-
   .player-avatar {
     width: 80px;
     height: 80px;

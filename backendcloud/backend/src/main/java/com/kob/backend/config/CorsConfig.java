@@ -20,11 +20,15 @@ import java.io.IOException;
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsConfig implements Filter {
-    @Override
     /**
-     * Handles doFilter.
-     * ??doFilter?
+     * 处理 doFilter 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of doFilter with controlled input and output handling.
+     *
+     * @param req 输入参数；Input parameter.
+     * @param res 输入参数；Input parameter.
+     * @param chain 输入参数；Input parameter.
      */
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
@@ -52,20 +56,23 @@ public class CorsConfig implements Filter {
         chain.doFilter(request, response);
     }
 
-    @Override
     /**
-     * Handles init.
-     * ??init?
+     * 创建或保存 init 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of init with controlled input and output handling.
+     *
+     * @param filterConfig 输入参数；Input parameter.
      */
+    @Override
     public void init(FilterConfig filterConfig) {
 
     }
 
-    @Override
     /**
-     * Handles destroy.
-     * ??destroy?
+     * 处理 destroy 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of destroy with controlled input and output handling.
+     *
      */
+    @Override
     public void destroy() {
     }
 }

@@ -1,8 +1,8 @@
-﻿import { API_BASE_URL } from "@/config/env";
+import { API_BASE_URL } from "@/config/env";
 
 /**
- * Handles toQueryString.
- * ??toQueryString?
+ * 处理 toQueryString 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of toQueryString, including state updates, interaction orchestration, and error branches.
  */
 const toQueryString = (params) => {
   const searchParams = new URLSearchParams();
@@ -15,8 +15,8 @@ const toQueryString = (params) => {
 };
 
 /**
- * Handles buildUrl.
- * ??buildUrl?
+ * 处理 buildUrl 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of buildUrl, including state updates, interaction orchestration, and error branches.
  */
 const buildUrl = (path, params) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -26,8 +26,8 @@ const buildUrl = (path, params) => {
 };
 
 /**
- * Handles handleUnauthorized.
- * ??handleUnauthorized?
+ * 处理 handleUnauthorized 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleUnauthorized, including state updates, interaction orchestration, and error branches.
  */
 const handleUnauthorized = () => {
   localStorage.removeItem("jwt_token");

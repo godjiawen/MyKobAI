@@ -33,15 +33,15 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     private FriendDomainService friendDomainService;
 
     /**
-     * Sends a friend request from the current user to the specified receiver.
-     * 从当前用户向指定接收者发送好友请求。
+     * 发送或通知 send 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of send with controlled input and output handling.
+     *
+     * @param receiverId 标识参数；Identifier value.
+     * @param message 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
     @Transactional
-    /**
-     * Handles send.
-     * ??send?
-     */
     public Map<String, Object> send(Integer receiverId, String message) {
         User currentUser = friendDomainService.currentUser();
         if (receiverId == null) return error("receiver_id is required");
@@ -71,14 +71,15 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Returns a paginated list of friend requests received by the current user.
-     * 返回当前用户收到的好友请求的分页列表。
+     * 处理 received 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of received with controlled input and output handling.
+     *
+     * @param status 输入参数；Input parameter.
+     * @param page 分页参数；Pagination parameter.
+     * @param pageSize 分页参数；Pagination parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles received.
-     * ??received?
-     */
     public Map<String, Object> received(String status, Integer page, Integer pageSize) {
         User currentUser = friendDomainService.currentUser();
         QueryWrapper<FriendRequest> wrapper = new QueryWrapper<>();
@@ -89,14 +90,15 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Returns a paginated list of friend requests sent by the current user.
-     * 返回当前用户发出的好友请求的分页列表。
+     * 处理 sent 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sent with controlled input and output handling.
+     *
+     * @param status 输入参数；Input parameter.
+     * @param page 分页参数；Pagination parameter.
+     * @param pageSize 分页参数；Pagination parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles sent.
-     * ??sent?
-     */
     public Map<String, Object> sent(String status, Integer page, Integer pageSize) {
         User currentUser = friendDomainService.currentUser();
         QueryWrapper<FriendRequest> wrapper = new QueryWrapper<>();
@@ -107,15 +109,14 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Accepts a pending friend request and creates the bidirectional friend relations.
-     * 接受待处理的好友请求并创建双向好友关系。
+     * 处理 accept 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of accept with controlled input and output handling.
+     *
+     * @param requestId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
     @Transactional
-    /**
-     * Handles accept.
-     * ??accept?
-     */
     public Map<String, Object> accept(Integer requestId) {
         User currentUser = friendDomainService.currentUser();
         FriendRequest request = friendRequestMapper.selectById(requestId);
@@ -139,15 +140,14 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Ignores (soft-declines) a pending friend request.
-     * 忽略（软拒绝）一个待处理的好友请求。
+     * 处理 ignore 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of ignore with controlled input and output handling.
+     *
+     * @param requestId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
     @Transactional
-    /**
-     * Handles ignore.
-     * ??ignore?
-     */
     public Map<String, Object> ignore(Integer requestId) {
         User currentUser = friendDomainService.currentUser();
         FriendRequest request = friendRequestMapper.selectById(requestId);
@@ -163,15 +163,14 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Cancels a pending friend request previously sent by the current user.
-     * 取消当前用户此前发出的待处理好友请求。
+     * 删除或清理 cancel 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of cancel with controlled input and output handling.
+     *
+     * @param requestId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
     @Transactional
-    /**
-     * Handles cancel.
-     * ??cancel?
-     */
     public Map<String, Object> cancel(Integer requestId) {
         User currentUser = friendDomainService.currentUser();
         FriendRequest request = friendRequestMapper.selectById(requestId);
@@ -186,8 +185,13 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Retrieves a paginated list of friend requests matching the given query wrapper.
-     * 检索满足给定查询条件的好友请求分页列表。
+     * 查询并返回 listRequests 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of listRequests with controlled input and output handling.
+     *
+     * @param wrapper 输入参数；Input parameter.
+     * @param page 分页参数；Pagination parameter.
+     * @param pageSize 分页参数；Pagination parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> listRequests(QueryWrapper<FriendRequest> wrapper, Integer page, Integer pageSize) {
         IPage<FriendRequest> requestPage = new Page<>(page, pageSize);
@@ -203,8 +207,11 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Normalizes the request message, trimming and truncating to 100 characters.
-     * 标准化请求消息，去除首尾空格并截断至100个字符。
+     * 处理 normalizeMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of normalizeMessage with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
     private String normalizeMessage(String message) {
         if (message == null || message.isBlank()) return "来打一局？";
@@ -212,8 +219,10 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Returns a success response map with error_message set to "success".
-     * 返回error_message为"success"的成功响应Map。
+     * 处理 success 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of success with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> success() {
         Map<String, Object> resp = new LinkedHashMap<>();
@@ -222,8 +231,11 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     /**
-     * Returns an error response map with the specified error message.
-     * 返回包含指定错误信息的错误响应Map。
+     * 处理 error 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of error with controlled input and output handling.
+     *
+     * @param errorMessage 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> error(String errorMessage) {
         Map<String, Object> resp = new LinkedHashMap<>();

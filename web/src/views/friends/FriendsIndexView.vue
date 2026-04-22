@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="friends-page">
     <section class="container friends-dashboard">
       <FriendsFeedbackBar :feedback="feedback" @close="friendStore.clearFeedback()" />
@@ -210,6 +210,12 @@ const tabs = computed(() => [
 
 const removeDialogVisible = computed({
   get: () => Boolean(pendingRemoveFriend.value),
+  /**
+   * 处理 set 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+   * Handles the core frontend logic of set with async flow control, including state updates, interaction orchestration, and error branches.
+   *
+   * @param visible 输入参数；Input parameter.
+   */
   set: (visible) => {
     if (!visible) friendStore.closeRemoveDialog();
   },

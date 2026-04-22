@@ -29,14 +29,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     private UserMapper userMapper;
 
     /**
-     * Extracts the JWT from the Authorization header, validates it, loads the user and sets the authentication context.
-     * 从Authorization请求头提取JWT，验证后加载用户并设置认证上下文。
+     * 处理 doFilterInternal 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of doFilterInternal with controlled input and output handling.
+     *
+     * @param request 输入参数；Input parameter.
+     * @param response 输入参数；Input parameter.
+     * @param filterChain 输入参数；Input parameter.
      */
     @Override
-    /**
-     * Handles doFilterInternal.
-     * ??doFilterInternal?
-     */
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
 

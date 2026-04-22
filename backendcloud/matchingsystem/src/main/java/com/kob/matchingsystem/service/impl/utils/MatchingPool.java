@@ -17,18 +17,24 @@ public class MatchingPool extends Thread{
     private static RestTemplate restTemplate;
     private final static String startGameUrl = "http://127.0.0.1:3000/pk/start/game/";
 
-    @Autowired
     /**
-     * Handles setRestTemplate.
-     * ??setRestTemplate?
+     * 更新 setRestTemplate 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setRestTemplate with controlled input and output handling.
+     *
+     * @param restTemplate 输入参数；Input parameter.
      */
+    @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
         MatchingPool.restTemplate = restTemplate;
     }
 
     /**
-     * Handles addPlayer.
-     * ??addPlayer?
+     * 创建或保存 addPlayer 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of addPlayer with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @param rating 输入参数；Input parameter.
+     * @param botId 标识参数；Identifier value.
      */
     public void addPlayer(Integer userId, Integer rating, Integer botId) {
         lock.lock();
@@ -40,8 +46,10 @@ public class MatchingPool extends Thread{
     }
 
     /**
-     * Handles removePlayer.
-     * ??removePlayer?
+     * 删除或清理 removePlayer 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of removePlayer with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
      */
     public void removePlayer(Integer userId) {
         lock.lock();
@@ -58,6 +66,12 @@ public class MatchingPool extends Thread{
         }
     }
 
+    /**
+     * 处理 for 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of for with controlled input and output handling.
+     *
+     * @param players 输入参数；Input parameter.
+     */
     private void increaseWaitingTime() { // 将所有当前玩家等待时间加1
         for (Player player : players) {
             player.setWaitingTime(player.getWaitingTime() + 1);
@@ -70,6 +84,14 @@ public class MatchingPool extends Thread{
         return ratingDelta <= waitingTime * 10;
     }
 
+    /**
+     * 处理 println 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of println with controlled input and output handling.
+     *
+     * @param a 输入参数；Input parameter.
+     * @param b 输入参数；Input parameter.
+     * @return 返回 void sendResult(Player a, Player b) { // 返回匹配结果 System.out. 类型结果；Returns a result of type void sendResult(Player a, Player b) { // 返回匹配结果 System.out..
+     */
     private void sendResult(Player a, Player b) {  // 返回匹配结果
         System.out.println("send result: " + a + " " + b);
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
@@ -106,10 +128,6 @@ public class MatchingPool extends Thread{
     }
 
     @Override
-    /**
-     * Handles run.
-     * ??run?
-     */
     public void run() {
         while (true) {
             try {

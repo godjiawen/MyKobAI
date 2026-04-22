@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div ref="chatRoot" class="chat-box" @focusin="handleFocusIn" @focusout="handleFocusOut">
     <div class="chat-header">
       <span class="chat-title">对局聊天</span>
@@ -68,6 +68,11 @@ let blurTimer = null;
 
 const currentUserId = computed(() => Number.parseInt(userStore.id, 10));
 
+/**
+ * 处理 scrollToBottom 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of scrollToBottom with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const scrollToBottom = async () => {
   await nextTick();
   if (messagesEl.value) {
@@ -76,8 +81,8 @@ const scrollToBottom = async () => {
 };
 
 /**
- * Handles handleFocusIn.
- * ??handleFocusIn?
+ * 处理 handleFocusIn 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleFocusIn, including state updates, interaction orchestration, and error branches.
  */
 const handleFocusIn = () => {
   if (blurTimer) {
@@ -88,8 +93,8 @@ const handleFocusIn = () => {
 };
 
 /**
- * Handles handleFocusOut.
- * ??handleFocusOut?
+ * 处理 handleFocusOut 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleFocusOut, including state updates, interaction orchestration, and error branches.
  */
 const handleFocusOut = () => {
   if (blurTimer) clearTimeout(blurTimer);
@@ -101,8 +106,8 @@ const handleFocusOut = () => {
 };
 
 /**
- * Handles disconnectChat.
- * ??disconnectChat?
+ * 处理 disconnectChat 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of disconnectChat, including state updates, interaction orchestration, and error branches.
  */
 const disconnectChat = () => {
   if (socket) {
@@ -121,8 +126,8 @@ const disconnectChat = () => {
 };
 
 /**
- * Handles connectChat.
- * ??connectChat?
+ * 处理 connectChat 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of connectChat, including state updates, interaction orchestration, and error branches.
  */
 const connectChat = (roomId) => {
   disconnectChat();
@@ -158,8 +163,8 @@ const connectChat = (roomId) => {
 };
 
 /**
- * Handles sendMessage.
- * ??sendMessage?
+ * 处理 sendMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of sendMessage, including state updates, interaction orchestration, and error branches.
  */
 const sendMessage = () => {
   const content = inputText.value.trim();

@@ -17,21 +17,27 @@ public class UpdateAccountController {
     @Autowired
     private UpdateAccountService updateAccountService;
 
-    @PostMapping("/api/user/account/update/username/")
     /**
-     * Handles updateUsername.
-     * ??updateUsername?
+     * 更新 updateUsername 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of updateUsername with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/user/account/update/username/")
     public Map<String, String> updateUsername(@RequestParam Map<String, String> data) {
         String newUsername = data.get("new_username");
         return updateAccountService.updateUsername(newUsername);
     }
 
-    @PostMapping("/api/user/account/update/password/")
     /**
-     * Handles updatePassword.
-     * ??updatePassword?
+     * 更新 updatePassword 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of updatePassword with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/user/account/update/password/")
     public Map<String, String> updatePassword(@RequestParam Map<String, String> data) {
         String oldPassword = data.get("old_password");
         String newPassword = data.get("new_password");
@@ -39,4 +45,3 @@ public class UpdateAccountController {
         return updateAccountService.updatePassword(oldPassword, newPassword, confirmedPassword);
     }
 }
-

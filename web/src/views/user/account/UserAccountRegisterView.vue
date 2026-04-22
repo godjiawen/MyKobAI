@@ -47,8 +47,8 @@ const confirmedPassword = ref("");
 const errorMessage = ref("");
 
 /**
- * Handles validateRegisterForm.
- * ??validateRegisterForm?
+ * 处理 validateRegisterForm 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of validateRegisterForm, including state updates, interaction orchestration, and error branches.
  */
 const validateRegisterForm = () => {
   const usernameValue = username.value.trim();
@@ -79,6 +79,11 @@ const validateRegisterForm = () => {
   return "";
 };
 
+/**
+ * 处理 register 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of register with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const register = async () => {
   errorMessage.value = "";
 

@@ -27,8 +27,8 @@ const isLose = computed(() => {
 });
 
 /**
- * Handles restart.
- * ??restart?
+ * 处理 restart 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of restart, including state updates, interaction orchestration, and error branches.
  */
 const restart = () => {
   pkStore.updateRoomId("");

@@ -21,14 +21,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserMapper userMapper;
 
     /**
-     * Loads the user record matching the given username and wraps it in a UserDetailsImpl.
-     * 加载与给定用户名匹配的用户记录并将其封装为UserDetailsImpl。
+     * 查询并返回 loadUserByUsername 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of loadUserByUsername with controlled input and output handling.
+     *
+     * @param username 用户相关参数；User-related parameter.
+     * @return 返回 UserDetails 类型结果；Returns a result of type UserDetails.
      */
     @Override
-    /**
-     * Handles loadUserByUsername.
-     * ??loadUserByUsername?
-     */
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
@@ -40,4 +39,3 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new UserDetailsImpl(user);
     }
 }
-

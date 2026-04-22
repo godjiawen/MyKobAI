@@ -25,6 +25,10 @@ public class Bot implements java.util.function.Supplier<Integer> {
 
     // ------------------------------------------------------------------ 解析
 
+    /**
+      * 用于查询或获取。
+      * Used to query or fetch Cells related business data.
+     */
     static List<int[]> getCells(int sx, int sy, String steps) {
         List<int[]> cells = new ArrayList<>();
         cells.add(new int[]{sx, sy});

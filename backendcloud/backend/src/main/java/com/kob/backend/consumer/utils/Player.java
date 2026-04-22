@@ -24,8 +24,11 @@ public class Player {
     private List<Integer> steps;
 
     /**
-     * Determines whether the snake tail should grow at the given step index.
-     * 判断在给定步骤索引时蛇尾是否应继续增长。
+     * 校验或判断 check_tail_increasing 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of check_tail_increasing with controlled input and output handling.
+     *
+     * @param step 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean check_tail_increasing(int step) {
         if (step <= 10) return true;
@@ -33,8 +36,10 @@ public class Player {
     }
 
     /**
-     * Computes and returns the list of cells occupied by this player's snake based on its steps.
-     * 根据步骤列表计算并返回该玩家蛇身占据的格子列表。
+     * 查询并返回 getCells 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getCells with controlled input and output handling.
+     *
+     * @return 返回集合结果；Returns a collection result.
      */
     public List<Cell> getCells() {
         List<Cell> res = new ArrayList<>();
@@ -55,8 +60,10 @@ public class Player {
     }
 
     /**
-     * Returns the steps list as a concatenated string of direction digits.
-     * 将步骤列表作为方向数字拼接字符串返回。
+     * 查询并返回 getStepsString 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getStepsString with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
      */
     public String getStepsString() {
         StringBuilder res = new StringBuilder();

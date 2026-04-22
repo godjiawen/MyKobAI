@@ -18,6 +18,12 @@ public class GetCurrentGameController {
     @Autowired
     private GameSnapshotService gameSnapshotService;
 
+    /**
+     * 查询并返回 getCurrentGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getCurrentGame with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
+     */
     @GetMapping("/api/pk/current-game/")
     public String getCurrentGame() {
         JSONObject resp = new JSONObject();
@@ -59,5 +65,3 @@ public class GetCurrentGameController {
         return resp.toJSONString();
     }
 }
-
-

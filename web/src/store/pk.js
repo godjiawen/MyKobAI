@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import defaultAvatar from "@/assets/images/default-avatar.svg";
 
 export const usePkStore = defineStore("pk", {
   state: () => ({
@@ -6,8 +7,8 @@ export const usePkStore = defineStore("pk", {
     status: "matching",
     // 当前对局的网络连接实例
     socket: null,
-    opponent_username: "",
-    opponent_photo: "",
+    opponent_username: "匹配对手",
+    opponent_photo: defaultAvatar,
     gamemap: null,
     a_id: 0,
     a_sx: 0,
@@ -36,41 +37,55 @@ export const usePkStore = defineStore("pk", {
     lastSnapshotAt: 0,
   }),
   actions: {
+    /**
+     * 处理 normalizeUserId 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of normalizeUserId with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param value 输入参数；Input parameter.
+     */
     normalizeUserId(value) {
       if (value === null || value === undefined || value === "") return null;
       const parsed = Number.parseInt(value, 10);
       return Number.isNaN(parsed) ? null : parsed;
     },
+    /**
+     * 处理 resolvePausedByUserId 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of resolvePausedByUserId with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param value 输入参数；Input parameter.
+     * @param aId 输入参数；Input parameter.
+     * @param bId 输入参数；Input parameter.
+     */
     resolvePausedByUserId(value, aId, bId) {
       if (value === "A") return this.normalizeUserId(aId);
       if (value === "B") return this.normalizeUserId(bId);
       return this.normalizeUserId(value);
     },
     /**
-     * Handles updateSocket.
-     * ??updateSocket?
+     * 处理 updateSocket 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateSocket, including state updates, interaction orchestration, and error branches.
      */
     updateSocket(socket) {
       this.socket = socket;
     },
     /**
-     * Handles updateOpponent.
-     * ??updateOpponent?
+     * 处理 updateOpponent 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateOpponent, including state updates, interaction orchestration, and error branches.
      */
     updateOpponent(opponent) {
       this.opponent_username = opponent.username;
       this.opponent_photo = opponent.photo;
     },
     /**
-     * Handles updateStatus.
-     * ??updateStatus?
+     * 处理 updateStatus 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateStatus, including state updates, interaction orchestration, and error branches.
      */
     updateStatus(status) {
       this.status = status;
     },
     /**
-     * Handles updateGame.
-     * ??updateGame?
+     * 处理 updateGame 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateGame, including state updates, interaction orchestration, and error branches.
      */
     updateGame(game) {
       // 将后端下发的对局快照拆分并写入状态。
@@ -83,44 +98,44 @@ export const usePkStore = defineStore("pk", {
       this.b_sy = game.b_sy;
     },
     /**
-     * Handles updateGameObject.
-     * ??updateGameObject?
+     * 处理 updateGameObject 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateGameObject, including state updates, interaction orchestration, and error branches.
      */
     updateGameObject(gameObject) {
       this.gameObject = gameObject;
     },
     /**
-     * Handles updateLoser.
-     * ??updateLoser?
+     * 处理 updateLoser 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateLoser, including state updates, interaction orchestration, and error branches.
      */
     updateLoser(loser) {
       this.loser = loser;
     },
     /**
-     * Handles updateResultVisible.
-     * ??updateResultVisible?
+     * 处理 updateResultVisible 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateResultVisible, including state updates, interaction orchestration, and error branches.
      */
     updateResultVisible(visible) {
       this.resultVisible = visible;
     },
     /**
-     * Handles updateRoomId.
-     * ??updateRoomId?
+     * 处理 updateRoomId 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateRoomId, including state updates, interaction orchestration, and error branches.
      */
     updateRoomId(roomId) {
       this.roomId = roomId;
     },
     /**
-     * Handles updatePaused.
-     * ??updatePaused?
+     * 处理 updatePaused 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updatePaused, including state updates, interaction orchestration, and error branches.
      */
     updatePaused({ isPaused, pausedByUserId }) {
       this.isPaused = isPaused;
       this.pausedByUserId = this.normalizeUserId(pausedByUserId);
     },
     /**
-     * Handles updateSelectedBot.
-     * ??updateSelectedBot?
+     * 处理 updateSelectedBot 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateSelectedBot, including state updates, interaction orchestration, and error branches.
      */
     updateSelectedBot(botId) {
       this.selectedBotId = String(botId ?? "-1");
@@ -160,10 +175,15 @@ export const usePkStore = defineStore("pk", {
         this.status = "playing";
       }
     },
+    /**
+     * 处理 resetActiveGameState 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of resetActiveGameState with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     resetActiveGameState() {
       this.status = "matching";
-      this.opponent_username = "";
-      this.opponent_photo = "";
+      this.opponent_username = "匹配对手";
+      this.opponent_photo = defaultAvatar;
       this.gamemap = null;
       this.a_id = 0;
       this.a_sx = 0;
@@ -185,15 +205,35 @@ export const usePkStore = defineStore("pk", {
       this.suspendedReason = "";
       this.lastSnapshotAt = 0;
     },
+    /**
+     * 处理 markPlayerAway 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of markPlayerAway with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param userId 输入参数；Input parameter.
+     */
     markPlayerAway(userId) {
       if (!this.awayUserIds.includes(userId)) {
         this.awayUserIds = [...this.awayUserIds, userId];
       }
       this.isAwaySuspended = true;
     },
+    /**
+     * 处理 markPlayerBack 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of markPlayerBack with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param userId 输入参数；Input parameter.
+     */
     markPlayerBack(userId) {
       this.awayUserIds = this.awayUserIds.filter((id) => id !== userId);
     },
+    /**
+     * 处理 updateAwaySuspended 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of updateAwaySuspended with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param suspended 输入参数；Input parameter.
+     * @param suspendedBy 输入参数；Input parameter.
+     * @param reason 输入参数；Input parameter.
+     */
     updateAwaySuspended(suspended, suspendedBy, reason) {
       this.isAwaySuspended = suspended;
       this.suspendedByUserId = this.normalizeUserId(suspendedBy);

@@ -6,11 +6,13 @@ package com.kob.botrunningsystem.service.impl.utils.runners;
  */
 public interface LanguageRunner {
     /**
-     * @param code      机器人源代码
-     * @param input     本局游戏输入字符串（会写入 input.txt）
-     * @param timeoutMs 子进程最大运行毫秒数（仅子进程类 runner 使用）
-     * @return 方向 0-3，出错返回 0
+     * 执行或处理 run 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of run with controlled input and output handling.
+     *
+     * @param code 代码内容参数；Code content parameter.
+     * @param input 输入参数；Input parameter.
+     * @param timeoutMs 时间参数；Time parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
     Integer run(String code, String input, long timeoutMs);
 }
-

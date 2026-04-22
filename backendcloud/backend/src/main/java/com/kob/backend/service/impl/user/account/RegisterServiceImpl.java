@@ -28,14 +28,15 @@ public class RegisterServiceImpl implements RegisterService {
     private PasswordEncoder passwordEncoder;
 
     /**
-     * Validates inputs and registers a new user account; returns success or an error message.
-     * 校验输入并注册新用户账户；返回成功消息或错误信息。
+     * 创建或保存 register 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of register with controlled input and output handling.
+     *
+     * @param username 用户相关参数；User-related parameter.
+     * @param password 密码参数；Password parameter.
+     * @param confirmePassword 密码参数；Password parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles register.
-     * ??register?
-     */
     public Map<String, String> register(String username, String password, String confirmePassword) {
         Map<String, String> map = new HashMap<>();
 
@@ -101,8 +102,11 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     /**
-     * Calculates a complexity score (0-4) based on character type variety in the password.
-     * 根据密码中字符类型的多样性计算复杂度分数（0-4）。
+     * 处理 passwordComplexityScore 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of passwordComplexityScore with controlled input and output handling.
+     *
+     * @param password 密码参数；Password parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
     private int passwordComplexityScore(String password) {
         int score = 0;
@@ -114,8 +118,11 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     /**
-     * Returns true if the text contains any whitespace character.
-     * 若文本包含任意空白字符则返回true。
+     * 处理 containsWhitespace 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of containsWhitespace with controlled input and output handling.
+     *
+     * @param text 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean containsWhitespace(String text) {
         return text.chars().anyMatch(Character::isWhitespace);

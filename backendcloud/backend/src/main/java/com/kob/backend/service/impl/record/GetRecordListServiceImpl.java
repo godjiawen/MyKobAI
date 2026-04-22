@@ -26,11 +26,14 @@ public class GetRecordListServiceImpl implements GetRecordListService {
     @Autowired
     private UserMapper userMapper;
 
-    @Override
     /**
-     * Handles getList.
-     * ??getList?
+     * 查询并返回 getList 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getList with controlled input and output handling.
+     *
+     * @param page 分页参数；Pagination parameter.
+     * @return 返回 JSONObject 类型结果；Returns a result of type JSONObject.
      */
+    @Override
     public JSONObject getList(Integer page) {
         IPage<Record> recordIPage = new Page<>(page, 10);
         QueryWrapper<Record> queryWrapper = new QueryWrapper<>();

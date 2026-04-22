@@ -17,11 +17,14 @@ public class StartGameController {
     @Autowired
     private StartGameService startGameService;
 
-    @PostMapping("/pk/start/game/")
     /**
-     * Handles startGame.
-     * ??startGame?
+     * 创建或保存 startGame 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of startGame with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
+    @PostMapping("/pk/start/game/")
     public String startGame(@RequestParam MultiValueMap<String, String> data) {
         Integer aId = Integer.parseInt(Objects.requireNonNull(data.getFirst("a_id")));
         Integer aBotId = Integer.parseInt(Objects.requireNonNull(data.getFirst("a_bot_id")));

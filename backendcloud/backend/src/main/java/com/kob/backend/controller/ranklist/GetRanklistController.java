@@ -17,11 +17,14 @@ public class GetRanklistController {
     @Autowired
     private GetRanklistService getRanklistService;
 
-    @GetMapping("/api/ranklist/getlist/")
     /**
-     * Handles getList.
-     * ??getList?
+     * 查询并返回 getList 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getList with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回 JSONObject 类型结果；Returns a result of type JSONObject.
      */
+    @GetMapping("/api/ranklist/getlist/")
     public JSONObject getList(@RequestParam Map<String, String> data) {
         Integer page = Integer.parseInt(data.get("page"));
         return getRanklistService.getList(page);

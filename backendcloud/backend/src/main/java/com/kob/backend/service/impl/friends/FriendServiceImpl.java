@@ -34,14 +34,18 @@ public class FriendServiceImpl implements FriendService {
     private FriendDomainService friendDomainService;
 
     /**
-     * Returns a filtered and paginated list of friends for the current user.
-     * 返回当前用户经过筛选和分页处理的好友列表。
+     * 查询并返回 list 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of list with controlled input and output handling.
+     *
+     * @param page 分页参数；Pagination parameter.
+     * @param pageSize 分页参数；Pagination parameter.
+     * @param keyword 输入参数；Input parameter.
+     * @param status 输入参数；Input parameter.
+     * @param favoriteOnly 输入参数；Input parameter.
+     * @param sortBy 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles list.
-     * ??list?
-     */
     public Map<String, Object> list(Integer page, Integer pageSize, String keyword, String status, Boolean favoriteOnly, String sortBy) {
         User currentUser = friendDomainService.currentUser();
         int normalizedPage = page == null || page < 1 ? 1 : page;
@@ -78,14 +82,12 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns friend statistics including counts of total, online, pending requests and new friends today.
-     * 返回好友统计信息，包括总数、在线数、待处理请求数及今日新增好友数。
+     * 处理 stats 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of stats with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles stats.
-     * ??stats?
-     */
     public Map<String, Object> stats() {
         User currentUser = friendDomainService.currentUser();
         QueryWrapper<FriendRelation> relationWrapper = new QueryWrapper<>();
@@ -116,14 +118,15 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Searches all users by keyword (username or ID) and returns relation status for each.
-     * 按关键字（用户名或ID）搜索所有用户并返回各用户的关系状态。
+     * 查询并返回 search 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of search with controlled input and output handling.
+     *
+     * @param keyword 输入参数；Input parameter.
+     * @param page 分页参数；Pagination parameter.
+     * @param pageSize 分页参数；Pagination parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles search.
-     * ??search?
-     */
     public Map<String, Object> search(String keyword, Integer page, Integer pageSize) {
         User currentUser = friendDomainService.currentUser();
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -156,15 +159,14 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Removes the bidirectional friend relation between the current user and the specified friend.
-     * 删除当前用户与指定好友之间的双向好友关系。
+     * 删除或清理 remove 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of remove with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
     @Transactional
-    /**
-     * Handles remove.
-     * ??remove?
-     */
     public Map<String, Object> remove(Integer friendId) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -180,15 +182,14 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Toggles the favorite status for the specified friend of the current user.
-     * 切换当前用户对指定好友的收藏状态。
+     * 更新 toggleFavorite 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of toggleFavorite with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
     @Transactional
-    /**
-     * Handles toggleFavorite.
-     * ??toggleFavorite?
-     */
     public Map<String, Object> toggleFavorite(Integer friendId) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -203,8 +204,12 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns true if the friend item matches the given keyword in username or ID.
-     * 若好友条目的用户名或ID匹配给定关键字则返回true。
+     * 处理 matchesKeyword 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of matchesKeyword with controlled input and output handling.
+     *
+     * @param item 输入参数；Input parameter.
+     * @param keyword 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean matchesKeyword(Map<String, Object> item, String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) return true;
@@ -214,8 +219,12 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns true if the friend item's online status matches the given status filter.
-     * 若好友条目的在线状态与给定过滤状态匹配则返回true。
+     * 处理 matchesStatus 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of matchesStatus with controlled input and output handling.
+     *
+     * @param item 输入参数；Input parameter.
+     * @param status 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean matchesStatus(Map<String, Object> item, String status) {
         if (status == null || status.trim().isEmpty()) return true;
@@ -223,8 +232,11 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns true if the given date falls within today.
-     * 若给定日期在今天范围内则返回true。
+     * 校验或判断 isToday 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of isToday with controlled input and output handling.
+     *
+     * @param date 时间参数；Time parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean isToday(java.util.Date date) {
         if (date == null) return false;
@@ -236,8 +248,11 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns true if the given string can be parsed as an integer.
-     * 若给定字符串可被解析为整数则返回true。
+     * 校验或判断 isInteger 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of isInteger with controlled input and output handling.
+     *
+     * @param value 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean isInteger(String value) {
         try {
@@ -249,8 +264,10 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns a success response map.
-     * 返回成功响应Map。
+     * 处理 success 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of success with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> success() {
         Map<String, Object> resp = new LinkedHashMap<>();
@@ -259,8 +276,11 @@ public class FriendServiceImpl implements FriendService {
     }
 
     /**
-     * Returns an error response map with the specified message.
-     * 返回包含指定消息的错误响应Map。
+     * 处理 error 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of error with controlled input and output handling.
+     *
+     * @param errorMessage 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> error(String errorMessage) {
         Map<String, Object> resp = new LinkedHashMap<>();

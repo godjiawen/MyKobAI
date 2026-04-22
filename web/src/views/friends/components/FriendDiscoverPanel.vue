@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="discover-panel" :class="{ 'is-loading': loading }">
     <div v-if="loading" class="discover-grid discover-grid--loading" aria-hidden="true">
       <article v-for="index in skeletonCount" :key="`discover-skeleton-${index}`" class="discover-card skeleton-card">
@@ -104,8 +104,8 @@ const props = defineProps({
 const skeletonCount = computed(() => Math.min(props.displayLimit, 6));
 
 /**
- * Handles relationLabel.
- * ??relationLabel?
+ * 处理 relationLabel 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of relationLabel, including state updates, interaction orchestration, and error branches.
  */
 const relationLabel = (relation) => {
   const labels = {
@@ -118,8 +118,8 @@ const relationLabel = (relation) => {
 };
 
 /**
- * Handles actionLabel.
- * ??actionLabel?
+ * 处理 actionLabel 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of actionLabel, including state updates, interaction orchestration, and error branches.
  */
 const actionLabel = (relation) => {
   const labels = {
@@ -132,8 +132,8 @@ const actionLabel = (relation) => {
 };
 
 /**
- * Handles actionClass.
- * ??actionClass?
+ * 处理 actionClass 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of actionClass, including state updates, interaction orchestration, and error branches.
  */
 const actionClass = (relation) => {
   if (relation === "incoming") return "btn-outline-warning";
@@ -145,8 +145,8 @@ const actionClass = (relation) => {
 const primaryTag = (user) => user.tags?.[0] || "离线";
 
 /**
- * Handles decisionHint.
- * ??decisionHint?
+ * 处理 decisionHint 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of decisionHint, including state updates, interaction orchestration, and error branches.
  */
 const decisionHint = (relation) => {
   const hints = {
@@ -159,8 +159,8 @@ const decisionHint = (relation) => {
 };
 
 /**
- * Handles handleAction.
- * ??handleAction?
+ * 处理 handleAction 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleAction, including state updates, interaction orchestration, and error branches.
  */
 const handleAction = (user) => {
   if (user.relation === "incoming") {

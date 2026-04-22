@@ -1,4 +1,4 @@
-﻿import { defineStore } from "pinia";
+import { defineStore } from "pinia";
 import { API_PATHS } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 import { useUserStore } from "@/store/user";
@@ -29,8 +29,8 @@ const requestStatusLabelMap = {
 const normalizeKeyword = (value) => (value || "").trim().toLowerCase();
 
 /**
- * Handles matchesKeyword.
- * ??matchesKeyword?
+ * 处理 matchesKeyword 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of matchesKeyword, including state updates, interaction orchestration, and error branches.
  */
 const matchesKeyword = (keyword, fields) => {
   if (!keyword) return true;
@@ -38,8 +38,8 @@ const matchesKeyword = (keyword, fields) => {
 };
 
 /**
- * Handles mapOnlineStatus.
- * ??mapOnlineStatus?
+ * 处理 mapOnlineStatus 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of mapOnlineStatus, including state updates, interaction orchestration, and error branches.
  */
 const mapOnlineStatus = (status) => {
   if (status === "in_game" || status === "busy") return "busy";
@@ -50,8 +50,8 @@ const mapOnlineStatus = (status) => {
 const buildStatusLabel = (status) => statusLabelMap[status] || "离线";
 
 /**
- * Handles isToday.
- * ??isToday?
+ * 处理 isToday 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of isToday, including state updates, interaction orchestration, and error branches.
  */
 const isToday = (value) => {
   if (!value) return false;
@@ -72,8 +72,8 @@ const normalizeBotOption = (bot = {}) => ({
 });
 
 /**
- * Handles buildFriendTags.
- * ??buildFriendTags?
+ * 处理 buildFriendTags 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of buildFriendTags, including state updates, interaction orchestration, and error branches.
  */
 const buildFriendTags = (item, uiStatus) => {
   const tags = [];
@@ -86,8 +86,8 @@ const buildFriendTags = (item, uiStatus) => {
 };
 
 /**
- * Handles mapFriendItem.
- * ??mapFriendItem?
+ * 处理 mapFriendItem 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of mapFriendItem, including state updates, interaction orchestration, and error branches.
  */
 const mapFriendItem = (item) => {
   const status = mapOnlineStatus(item.online_status);
@@ -122,8 +122,8 @@ const mapFriendItem = (item) => {
 };
 
 /**
- * Handles mapRequestItem.
- * ??mapRequestItem?
+ * 处理 mapRequestItem 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of mapRequestItem, including state updates, interaction orchestration, and error branches.
  */
 const mapRequestItem = (item, perspective) => {
   const isReceived = perspective === "received";
@@ -147,8 +147,8 @@ const mapRequestItem = (item, perspective) => {
 };
 
 /**
- * Handles mapDiscoverItem.
- * ??mapDiscoverItem?
+ * 处理 mapDiscoverItem 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of mapDiscoverItem, including state updates, interaction orchestration, and error branches.
  */
 const mapDiscoverItem = (item) => {
   const relationMap = {
@@ -172,8 +172,8 @@ const mapDiscoverItem = (item) => {
 };
 
 /**
- * Handles mapChatConversation.
- * ??mapChatConversation?
+ * 处理 mapChatConversation 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of mapChatConversation, including state updates, interaction orchestration, and error branches.
  */
 const mapChatConversation = (item) => {
   const status = mapOnlineStatus(item.online_status);
@@ -213,8 +213,8 @@ const createDefaultStats = () => ({
 });
 
 /**
- * Handles ensureSuccess.
- * ??ensureSuccess?
+ * 处理 ensureSuccess 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of ensureSuccess, including state updates, interaction orchestration, and error branches.
  */
 const ensureSuccess = (resp, fallbackMessage) => {
   if (!resp || resp.error_message !== "success") {
@@ -265,8 +265,8 @@ export const useFriendStore = defineStore("friend", {
   }),
   getters: {
     /**
-     * Handles summaryCards.
-     * ??summaryCards?
+     * 处理 summaryCards 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of summaryCards, including state updates, interaction orchestration, and error branches.
      */
     summaryCards(state) {
       return [
@@ -293,8 +293,8 @@ export const useFriendStore = defineStore("friend", {
       ];
     },
     /**
-     * Handles segmentCounts.
-     * ??segmentCounts?
+     * 处理 segmentCounts 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of segmentCounts, including state updates, interaction orchestration, and error branches.
      */
     segmentCounts(state) {
       return {
@@ -305,8 +305,8 @@ export const useFriendStore = defineStore("friend", {
       };
     },
     /**
-     * Handles filteredFriends.
-     * ??filteredFriends?
+     * 处理 filteredFriends 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of filteredFriends, including state updates, interaction orchestration, and error branches.
      */
     filteredFriends(state) {
       const keyword = normalizeKeyword(state.sidebarKeyword);
@@ -334,29 +334,29 @@ export const useFriendStore = defineStore("friend", {
       });
     },
     /**
-     * Handles selectedFriend.
-     * ??selectedFriend?
+     * 处理 selectedFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of selectedFriend, including state updates, interaction orchestration, and error branches.
      */
     selectedFriend(state) {
       return state.friends.find((friend) => friend.id === state.selectedFriendId) || state.friends[0] || null;
     },
     /**
-     * Handles pendingRemoveFriend.
-     * ??pendingRemoveFriend?
+     * 处理 pendingRemoveFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of pendingRemoveFriend, including state updates, interaction orchestration, and error branches.
      */
     pendingRemoveFriend(state) {
       return state.friends.find((friend) => friend.id === state.pendingRemoveFriendId) || null;
     },
     /**
-     * Handles inviteDialogFriend.
-     * ??inviteDialogFriend?
+     * 处理 inviteDialogFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of inviteDialogFriend, including state updates, interaction orchestration, and error branches.
      */
     inviteDialogFriend(state) {
       return state.friends.find((friend) => friend.id === state.inviteDialogFriendId) || null;
     },
     /**
-     * Handles filteredDiscoverUsers.
-     * ??filteredDiscoverUsers?
+     * 处理 filteredDiscoverUsers 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of filteredDiscoverUsers, including state updates, interaction orchestration, and error branches.
      */
     filteredDiscoverUsers(state) {
       const keyword = normalizeKeyword(state.discoverKeyword);
@@ -370,16 +370,16 @@ export const useFriendStore = defineStore("friend", {
         .slice(0, state.discoverDisplayLimit);
     },
     /**
-     * Handles activeChatFriend.
-     * ??activeChatFriend?
+     * 处理 activeChatFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of activeChatFriend, including state updates, interaction orchestration, and error branches.
      */
     activeChatFriend(state) {
       const targetId = state.chatActiveFriendId || state.selectedFriendId;
       return state.friends.find((friend) => friend.id === targetId) || null;
     },
     /**
-     * Handles activeChatConversation.
-     * ??activeChatConversation?
+     * 处理 activeChatConversation 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of activeChatConversation, including state updates, interaction orchestration, and error branches.
      */
     activeChatConversation(state) {
       const targetId = state.chatActiveFriendId || state.selectedFriendId;
@@ -388,13 +388,19 @@ export const useFriendStore = defineStore("friend", {
   },
   actions: {
     /**
-     * Handles getToken.
-     * ??getToken?
+     * 处理 getToken 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of getToken, including state updates, interaction orchestration, and error branches.
      */
     getToken() {
       const userStore = useUserStore();
       return userStore.token || localStorage.getItem("jwt_token") || "";
     },
+    /**
+     * 处理 ensureInitialized 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of ensureInitialized with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param force 输入参数；Input parameter.
+     */
     async ensureInitialized(force = false) {
       if (this.initialized && !force) return;
       this.loading = true;
@@ -419,6 +425,11 @@ export const useFriendStore = defineStore("friend", {
         this.loading = false;
       }
     },
+    /**
+     * 处理 fetchStats 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchStats with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async fetchStats() {
       const resp = ensureSuccess(
         await apiRequest(API_PATHS.friendStats, { token: this.getToken() }),
@@ -429,6 +440,11 @@ export const useFriendStore = defineStore("friend", {
         ...(resp.stats || {}),
       };
     },
+    /**
+     * 处理 fetchFriends 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchFriends with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async fetchFriends() {
       const resp = ensureSuccess(
         await apiRequest(API_PATHS.friendList, {
@@ -446,6 +462,11 @@ export const useFriendStore = defineStore("friend", {
         this.selectedFriendId = this.friends[0]?.id || null;
       }
     },
+    /**
+     * 处理 fetchReceivedRequests 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchReceivedRequests with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async fetchReceivedRequests() {
       const resp = ensureSuccess(
         await apiRequest(API_PATHS.friendRequestReceived, {
@@ -456,6 +477,11 @@ export const useFriendStore = defineStore("friend", {
       );
       this.incomingRequests = (resp.requests || []).map((item) => mapRequestItem(item, "received"));
     },
+    /**
+     * 处理 fetchSentRequests 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchSentRequests with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async fetchSentRequests() {
       const resp = ensureSuccess(
         await apiRequest(API_PATHS.friendRequestSent, {
@@ -466,6 +492,12 @@ export const useFriendStore = defineStore("friend", {
       );
       this.outgoingRequests = (resp.requests || []).map((item) => mapRequestItem(item, "sent"));
     },
+    /**
+     * 处理 searchUsers 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of searchUsers with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param keyword 输入参数；Input parameter.
+     */
     async searchUsers(keyword = this.discoverKeyword) {
       this.discoverLoading = true;
       try {
@@ -486,6 +518,11 @@ export const useFriendStore = defineStore("friend", {
         this.discoverLoading = false;
       }
     },
+    /**
+     * 处理 refreshRelationshipData 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of refreshRelationshipData with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async refreshRelationshipData() {
       await Promise.all([
         this.fetchStats(),
@@ -495,6 +532,12 @@ export const useFriendStore = defineStore("friend", {
       ]);
       await this.searchUsers(this.discoverKeyword);
     },
+    /**
+     * 处理 fetchInviteBots 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchInviteBots with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param force 输入参数；Input parameter.
+     */
     async fetchInviteBots(force = false) {
       if (!force && this.inviteBots.length) return;
       this.inviteDialogLoading = true;
@@ -507,6 +550,11 @@ export const useFriendStore = defineStore("friend", {
         this.inviteDialogLoading = false;
       }
     },
+    /**
+     * 处理 fetchChatConversations 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchChatConversations with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async fetchChatConversations() {
       this.chatConversationLoading = true;
       try {
@@ -521,6 +569,13 @@ export const useFriendStore = defineStore("friend", {
         this.chatConversationLoading = false;
       }
     },
+    /**
+     * 处理 fetchChatHistory 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchChatHistory with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     * @param page 输入参数；Input parameter.
+     */
     async fetchChatHistory(friendId, page = 1) {
       if (!friendId) return;
       this.chatHistoryLoading = true;
@@ -544,29 +599,29 @@ export const useFriendStore = defineStore("friend", {
       }
     },
     /**
-     * Handles setActiveSegment.
-     * ??setActiveSegment?
+     * 处理 setActiveSegment 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setActiveSegment, including state updates, interaction orchestration, and error branches.
      */
     setActiveSegment(segment) {
       this.activeSegment = segment;
     },
     /**
-     * Handles setActiveTab.
-     * ??setActiveTab?
+     * 处理 setActiveTab 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setActiveTab, including state updates, interaction orchestration, and error branches.
      */
     setActiveTab(tab) {
       this.activeTab = tab;
     },
     /**
-     * Handles setSidebarKeyword.
-     * ??setSidebarKeyword?
+     * 处理 setSidebarKeyword 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setSidebarKeyword, including state updates, interaction orchestration, and error branches.
      */
     setSidebarKeyword(keyword) {
       this.sidebarKeyword = keyword;
     },
     /**
-     * Handles setDiscoverKeyword.
-     * ??setDiscoverKeyword?
+     * 处理 setDiscoverKeyword 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setDiscoverKeyword, including state updates, interaction orchestration, and error branches.
      */
     setDiscoverKeyword(keyword) {
       this.discoverKeyword = keyword;
@@ -583,8 +638,8 @@ export const useFriendStore = defineStore("friend", {
       }, 280);
     },
     /**
-     * Handles selectFriend.
-     * ??selectFriend?
+     * 处理 selectFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of selectFriend, including state updates, interaction orchestration, and error branches.
      */
     selectFriend(friendId) {
       const target = this.friends.find((friend) => friend.id === friendId);
@@ -593,8 +648,8 @@ export const useFriendStore = defineStore("friend", {
       this.activeTab = "detail";
     },
     /**
-     * Handles showFeedback.
-     * ??showFeedback?
+     * 处理 showFeedback 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of showFeedback, including state updates, interaction orchestration, and error branches.
      */
     showFeedback({ title, message, type = "info" }) {
       this.feedback = { visible: true, title, message, type };
@@ -604,8 +659,8 @@ export const useFriendStore = defineStore("friend", {
       }, 2600);
     },
     /**
-     * Handles clearFeedback.
-     * ??clearFeedback?
+     * 处理 clearFeedback 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of clearFeedback, including state updates, interaction orchestration, and error branches.
      */
     clearFeedback() {
       if (feedbackTimer) {
@@ -615,12 +670,18 @@ export const useFriendStore = defineStore("friend", {
       this.feedback.visible = false;
     },
     /**
-     * Handles getOutgoingInviteForFriend.
-     * ??getOutgoingInviteForFriend?
+     * 处理 getOutgoingInviteForFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of getOutgoingInviteForFriend, including state updates, interaction orchestration, and error branches.
      */
     getOutgoingInviteForFriend(friendId) {
       return useRealtimeStore().getPendingInviteWithFriend(friendId);
     },
+    /**
+     * 处理 inviteFriend 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of inviteFriend with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async inviteFriend(friendId) {
       this.inviteDialogFriendId = friendId;
       this.inviteDialogVisible = true;
@@ -639,8 +700,8 @@ export const useFriendStore = defineStore("friend", {
       }
     },
     /**
-     * Handles closeInviteDialog.
-     * ??closeInviteDialog?
+     * 处理 closeInviteDialog 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of closeInviteDialog, including state updates, interaction orchestration, and error branches.
      */
     closeInviteDialog() {
       this.inviteDialogVisible = false;
@@ -648,12 +709,17 @@ export const useFriendStore = defineStore("friend", {
       this.inviteDialogSubmitting = false;
     },
     /**
-     * Handles setInviteDialogBot.
-     * ??setInviteDialogBot?
+     * 处理 setInviteDialogBot 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setInviteDialogBot, including state updates, interaction orchestration, and error branches.
      */
     setInviteDialogBot(botId) {
       this.inviteDialogBotId = String(botId ?? "-1");
     },
+    /**
+     * 处理 submitInviteDialog 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of submitInviteDialog with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async submitInviteDialog() {
       const friend = this.inviteDialogFriend;
       if (!friend || this.inviteDialogSubmitting) return;
@@ -688,6 +754,12 @@ export const useFriendStore = defineStore("friend", {
         this.inviteDialogSubmitting = false;
       }
     },
+    /**
+     * 处理 cancelInviteForFriend 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of cancelInviteForFriend with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async cancelInviteForFriend(friendId = this.inviteDialogFriendId) {
       const friend = this.friends.find((item) => item.id === friendId);
       const pendingInvite = this.getOutgoingInviteForFriend(friendId);
@@ -703,9 +775,21 @@ export const useFriendStore = defineStore("friend", {
         });
       }
     },
+    /**
+     * 处理 sendQuickMessage 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of sendQuickMessage with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async sendQuickMessage(friendId) {
       await this.openChatDrawer(friendId);
     },
+    /**
+     * 处理 openChatDrawer 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of openChatDrawer with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async openChatDrawer(friendId = this.selectedFriendId) {
       this.chatDrawerVisible = true;
       await this.fetchChatConversations();
@@ -714,13 +798,19 @@ export const useFriendStore = defineStore("friend", {
       await this.setActiveChatFriend(nextFriendId);
     },
     /**
-     * Handles closeChatDrawer.
-     * ??closeChatDrawer?
+     * 处理 closeChatDrawer 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of closeChatDrawer, including state updates, interaction orchestration, and error branches.
      */
     closeChatDrawer() {
       this.chatDrawerVisible = false;
       this.chatDraft = "";
     },
+    /**
+     * 处理 setActiveChatFriend 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setActiveChatFriend with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async setActiveChatFriend(friendId) {
       if (!friendId) return;
       this.chatActiveFriendId = friendId;
@@ -728,15 +818,15 @@ export const useFriendStore = defineStore("friend", {
       await this.markChatConversationRead(friendId);
     },
     /**
-     * Handles setChatDraft.
-     * ??setChatDraft?
+     * 处理 setChatDraft 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of setChatDraft, including state updates, interaction orchestration, and error branches.
      */
     setChatDraft(value) {
       this.chatDraft = value;
     },
     /**
-     * Handles markLocalConversationRead.
-     * ??markLocalConversationRead?
+     * 处理 markLocalConversationRead 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of markLocalConversationRead, including state updates, interaction orchestration, and error branches.
      */
     markLocalConversationRead(friendId) {
       const target = this.chatConversations.find((item) => item.friendId === friendId);
@@ -745,8 +835,8 @@ export const useFriendStore = defineStore("friend", {
       }
     },
     /**
-     * Handles upsertConversationFromMessage.
-     * ??upsertConversationFromMessage?
+     * 处理 upsertConversationFromMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of upsertConversationFromMessage, including state updates, interaction orchestration, and error branches.
      */
     upsertConversationFromMessage(message) {
       const currentUserId = Number.parseInt(useUserStore().id, 10);
@@ -795,8 +885,8 @@ export const useFriendStore = defineStore("friend", {
       ];
     },
     /**
-     * Handles upsertChatMessage.
-     * ??upsertChatMessage?
+     * 处理 upsertChatMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of upsertChatMessage, including state updates, interaction orchestration, and error branches.
      */
     upsertChatMessage(message) {
       if (this.chatMessages.some((item) => item.id === message.id)) return;
@@ -807,6 +897,12 @@ export const useFriendStore = defineStore("friend", {
       this.chatMessages = [...this.chatMessages, message];
       this.chatMessagesCount += 1;
     },
+    /**
+     * 处理 markChatConversationRead 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of markChatConversationRead with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async markChatConversationRead(friendId) {
       if (!friendId) return;
       try {
@@ -820,6 +916,11 @@ export const useFriendStore = defineStore("friend", {
       }
       this.markLocalConversationRead(friendId);
     },
+    /**
+     * 处理 sendActiveChatMessage 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of sendActiveChatMessage with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async sendActiveChatMessage() {
       const activeFriend = this.activeChatFriend;
       const content = this.chatDraft.trim();
@@ -853,8 +954,8 @@ export const useFriendStore = defineStore("friend", {
       }
     },
     /**
-     * Handles receivePrivateChatMessage.
-     * ??receivePrivateChatMessage?
+     * 处理 receivePrivateChatMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of receivePrivateChatMessage, including state updates, interaction orchestration, and error branches.
      */
     receivePrivateChatMessage(message) {
       const normalizedMessage = mapChatMessage(message);
@@ -871,6 +972,12 @@ export const useFriendStore = defineStore("friend", {
         }
       }
     },
+    /**
+     * 处理 toggleFavorite 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of toggleFavorite with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param friendId 输入参数；Input parameter.
+     */
     async toggleFavorite(friendId) {
       const friend = this.friends.find((item) => item.id === friendId);
       if (!friend) return;
@@ -899,19 +1006,24 @@ export const useFriendStore = defineStore("friend", {
       }
     },
     /**
-     * Handles openRemoveDialog.
-     * ??openRemoveDialog?
+     * 处理 openRemoveDialog 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of openRemoveDialog, including state updates, interaction orchestration, and error branches.
      */
     openRemoveDialog(friendId) {
       this.pendingRemoveFriendId = friendId;
     },
     /**
-     * Handles closeRemoveDialog.
-     * ??closeRemoveDialog?
+     * 处理 closeRemoveDialog 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of closeRemoveDialog, including state updates, interaction orchestration, and error branches.
      */
     closeRemoveDialog() {
       this.pendingRemoveFriendId = null;
     },
+    /**
+     * 处理 confirmRemoveFriend 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of confirmRemoveFriend with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async confirmRemoveFriend() {
       const friend = this.friends.find((item) => item.id === this.pendingRemoveFriendId);
       if (!friend) {
@@ -942,6 +1054,12 @@ export const useFriendStore = defineStore("friend", {
         });
       }
     },
+    /**
+     * 处理 acceptIncomingRequest 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of acceptIncomingRequest with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param requestId 输入参数；Input parameter.
+     */
     async acceptIncomingRequest(requestId) {
       const request = this.incomingRequests.find((item) => item.id === requestId);
       if (!request) return;
@@ -973,6 +1091,12 @@ export const useFriendStore = defineStore("friend", {
         });
       }
     },
+    /**
+     * 处理 ignoreIncomingRequest 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of ignoreIncomingRequest with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param requestId 输入参数；Input parameter.
+     */
     async ignoreIncomingRequest(requestId) {
       const request = this.incomingRequests.find((item) => item.id === requestId);
       if (!request) return;
@@ -999,6 +1123,12 @@ export const useFriendStore = defineStore("friend", {
         });
       }
     },
+    /**
+     * 处理 sendFriendRequest 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of sendFriendRequest with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param userId 输入参数；Input parameter.
+     */
     async sendFriendRequest(userId) {
       const user = this.discoverUsers.find((item) => item.id === userId);
       if (!user) return;
@@ -1032,6 +1162,12 @@ export const useFriendStore = defineStore("friend", {
         });
       }
     },
+    /**
+     * 处理 cancelOutgoingRequest 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of cancelOutgoingRequest with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     * @param requestId 输入参数；Input parameter.
+     */
     async cancelOutgoingRequest(requestId) {
       const request = this.outgoingRequests.find((item) => item.id === requestId);
       if (!request) return;

@@ -10,12 +10,20 @@ import java.util.Date;
 public class DateTimeUtil {
     private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * 处理 DateTimeUtil 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of DateTimeUtil with controlled input and output handling.
+     *
+     */
     private DateTimeUtil() {
     }
 
     /**
-     * Formats a Date to "yyyy-MM-dd HH:mm:ss"; returns null if the date is null.
-     * 将Date格式化为"yyyy-MM-dd HH:mm:ss"字符串；date为null时返回null。
+     * 处理 format 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of format with controlled input and output handling.
+     *
+     * @param date 时间参数；Time parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
     public static String format(Date date) {
         if (date == null) return null;

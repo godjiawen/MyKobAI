@@ -30,11 +30,13 @@ public class FriendInviteController {
         return friendInviteService.respond(inviteId, action, receiverBotId);
     }
 
-    @GetMapping("/api/friends/invite/pending/")
     /**
-     * Handles pending.
-     * ??pending?
+     * 处理 pending 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of pending with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @GetMapping("/api/friends/invite/pending/")
     public Map<String, Object> pending() {
         return friendInviteService.pending();
     }

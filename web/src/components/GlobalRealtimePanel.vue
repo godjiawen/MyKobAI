@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="!isPkRoute" class="realtime-panel">
     <transition name="realtime-pop">
       <section v-if="incomingInvite" class="realtime-card realtime-card--invite">
@@ -119,10 +119,20 @@ const { incomingInvite, outgoingInvite, inviteActionLoading, inviteNotice, frien
 const isPkRoute = computed(() => route.name === "pk_index");
 const selectedBotLabel = computed(() => (pkStore.selectedBotId === "-1" ? "手动操作" : `Bot #${pkStore.selectedBotId}`));
 
+/**
+ * 处理 goPk 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of goPk with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const goPk = async () => {
   await router.push({ name: "pk_index" });
 };
 
+/**
+ * 处理 goFriends 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of goFriends with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const goFriends = async () => {
   realtimeStore.clearFriendRequestNotice();
   await router.push({ name: "friends_index" });

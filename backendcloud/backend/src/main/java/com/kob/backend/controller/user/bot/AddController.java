@@ -16,11 +16,14 @@ public class AddController {
     @Autowired
     private AddService addService;
 
-    @PostMapping("/api/user/bot/add/")
     /**
-     * Handles add.
-     * ??add?
+     * 创建或保存 add 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of add with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/user/bot/add/")
     public Map<String, String> add(@RequestParam Map<String, String> data) {
         return addService.add(data);
     }

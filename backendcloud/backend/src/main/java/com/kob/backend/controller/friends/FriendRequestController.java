@@ -37,29 +37,38 @@ public class FriendRequestController {
         return friendRequestService.sent(status, page, pageSize);
     }
 
-    @PostMapping("/api/friends/request/accept/")
     /**
-     * Handles accept.
-     * ??accept?
+     * 处理 RequestParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of RequestParam with controlled input and output handling.
+     *
+     * @param requestId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/friends/request/accept/")
     public Map<String, Object> accept(@RequestParam("request_id") Integer requestId) {
         return friendRequestService.accept(requestId);
     }
 
-    @PostMapping("/api/friends/request/ignore/")
     /**
-     * Handles ignore.
-     * ??ignore?
+     * 处理 RequestParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of RequestParam with controlled input and output handling.
+     *
+     * @param requestId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/friends/request/ignore/")
     public Map<String, Object> ignore(@RequestParam("request_id") Integer requestId) {
         return friendRequestService.ignore(requestId);
     }
 
-    @PostMapping("/api/friends/request/cancel/")
     /**
-     * Handles cancel.
-     * ??cancel?
+     * 处理 RequestParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of RequestParam with controlled input and output handling.
+     *
+     * @param requestId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/friends/request/cancel/")
     public Map<String, Object> cancel(@RequestParam("request_id") Integer requestId) {
         return friendRequestService.cancel(requestId);
     }

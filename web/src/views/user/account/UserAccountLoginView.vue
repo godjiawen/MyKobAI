@@ -39,6 +39,11 @@ const username = ref("");
 const password = ref("");
 const errorMessage = ref("");
 
+/**
+ * 处理 login 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of login with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const login = async () => {
   errorMessage.value = "";
   try {

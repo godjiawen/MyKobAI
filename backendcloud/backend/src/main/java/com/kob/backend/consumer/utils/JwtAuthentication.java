@@ -9,8 +9,11 @@ import io.jsonwebtoken.Claims;
  */
 public class JwtAuthentication {
     /**
-     * Parses the given JWT token and returns the user ID encoded as its subject.
-     * 解析给定的JWT令牌并返回其主题中编码的用户ID。
+     * 查询并返回 getUserId 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getUserId with controlled input and output handling.
+     *
+     * @param token 令牌参数；Token parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
     public static Integer getUserId(String token) {
         int userId = -1;

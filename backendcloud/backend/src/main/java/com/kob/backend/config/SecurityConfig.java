@@ -28,40 +28,36 @@ public class SecurityConfig {
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
     /**
-     * Exposes the BCrypt password encoder as a Spring bean.
-     * 将BCrypt密码编码器暴露为Spring Bean。
+     * 处理 passwordEncoder 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of passwordEncoder with controlled input and output handling.
+     *
+     * @return 返回 PasswordEncoder 类型结果；Returns a result of type PasswordEncoder.
      */
     @Bean
-    /**
-     * Handles passwordEncoder.
-     * ??passwordEncoder?
-     */
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     /**
-     * Exposes the AuthenticationManager as a Spring bean for use in login services.
-     * 将AuthenticationManager暴露为Spring Bean供登录服务使用。
+     * 处理 authenticationManagerBean 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of authenticationManagerBean with controlled input and output handling.
+     *
+     * @param authenticationConfiguration 输入参数；Input parameter.
+     * @return 返回 AuthenticationManager 类型结果；Returns a result of type AuthenticationManager.
      */
     @Bean
-    /**
-     * Handles authenticationManagerBean.
-     * ??authenticationManagerBean?
-     */
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     /**
-     * Configures the security filter chain: disables CSRF, sets stateless sessions and defines authorization rules.
-     * 配置安全过滤器链：禁用CSRF、设置无状态会话并定义授权规则。
+     * 处理 filterChain 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of filterChain with controlled input and output handling.
+     *
+     * @param http 输入参数；Input parameter.
+     * @return 返回 SecurityFilterChain 类型结果；Returns a result of type SecurityFilterChain.
      */
     @Bean
-    /**
-     * Handles filterChain.
-     * ??filterChain?
-     */
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -79,14 +75,12 @@ public class SecurityConfig {
     }
 
     /**
-     * Ignores WebSocket endpoint paths from the security filter chain entirely.
-     * 将WebSocket端点路径完全排除在安全过滤器链之外。
+     * 处理 webSecurityCustomizer 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of webSecurityCustomizer with controlled input and output handling.
+     *
+     * @return 返回 WebSecurityCustomizer 类型结果；Returns a result of type WebSecurityCustomizer.
      */
     @Bean
-    /**
-     * Handles webSecurityCustomizer.
-     * ??webSecurityCustomizer?
-     */
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/websocket/**");
     }

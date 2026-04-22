@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <aside class="friends-sidebar">
     <div class="sidebar-head">
       <div>

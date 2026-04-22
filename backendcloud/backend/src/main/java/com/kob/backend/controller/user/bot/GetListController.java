@@ -16,11 +16,13 @@ public class GetListController {
     @Autowired
     private GetListService getListService;
 
-    @GetMapping("/api/user/bot/getlist/")
     /**
-     * Handles getList.
-     * ??getList?
+     * 查询并返回 getList 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getList with controlled input and output handling.
+     *
+     * @return 返回集合结果；Returns a collection result.
      */
+    @GetMapping("/api/user/bot/getlist/")
     public List<Bot> getList() {
         return getListService.getList();
     }

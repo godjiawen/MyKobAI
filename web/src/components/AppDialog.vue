@@ -66,8 +66,8 @@ const titleId = computed(() => `app-dialog-title-${uid}`);
 const messageId = computed(() => `app-dialog-message-${uid}`);
 
 /**
- * Handles getFocusableElements.
- * ??getFocusableElements?
+ * 处理 getFocusableElements 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of getFocusableElements, including state updates, interaction orchestration, and error branches.
  */
 const getFocusableElements = () => {
   const root = dialogRef.value;
@@ -79,6 +79,11 @@ const getFocusableElements = () => {
   );
 };
 
+/**
+ * 处理 focusPreferredButton 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of focusPreferredButton with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const focusPreferredButton = async () => {
   await nextTick();
   const target = confirmButtonRef.value || cancelButtonRef.value || closeButtonRef.value;
@@ -88,8 +93,8 @@ const focusPreferredButton = async () => {
 };
 
 /**
- * Handles handleKeydown.
- * ??handleKeydown?
+ * 处理 handleKeydown 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleKeydown, including state updates, interaction orchestration, and error branches.
  */
 const handleKeydown = (event) => {
   if (!props.modelValue) return;
@@ -118,8 +123,8 @@ const handleKeydown = (event) => {
 };
 
 /**
- * Handles close.
- * ??close?
+ * 处理 close 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of close, including state updates, interaction orchestration, and error branches.
  */
 const close = () => {
   if (!props.modelValue) return;
@@ -127,8 +132,8 @@ const close = () => {
 };
 
 /**
- * Handles handleConfirm.
- * ??handleConfirm?
+ * 处理 handleConfirm 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleConfirm, including state updates, interaction orchestration, and error branches.
  */
 const handleConfirm = () => {
   emit("confirm");
@@ -136,8 +141,8 @@ const handleConfirm = () => {
 };
 
 /**
- * Handles handleCancel.
- * ??handleCancel?
+ * 处理 handleCancel 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleCancel, including state updates, interaction orchestration, and error branches.
  */
 const handleCancel = () => {
   emit("cancel");

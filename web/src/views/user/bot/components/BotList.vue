@@ -147,16 +147,16 @@ const aceLang = computed(() => {
 });
 
 /**
- * Handles openModal.
- * ??openModal?
+ * 处理 openModal 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of openModal, including state updates, interaction orchestration, and error branches.
  */
 const openModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).show();
 };
 
 /**
- * Handles closeModal.
- * ??closeModal?
+ * 处理 closeModal 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of closeModal, including state updates, interaction orchestration, and error branches.
  */
 const closeModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).hide();
@@ -175,6 +175,11 @@ const closeModalAndWait = (modalRef) => new Promise((resolve) => {
   }
 
   let settled = false;
+  /**
+   * 处理 cleanup 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+   * Handles the core frontend logic of cleanup with async flow control, including state updates, interaction orchestration, and error branches.
+   *
+   */
   const cleanup = () => {
     if (settled) return;
     settled = true;
@@ -187,6 +192,11 @@ const closeModalAndWait = (modalRef) => new Promise((resolve) => {
   setTimeout(cleanup, 420);
 });
 
+/**
+ * 处理 cleanupDanglingBackdrop 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of cleanupDanglingBackdrop with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const cleanupDanglingBackdrop = () => {
   const hasVisibleModal = document.querySelector(".modal.show");
   if (hasVisibleModal) return;
@@ -198,6 +208,11 @@ const cleanupDanglingBackdrop = () => {
   document.body.style.removeProperty("padding-right");
 };
 
+/**
+ * 处理 prepareDialogLayer 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of prepareDialogLayer with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const prepareDialogLayer = async () => {
   await closeModalAndWait(botModalRef.value);
   cleanupDanglingBackdrop();
@@ -228,8 +243,8 @@ const openDialog = async ({
 };
 
 /**
- * Handles settleDialog.
- * ??settleDialog?
+ * 处理 settleDialog 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of settleDialog, including state updates, interaction orchestration, and error branches.
  */
 const settleDialog = (result) => {
   dialogState.visible = false;
@@ -241,6 +256,11 @@ const settleDialog = (result) => {
 const handleDialogConfirm = () => settleDialog(true);
 const handleDialogCancel = () => settleDialog(false);
 
+/**
+ * 处理 refreshBots 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of refreshBots with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const refreshBots = async () => {
   try {
     bots.value = await apiRequest(API_PATHS.botList, {
@@ -258,8 +278,8 @@ onMounted(() => {
 });
 
 /**
- * Handles openBotModal.
- * ??openBotModal?
+ * 处理 openBotModal 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of openBotModal, including state updates, interaction orchestration, and error branches.
  */
 const openBotModal = (bot = null) => {
   if (bot) {
@@ -277,6 +297,11 @@ const openBotModal = (bot = null) => {
   openModal(botModalRef.value);
 };
 
+/**
+ * 处理 saveBot 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of saveBot with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const saveBot = async () => {
   botDraft.error_message = "";
   if (!botDraft.title.trim()) {
@@ -339,6 +364,12 @@ const saveBot = async () => {
   }
 };
 
+/**
+ * 处理 removeBot 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of removeBot with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ * @param bot 输入参数；Input parameter.
+ */
 const removeBot = async (bot) => {
   const confirmed = await openDialog({
     title: "删除 Bot",
@@ -372,8 +403,8 @@ const removeBot = async (bot) => {
 };
 
 /**
- * Handles onLanguageChange.
- * ??onLanguageChange?
+ * 处理 onLanguageChange 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of onLanguageChange, including state updates, interaction orchestration, and error branches.
  */
 const onLanguageChange = () => {
   if (botDraft.id) return;
@@ -389,8 +420,8 @@ const onLanguageChange = () => {
 };
 
 /**
- * Handles codePlaceholder.
- * ??codePlaceholder?
+ * 处理 codePlaceholder 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of codePlaceholder, including state updates, interaction orchestration, and error branches.
  */
 const codePlaceholder = (lang) => {
   const map = {

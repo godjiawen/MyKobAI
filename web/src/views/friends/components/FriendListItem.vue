@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <article class="friend-list-item" :class="{ active }">
     <button
       type="button"

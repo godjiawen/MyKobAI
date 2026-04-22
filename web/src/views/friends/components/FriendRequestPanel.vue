@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="request-panel">
     <div class="request-grid">
       <article class="request-column">

@@ -11,8 +11,13 @@ public class BotPool extends Thread {
     private final Queue<Bot> bots = new LinkedList<>();
 
     /**
-     * Handles addBot.
-     * ??addBot?
+     * 创建或保存 addBot 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of addBot with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @param botCode 机器人相关参数；Bot-related parameter.
+     * @param input 输入参数；Input parameter.
+     * @param language 语言参数；Language parameter.
      */
     public void addBot(Integer userId, String botCode, String input, String language) {
         lock.lock();
@@ -25,19 +30,22 @@ public class BotPool extends Thread {
     }
 
     /**
-     * Handles consume.
-     * ??consume?
+     * 处理 consume 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of consume with controlled input and output handling.
+     *
+     * @param bot 机器人相关参数；Bot-related parameter.
      */
     private void consume(Bot bot) {
         Consumer consumer = new Consumer();
         consumer.startTimeout(2000, bot);
     }
 
-    @Override
     /**
-     * Handles run.
-     * ??run?
+     * 执行或处理 run 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of run with controlled input and output handling.
+     *
      */
+    @Override
     public void run() {
         while (true) {
             Bot bot;

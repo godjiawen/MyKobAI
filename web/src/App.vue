@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="app-shell">
     <div class="bg-layer bg-gradient"></div>
     <div class="bg-layer bg-grid"></div>
@@ -39,8 +39,8 @@ const userStore = useUserStore();
 const realtimeStore = useRealtimeStore();
 
 /**
- * Handles resetRenderError.
- * ??resetRenderError?
+ * 处理 resetRenderError 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of resetRenderError, including state updates, interaction orchestration, and error branches.
  */
 const resetRenderError = () => {
   renderError.value = "";

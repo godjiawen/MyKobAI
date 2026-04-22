@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ServerEndpoint("/chat/{token}/{roomId}")
 public class ChatWebSocketServer {
 
-    /** roomId 到该房间连接集合的映射 */
     private static final ConcurrentHashMap<String, CopyOnWriteArraySet<ChatWebSocketServer>> rooms =
             new ConcurrentHashMap<>();
 
@@ -35,6 +34,15 @@ public class ChatWebSocketServer {
 
     // 连接生命周期
 
+    /**
+     * 处理 PathParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of PathParam with controlled input and output handling.
+     *
+     * @param session 输入参数；Input parameter.
+     * @param token 令牌参数；Token parameter.
+     * @param roomId 标识参数；Identifier value.
+     * @return 返回 void onOpen(Session session, @PathParam("token") String token, @ 类型结果；Returns a result of type void onOpen(Session session, @PathParam("token") String token, @.
+     */
     @OnOpen
     public void onOpen(Session session,
                        @PathParam("token")  String token,
@@ -58,11 +66,12 @@ public class ChatWebSocketServer {
                 + " | room size=" + rooms.get(roomId).size());
     }
 
-    @OnClose
     /**
-     * Handles onClose.
-     * ??onClose?
+     * 处理 onClose 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of onClose with controlled input and output handling.
+     *
      */
+    @OnClose
     public void onClose() {
         if (roomId != null) {
             CopyOnWriteArraySet<ChatWebSocketServer> room = rooms.get(roomId);
@@ -76,22 +85,28 @@ public class ChatWebSocketServer {
         System.out.println("[Chat] Disconnected: userId=" + userId + " room=" + roomId);
     }
 
-    @OnError
     /**
-     * Handles onError.
-     * ??onError?
+     * 处理 onError 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of onError with controlled input and output handling.
+     *
+     * @param session 输入参数；Input parameter.
+     * @param error 输入参数；Input parameter.
      */
+    @OnError
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
 
     // 消息收发
 
-    @OnMessage
     /**
-     * Handles onMessage.
-     * ??onMessage?
+     * 处理 onMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of onMessage with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
+     * @param session 输入参数；Input parameter.
      */
+    @OnMessage
     public void onMessage(String message, Session session) {
         JSONObject data;
         try {
@@ -123,8 +138,10 @@ public class ChatWebSocketServer {
     }
 
     /**
-     * Handles sendMessage.
-     * ??sendMessage?
+     * 发送或通知 sendMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendMessage with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
      */
     public void sendMessage(String message) {
         synchronized (this.session) {
@@ -136,4 +153,3 @@ public class ChatWebSocketServer {
         }
     }
 }
-

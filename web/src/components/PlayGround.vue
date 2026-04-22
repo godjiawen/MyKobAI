@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div :class="['battle-area', 'kob-page-shell', { 'battle-area--record': recordStore.is_record }]" @mousedown.stop>
     <div class="playground">
       <div v-if="showPauseControl" class="play-controls">
@@ -90,8 +90,8 @@ const isPauseButtonDisabled = computed(() => {
 });
 
 /**
- * Handles resumeGame.
- * ??resumeGame?
+ * 处理 resumeGame 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of resumeGame, including state updates, interaction orchestration, and error branches.
  */
 const resumeGame = () => {
   const socket = pkStore.socket;
@@ -101,8 +101,8 @@ const resumeGame = () => {
 };
 
 /**
- * Handles pauseGame.
- * ??pauseGame?
+ * 处理 pauseGame 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of pauseGame, including state updates, interaction orchestration, and error branches.
  */
 const pauseGame = () => {
   const socket = pkStore.socket;
@@ -112,8 +112,8 @@ const pauseGame = () => {
 };
 
 /**
- * Handles togglePause.
- * ??togglePause?
+ * 处理 togglePause 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of togglePause, including state updates, interaction orchestration, and error branches.
  */
 const togglePause = () => {
   if (pkStore.loser !== "none") return;

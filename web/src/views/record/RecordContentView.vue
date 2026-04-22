@@ -35,13 +35,18 @@ const loading = ref(false);
 const loadError = ref("");
 const ready = ref(false);
 
+/**
+ * 处理 goBackToRecordList 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of goBackToRecordList with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const goBackToRecordList = async () => {
   await router.push({ name: "record_index" });
 };
 
 /**
- * Handles stringTo2D.
- * ??stringTo2D?
+ * 处理 stringTo2D 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of stringTo2D, including state updates, interaction orchestration, and error branches.
  */
 const stringTo2D = (map) => {
   const graph = [];

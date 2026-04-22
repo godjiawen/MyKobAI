@@ -12,16 +12,16 @@ let friendMessageTimer = null;
 let manuallyClosed = false;
 
 /**
- * Handles clearTimer.
- * ??clearTimer?
+ * 处理 clearTimer 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of clearTimer, including state updates, interaction orchestration, and error branches.
  */
 const clearTimer = (timerRef) => {
   if (timerRef) clearTimeout(timerRef);
 };
 
 /**
- * Handles syncFriendStoreRelationships.
- * ??syncFriendStoreRelationships?
+ * 处理 syncFriendStoreRelationships 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of syncFriendStoreRelationships, including state updates, interaction orchestration, and error branches.
  */
 const syncFriendStoreRelationships = () => {
   import("@/store/friend")
@@ -37,8 +37,8 @@ const syncFriendStoreRelationships = () => {
 };
 
 /**
- * Handles pushRealtimeChatMessage.
- * ??pushRealtimeChatMessage?
+ * 处理 pushRealtimeChatMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of pushRealtimeChatMessage, including state updates, interaction orchestration, and error branches.
  */
 const pushRealtimeChatMessage = (message) => {
   import("@/store/friend")
@@ -112,16 +112,16 @@ export const useRealtimeStore = defineStore("realtime", {
   }),
   actions: {
     /**
-     * Handles getToken.
-     * ??getToken?
+     * 处理 getToken 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of getToken, including state updates, interaction orchestration, and error branches.
      */
     getToken() {
       const userStore = useUserStore();
       return userStore.token || localStorage.getItem("jwt_token") || "";
     },
     /**
-     * Handles syncInviteSnapshots.
-     * ??syncInviteSnapshots?
+     * 处理 syncInviteSnapshots 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of syncInviteSnapshots, including state updates, interaction orchestration, and error branches.
      */
     syncInviteSnapshots() {
       const userStore = useUserStore();
@@ -130,8 +130,8 @@ export const useRealtimeStore = defineStore("realtime", {
       this.outgoingInvite = this.pendingInvites.find((invite) => invite.senderId === currentUserId) || null;
     },
     /**
-     * Handles getPendingInviteWithFriend.
-     * ??getPendingInviteWithFriend?
+     * 处理 getPendingInviteWithFriend 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of getPendingInviteWithFriend, including state updates, interaction orchestration, and error branches.
      */
     getPendingInviteWithFriend(friendId) {
       const userStore = useUserStore();
@@ -146,8 +146,8 @@ export const useRealtimeStore = defineStore("realtime", {
       );
     },
     /**
-     * Handles initialize.
-     * ??initialize?
+     * 处理 initialize 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of initialize, including state updates, interaction orchestration, and error branches.
      */
     initialize() {
       const token = this.getToken();
@@ -196,8 +196,8 @@ export const useRealtimeStore = defineStore("realtime", {
       };
     },
     /**
-     * Handles disconnect.
-     * ??disconnect?
+     * 处理 disconnect 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of disconnect, including state updates, interaction orchestration, and error branches.
      */
     disconnect() {
       manuallyClosed = true;
@@ -214,8 +214,8 @@ export const useRealtimeStore = defineStore("realtime", {
       this.resetNotifications();
     },
     /**
-     * Handles resetNotifications.
-     * ??resetNotifications?
+     * 处理 resetNotifications 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of resetNotifications, including state updates, interaction orchestration, and error branches.
      */
     resetNotifications() {
       clearTimer(inviteNoticeTimer);
@@ -234,6 +234,11 @@ export const useRealtimeStore = defineStore("realtime", {
       this.friendMessageNotice.visible = false;
       this.friendMessageNotice.message = null;
     },
+    /**
+     * 处理 fetchPendingInvites 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of fetchPendingInvites with async flow control, including state updates, interaction orchestration, and error branches.
+     *
+     */
     async fetchPendingInvites() {
       const token = this.getToken();
       if (!token) return;
@@ -245,8 +250,8 @@ export const useRealtimeStore = defineStore("realtime", {
       this.syncInviteSnapshots();
     },
     /**
-     * Handles showInviteNotice.
-     * ??showInviteNotice?
+     * 处理 showInviteNotice 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of showInviteNotice, including state updates, interaction orchestration, and error branches.
      */
     showInviteNotice(title, message, type = "info") {
       this.inviteNotice = {
@@ -261,8 +266,8 @@ export const useRealtimeStore = defineStore("realtime", {
       }, 3200);
     },
     /**
-     * Handles clearInviteNotice.
-     * ??clearInviteNotice?
+     * 处理 clearInviteNotice 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of clearInviteNotice, including state updates, interaction orchestration, and error branches.
      */
     clearInviteNotice() {
       clearTimer(inviteNoticeTimer);
@@ -270,8 +275,8 @@ export const useRealtimeStore = defineStore("realtime", {
       this.inviteNotice.visible = false;
     },
     /**
-     * Handles showFriendRequestNotice.
-     * ??showFriendRequestNotice?
+     * 处理 showFriendRequestNotice 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of showFriendRequestNotice, including state updates, interaction orchestration, and error branches.
      */
     showFriendRequestNotice(request) {
       this.friendRequestNotice.visible = true;
@@ -282,8 +287,8 @@ export const useRealtimeStore = defineStore("realtime", {
       }, 4200);
     },
     /**
-     * Handles clearFriendRequestNotice.
-     * ??clearFriendRequestNotice?
+     * 处理 clearFriendRequestNotice 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of clearFriendRequestNotice, including state updates, interaction orchestration, and error branches.
      */
     clearFriendRequestNotice() {
       clearTimer(friendRequestTimer);
@@ -292,8 +297,8 @@ export const useRealtimeStore = defineStore("realtime", {
       this.friendRequestNotice.request = null;
     },
     /**
-     * Handles showFriendMessageNotice.
-     * ??showFriendMessageNotice?
+     * 处理 showFriendMessageNotice 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of showFriendMessageNotice, including state updates, interaction orchestration, and error branches.
      */
     showFriendMessageNotice(message) {
       this.friendMessageNotice.visible = true;
@@ -304,8 +309,8 @@ export const useRealtimeStore = defineStore("realtime", {
       }, 4200);
     },
     /**
-     * Handles clearFriendMessageNotice.
-     * ??clearFriendMessageNotice?
+     * 处理 clearFriendMessageNotice 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of clearFriendMessageNotice, including state updates, interaction orchestration, and error branches.
      */
     clearFriendMessageNotice() {
       clearTimer(friendMessageTimer);
@@ -313,6 +318,12 @@ export const useRealtimeStore = defineStore("realtime", {
       this.friendMessageNotice.visible = false;
       this.friendMessageNotice.message = null;
     },
+        /**
+         * 处理 respondInvite 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+         * Handles the core frontend logic of respondInvite with async flow control, including state updates, interaction orchestration, and error branches.
+         *
+         * @param action 输入参数；Input parameter.
+         */
         async respondInvite(action) {
       if (!this.incomingInvite || this.inviteActionLoading) return;
       const pkStore = usePkStore();
@@ -344,6 +355,12 @@ export const useRealtimeStore = defineStore("realtime", {
         this.inviteActionLoading = false;
       }
     },
+        /**
+         * 处理 cancelOutgoingInvite 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+         * Handles the core frontend logic of cancelOutgoingInvite with async flow control, including state updates, interaction orchestration, and error branches.
+         *
+         * @param inviteId 输入参数；Input parameter.
+         */
         async cancelOutgoingInvite(inviteId = this.outgoingInvite?.id) {
       if (!inviteId || this.inviteActionLoading) return;
       const currentInvite = this.pendingInvites.find((invite) => invite.id === inviteId) || this.outgoingInvite;
@@ -371,8 +388,8 @@ export const useRealtimeStore = defineStore("realtime", {
       }
     },
     /**
-     * Handles handleFriendChatMessage.
-     * ??handleFriendChatMessage?
+     * 处理 handleFriendChatMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of handleFriendChatMessage, including state updates, interaction orchestration, and error branches.
      */
     handleFriendChatMessage(message) {
       const normalized = normalizeFriendMessage(message);
@@ -385,8 +402,8 @@ export const useRealtimeStore = defineStore("realtime", {
       }
     },
     /**
-     * Handles handleSocketMessage.
-     * ??handleSocketMessage?
+     * 处理 handleSocketMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of handleSocketMessage, including state updates, interaction orchestration, and error branches.
      */
     handleSocketMessage(raw) {
       const data = JSON.parse(raw);
@@ -519,8 +536,8 @@ export const useRealtimeStore = defineStore("realtime", {
       }
     },
     /**
-     * Handles handleInviteUpdated.
-     * ??handleInviteUpdated?
+     * 处理 handleInviteUpdated 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+     * Handles the core frontend logic of handleInviteUpdated, including state updates, interaction orchestration, and error branches.
      */
         handleInviteUpdated(data) {
       const status = data.status || "updated";

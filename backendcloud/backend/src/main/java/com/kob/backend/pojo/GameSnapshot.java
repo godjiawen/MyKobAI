@@ -77,4 +77,3 @@ public class GameSnapshot {
     public long getExpireAt() { return expireAt; }
     public void setExpireAt(long expireAt) { this.expireAt = expireAt; }
 }
-

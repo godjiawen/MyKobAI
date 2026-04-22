@@ -13,11 +13,13 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${kob.upload.dir}")
     private String uploadDir;
 
-    @Override
     /**
-     * Handles addResourceHandlers.
-     * ??addResourceHandlers?
+     * 创建或保存 addResourceHandlers 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of addResourceHandlers with controlled input and output handling.
+     *
+     * @param registry 输入参数；Input parameter.
      */
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         File dir = new File(uploadDir);
         if (!dir.exists()) {
@@ -29,4 +31,3 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:" + uploadDir);
     }
 }
-

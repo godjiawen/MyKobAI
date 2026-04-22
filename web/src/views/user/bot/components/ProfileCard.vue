@@ -125,16 +125,16 @@ const dialogState = reactive({
 let dialogResolver = null;
 
 /**
- * Handles openModal.
- * ??openModal?
+ * 处理 openModal 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of openModal, including state updates, interaction orchestration, and error branches.
  */
 const openModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).show();
 };
 
 /**
- * Handles closeModal.
- * ??closeModal?
+ * 处理 closeModal 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of closeModal, including state updates, interaction orchestration, and error branches.
  */
 const closeModal = (modalRef) => {
   if (modalRef) Modal.getOrCreateInstance(modalRef).hide();
@@ -153,6 +153,11 @@ const closeModalAndWait = (modalRef) => new Promise((resolve) => {
   }
 
   let settled = false;
+  /**
+   * 处理 cleanup 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+   * Handles the core frontend logic of cleanup with async flow control, including state updates, interaction orchestration, and error branches.
+   *
+   */
   const cleanup = () => {
     if (settled) return;
     settled = true;
@@ -165,6 +170,11 @@ const closeModalAndWait = (modalRef) => new Promise((resolve) => {
   setTimeout(cleanup, 420);
 });
 
+/**
+ * 处理 cleanupDanglingBackdrop 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of cleanupDanglingBackdrop with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const cleanupDanglingBackdrop = () => {
   const hasVisibleModal = document.querySelector(".modal.show");
   if (hasVisibleModal) return;
@@ -176,6 +186,11 @@ const cleanupDanglingBackdrop = () => {
   document.body.style.removeProperty("padding-right");
 };
 
+/**
+ * 处理 prepareDialogLayer 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of prepareDialogLayer with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const prepareDialogLayer = async () => {
   await Promise.all([
     closeModalAndWait(usernameModalRef.value),
@@ -209,8 +224,8 @@ const openDialog = async ({
 };
 
 /**
- * Handles settleDialog.
- * ??settleDialog?
+ * 处理 settleDialog 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of settleDialog, including state updates, interaction orchestration, and error branches.
  */
 const settleDialog = (result) => {
   dialogState.visible = false;
@@ -223,13 +238,19 @@ const handleDialogConfirm = () => settleDialog(true);
 const handleDialogCancel = () => settleDialog(false);
 
 /**
- * Handles triggerUpload.
- * ??triggerUpload?
+ * 处理 triggerUpload 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of triggerUpload, including state updates, interaction orchestration, and error branches.
  */
 const triggerUpload = () => {
   if (fileInput.value) fileInput.value.click();
 };
 
+/**
+ * 处理 uploadAvatar 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of uploadAvatar with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ * @param event 输入参数；Input parameter.
+ */
 const uploadAvatar = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -279,6 +300,11 @@ const uploadAvatar = async (event) => {
   }
 };
 
+/**
+ * 处理 updateUsername 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of updateUsername with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const updateUsername = async () => {
   accountDraft.username_error = "";
   const newUsername = accountDraft.new_username.trim();
@@ -312,6 +338,11 @@ const updateUsername = async () => {
   }
 };
 
+/**
+ * 处理 updatePassword 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of updatePassword with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const updatePassword = async () => {
   accountDraft.password_error = "";
   if (!accountDraft.new_password) {

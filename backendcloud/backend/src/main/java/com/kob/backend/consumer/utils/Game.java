@@ -52,8 +52,18 @@ public class Game extends Thread {
     private final static String addBotUrl = "http://127.0.0.1:3002/bot/add/";
 
     /**
-     * Constructor: initializes game with map dimensions, wall count, player IDs and bot settings.
-     * 鏋勯€犲嚱鏁帮細浣跨敤鍦板浘灏哄銆佸鏁伴噺銆佺帺瀹禝D鍜屾満鍣ㄤ汉閰嶇疆鍒濆鍖栨父鎴忋€?
+     * 处理 Game 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of Game with controlled input and output handling.
+     *
+     * @param rows 输入参数；Input parameter.
+     * @param cols 输入参数；Input parameter.
+     * @param inner_walls_count 输入参数；Input parameter.
+     * @param idA 输入参数；Input parameter.
+     * @param botA 机器人相关参数；Bot-related parameter.
+     * @param idB 输入参数；Input parameter.
+     * @param botB 机器人相关参数；Bot-related parameter.
+     * @param gameId 标识参数；Identifier value.
+     * @param roomId 标识参数；Identifier value.
      */
     public Game(Integer rows,
                 Integer cols,
@@ -91,56 +101,129 @@ public class Game extends Thread {
     }
 
     /**
-     * Returns player A.
-     * 杩斿洖鐜╁A銆?
+     * 查询并返回 getPlayerA 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getPlayerA with controlled input and output handling.
+     *
+     * @return 返回 Player 类型结果；Returns a result of type Player.
      */
     public Player getPlayerA() {
         return playerA;
     }
 
     /**
-     * Returns player B.
-     * 杩斿洖鐜╁B銆?
+     * 查询并返回 getPlayerB 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getPlayerB with controlled input and output handling.
+     *
+     * @return 返回 Player 类型结果；Returns a result of type Player.
      */
     public Player getPlayerB() {
         return playerB;
     }
 
     /**
-     * Returns whether the game is currently paused.
-     * 杩斿洖娓告垙褰撳墠鏄惁澶勪簬鏆傚仠鐘舵€併€?
+     * 校验或判断 isPaused 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of isPaused with controlled input and output handling.
+     *
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     public boolean isPaused() {
         return paused;
     }
 
     /**
-     * Returns the identifier of the player who paused the game.
-     * 杩斿洖鏆傚仠娓告垙鐨勭帺瀹舵爣璇嗐€?
+     * 查询并返回 getPausedBy 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getPausedBy with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
      */
     public String getPausedBy() {
         return pausedBy;
     }
 
+        /**
+     * 查询并返回当前对局唯一标识。
+     * Returns the unique identifier of the current game.
+     *
+     * @return 返回对局 ID 字符串；Returns the game ID string.
+     */
     public String getGameId() { return gameId; }
+
+    /**
+     * 查询并返回当前对局所在房间标识。
+     * Returns the room identifier that the current game belongs to.
+     *
+     * @return 返回房间 ID 字符串；Returns the room ID string.
+     */
     public String getRoomId() { return roomId; }
+
+    /**
+     * 校验或判断对局是否处于挂起状态。
+     * Determines whether the current game is suspended.
+     *
+     * @return 返回挂起状态；Returns whether the game is suspended.
+     */
     public boolean isSuspended() { return suspended; }
+
+    /**
+     * 查询并返回触发挂起的用户标识。
+     * Returns the user identifier that triggered suspension.
+     *
+     * @return 返回挂起发起人 ID；Returns the suspender user ID.
+     */
     public Integer getSuspendedBy() { return suspendedBy; }
+
+    /**
+     * 查询并返回当前挂起原因描述。
+     * Returns the current suspension reason description.
+     *
+     * @return 返回挂起原因；Returns the suspension reason.
+     */
     public String getSuspendedReason() { return suspendedReason; }
+
+    /**
+     * 查询并返回当前离线玩家集合。
+     * Returns the current set of away/offline players.
+     *
+     * @return 返回离线玩家 ID 集合；Returns the set of away player IDs.
+     */
     public Set<Integer> getAwayPlayers() { return awayPlayers; }
 
+    /**
+     * 更新对局挂起状态及对应上下文信息。
+     * Updates suspension state together with related context.
+     *
+     * @param suspended 是否挂起；Whether the game is suspended.
+     * @param by 挂起发起人 ID；Identifier of the suspending user.
+     * @param reason 挂起原因；Reason for suspension.
+     */
     public void setSuspended(boolean suspended, Integer by, String reason) {
         this.suspended = suspended;
         this.suspendedBy = by;
         this.suspendedReason = reason;
     }
 
+    /**
+     * 将指定用户加入离线玩家集合。
+     * Adds the specified user into the away-player set.
+     *
+     * @param userId 用户 ID；User identifier.
+     */
     public void addAwayPlayer(Integer userId) { awayPlayers.add(userId); }
+
+    /**
+     * 将指定用户从离线玩家集合中移除。
+     * Removes the specified user from the away-player set.
+     *
+     * @param userId 用户 ID；User identifier.
+     */
     public void removeAwayPlayer(Integer userId) { awayPlayers.remove(userId); }
 
     /**
-     * Sets the pause state and records who triggered the pause, thread-safe.
-     * 绾跨▼瀹夊叏鍦拌缃父鎴忔殏鍋滅姸鎬侊紝骞惰褰曡Е鍙戞柟銆?
+     * 更新暂停状态并记录暂停来源，过程受锁保护。
+     * Updates pause state and pause source under lock protection.
+     *
+     * @param paused 是否暂停；Whether the game is paused.
+     * @param by 暂停来源标识；Identifier describing who paused the game.
      */
     public void setPaused(boolean paused, String by) {
         lock.lock();
@@ -153,8 +236,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Sets the next move direction for player A, thread-safe.
-     * 绾跨▼瀹夊叏鍦拌缃帺瀹禔鐨勪笅涓€姝ョЩ鍔ㄦ柟鍚戙€?
+     * 更新玩家 A 的下一步操作方向，线程安全。
+     * Updates player A's next move direction in a thread-safe way.
+     *
+     * @param nextStepA 玩家 A 的下一步方向；Next direction of player A.
      */
     public void setNextStepA(Integer nextStepA) {
         lock.lock();
@@ -166,8 +251,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Sets the next move direction for player B, thread-safe.
-     * 绾跨▼瀹夊叏鍦拌缃帺瀹禕鐨勪笅涓€姝ョЩ鍔ㄦ柟鍚戙€?
+     * 更新 setNextStepB 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of setNextStepB with controlled input and output handling.
+     *
+     * @param nextStepB 输入参数；Input parameter.
      */
     public void setNextStepB(Integer nextStepB) {
         lock.lock();
@@ -179,16 +266,24 @@ public class Game extends Thread {
     }
 
     /**
-     * Returns the game map grid.
-     * 杩斿洖娓告垙鍦板浘缃戞牸鏁扮粍銆?
+     * 查询并返回 getG 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getG with controlled input and output handling.
+     *
+     * @return 返回数值结果；Returns a numeric result.
      */
     public int[][] getG() {
         return g;
     }
 
     /**
-     * Checks connectivity between two cells using DFS, returns true if reachable.
-     * 浣跨敤娣卞害浼樺厛鎼滅储妫€鏌ヤ袱鏍间箣闂寸殑杩為€氭€э紝鍙揪鍒欒繑鍥瀟rue銆?
+     * 校验或判断 check_connectivity 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of check_connectivity with controlled input and output handling.
+     *
+     * @param sx 输入参数；Input parameter.
+     * @param sy 输入参数；Input parameter.
+     * @param tx 输入参数；Input parameter.
+     * @param ty 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean check_connectivity(int sx, int sy, int tx, int ty) {
         if (sx == tx && sy == ty) return true;
@@ -209,8 +304,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Randomly generates walls on the map with symmetry and validates connectivity.
-     * 闅忔満瀵圭О鐢熸垚鍦板浘鍐呴儴澧欎綋骞堕獙璇佽繛閫氭€с€?
+     * 处理 draw 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of draw with controlled input and output handling.
+     *
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean draw() {
         for (int i = 0; i < this.rows; i++) {
@@ -246,8 +343,9 @@ public class Game extends Thread {
     }
 
     /**
-     * Creates a valid map by repeating random generation until connectivity is satisfied.
-     * 閲嶅闅忔満鐢熸垚鍦板浘鐩村埌婊¤冻杩為€氭€ц姹傘€?
+     * 创建或保存 createMap 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of createMap with controlled input and output handling.
+     *
      */
     public void createMap() {
         for (int i = 0; i < 1000; i++) {
@@ -256,8 +354,11 @@ public class Game extends Thread {
     }
 
     /**
-     * Builds the input string for the bot: map, self position/steps, opponent position/steps.
-     * 鏋勫缓鏈哄櫒浜鸿緭鍏ュ瓧绗︿覆锛氬湴鍥俱€佽嚜韬綅缃?姝ラ銆佸鎵嬩綅缃?姝ラ銆?
+     * 查询并返回 getInput 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getInput with controlled input and output handling.
+     *
+     * @param player 输入参数；Input parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
     private String getInput(Player player) {
         Player me, you;
@@ -279,8 +380,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Sends bot code and input to the bot running system via HTTP.
-     * 閫氳繃HTTP灏嗘満鍣ㄤ汉浠ｇ爜鍜岃緭鍏ュ彂閫佸埌鏈哄櫒浜鸿繍琛岀郴缁熴€?
+     * 发送或通知 sendBotCode 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendBotCode with controlled input and output handling.
+     *
+     * @param player 输入参数；Input parameter.
      */
     private void sendBotCode(Player player) {
         if (player.getBotId().equals(-1)) return;
@@ -293,8 +396,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Waits for both players to submit their next step within the timeout; returns true if both submitted.
-     * 绛夊緟鍙屾柟鐜╁鍦ㄨ秴鏃舵椂闄愬唴鎻愪氦涓嬩竴姝ワ紱鍙屾柟鍧囨彁浜ゅ垯杩斿洖true銆?
+     * 处理 nextStep 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of nextStep with controlled input and output handling.
+     *
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean nextStep() {
         try {
@@ -333,8 +438,12 @@ public class Game extends Thread {
     }
 
     /**
-     * Checks if a player's latest move is valid (not hitting walls or snake bodies).
-     * 妫€鏌ョ帺瀹舵渶鏂扮Щ鍔ㄦ槸鍚﹀悎娉曪紙鏈挒澧欐垨铔囪韩锛夈€?
+     * 校验或判断 check_valid 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of check_valid with controlled input and output handling.
+     *
+     * @param cellsA 集合参数；Collection parameter.
+     * @param cellsB 集合参数；Collection parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean check_valid(List<Cell> cellsA, List<Cell> cellsB) {
         int n = cellsA.size();
@@ -353,8 +462,9 @@ public class Game extends Thread {
     }
 
     /**
-     * Judges the current game state and determines the loser if either player made an invalid move.
-     * 鍒ゆ柇褰撳墠娓告垙鐘舵€侊紝鑻ヤ换鎰忕帺瀹剁Щ鍔ㄩ潪娉曞垯纭畾澶辫触鏂广€?
+     * 处理 judge 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of judge with controlled input and output handling.
+     *
      */
     private void judge() {
         List<Cell> cellsA = playerA.getCells();
@@ -377,8 +487,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Sends a message to both players via WebSocket.
-     * 閫氳繃WebSocket鍚戜袱浣嶇帺瀹跺彂閫佹秷鎭€?
+     * 发送或通知 sendAllMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendAllMessage with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
      */
     private void sendAllMessage(String message) {
         if (WebSocketServer.users.get(playerA.getId()) != null) {
@@ -390,8 +502,9 @@ public class Game extends Thread {
     }
 
     /**
-     * Broadcasts both players' move directions to all participants and clears the next steps.
-     * 骞挎挱鍙屾柟绉诲姩鏂瑰悜缁欐墍鏈夊弬涓庤€呭苟娓呯┖涓嬩竴姝ョ紦瀛樸€?
+     * 发送或通知 sendMove 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendMove with controlled input and output handling.
+     *
      */
     private void sendMove() {
         lock.lock();
@@ -415,8 +528,10 @@ public class Game extends Thread {
     }
 
     /**
-     * Serializes the map grid to a string for transmission.
-     * 灏嗗湴鍥剧綉鏍煎簭鍒楀寲涓哄瓧绗︿覆浠ヤ究浼犺緭銆?
+     * 查询并返回 getMapString 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getMapString with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
      */
     private String getMapString() {
         StringBuilder res = new StringBuilder();
@@ -429,8 +544,11 @@ public class Game extends Thread {
     }
 
     /**
-     * Updates a player's rating in the database.
-     * 鍦ㄦ暟鎹簱涓洿鏂扮帺瀹剁殑璇勫垎銆?
+     * 更新 updateUserRating 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of updateUserRating with controlled input and output handling.
+     *
+     * @param player 输入参数；Input parameter.
+     * @param rating 输入参数；Input parameter.
      */
     private void updateUserRating(Player player, Integer rating) {
         User user = WebSocketServer.userMapper.selectById(player.getId());
@@ -439,8 +557,9 @@ public class Game extends Thread {
     }
 
     /**
-     * Adjusts ratings for both players based on outcome and saves the game record to the database.
-     * 鏍规嵁瀵瑰眬缁撴灉璋冩暣鍙屾柟璇勫垎骞跺皢瀵瑰眬璁板綍瀛樺叆鏁版嵁搴撱€?
+     * 创建或保存 saveToDatabase 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of saveToDatabase with controlled input and output handling.
+     *
      */
     private void saveToDatabase() {
         Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
@@ -479,8 +598,9 @@ public class Game extends Thread {
     }
 
     /**
-     * Saves the game result to the database and notifies all players.
-     * 灏嗗灞€缁撴灉淇濆瓨鍒版暟鎹簱骞堕€氱煡鎵€鏈夌帺瀹躲€?
+     * 发送或通知 sendResult 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of sendResult with controlled input and output handling.
+     *
      */
     private void sendResult() {
         JSONObject resp = new JSONObject();
@@ -498,14 +618,11 @@ public class Game extends Thread {
     }
 
     /**
-     * Main game loop: processes steps, judges validity, sends moves or result until game ends.
-     * 娓告垙涓诲惊鐜細澶勭悊姝ラ銆佸垽鏂悎娉曟€с€佸彂閫佺Щ鍔ㄦ垨缁撴灉鐩村埌娓告垙缁撴潫銆?
+     * 处理 run 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of run with controlled input and output handling.
+     *
      */
     @Override
-    /**
-     * Handles run.
-     * ??run?
-     */
     public void run() {
         for (int i = 0; i < 1000; i++) {
             if (nextStep()) {
@@ -537,5 +654,3 @@ public class Game extends Thread {
         }
     }
 }
-
-

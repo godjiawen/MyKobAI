@@ -15,11 +15,14 @@ public class GetRecordController {
     @Autowired
     private GetRecordService getRecordService;
 
-    @GetMapping("/api/record/get/")
     /**
-     * Handles getRecord.
-     * ??getRecord?
+     * 处理 RequestParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of RequestParam with controlled input and output handling.
+     *
+     * @param recordId 标识参数；Identifier value.
+     * @return 返回 JSONObject getRecord(@ 类型结果；Returns a result of type JSONObject getRecord(@.
      */
+    @GetMapping("/api/record/get/")
     public JSONObject getRecord(@RequestParam("record_id") Integer recordId) {
         return getRecordService.getRecord(recordId);
     }

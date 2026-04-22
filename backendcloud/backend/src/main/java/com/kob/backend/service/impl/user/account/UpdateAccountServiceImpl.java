@@ -32,14 +32,13 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
     private PasswordEncoder passwordEncoder;
 
     /**
-     * Validates and updates the current user's username.
-     * 校验并更新当前用户的用户名。
+     * 更新 updateUsername 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of updateUsername with controlled input and output handling.
+     *
+     * @param newUsername 用户相关参数；User-related parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles updateUsername.
-     * ??updateUsername?
-     */
     public Map<String, String> updateUsername(String newUsername) {
         Map<String, String> map = new HashMap<>();
 
@@ -86,14 +85,15 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
     }
 
     /**
-     * Validates and updates the current user's password after verifying the old password.
-     * 验证原密码后校验并更新当前用户的密码。
+     * 更新 updatePassword 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of updatePassword with controlled input and output handling.
+     *
+     * @param oldPassword 密码参数；Password parameter.
+     * @param newPassword 密码参数；Password parameter.
+     * @param confirmedPassword 密码参数；Password parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles updatePassword.
-     * ??updatePassword?
-     */
     public Map<String, String> updatePassword(String oldPassword, String newPassword, String confirmedPassword) {
         Map<String, String> map = new HashMap<>();
 
@@ -146,8 +146,11 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
     }
 
     /**
-     * Calculates a complexity score (0-4) based on character type variety in the password.
-     * 根据密码中字符类型的多样性计算复杂度分数（0-4）。
+     * 处理 passwordComplexityScore 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of passwordComplexityScore with controlled input and output handling.
+     *
+     * @param password 密码参数；Password parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
     private int passwordComplexityScore(String password) {
         int score = 0;
@@ -159,11 +162,13 @@ public class UpdateAccountServiceImpl implements UpdateAccountService {
     }
 
     /**
-     * Returns true if the text contains any whitespace character.
-     * 若文本包含任意空白字符则返回true。
+     * 处理 containsWhitespace 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of containsWhitespace with controlled input and output handling.
+     *
+     * @param text 输入参数；Input parameter.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     private boolean containsWhitespace(String text) {
         return text.chars().anyMatch(Character::isWhitespace);
     }
 }
-

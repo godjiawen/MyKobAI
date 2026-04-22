@@ -19,22 +19,26 @@ public class PythonRunner extends SubprocessRunner {
     private static final String PYTHON_CMD =
             System.getProperty("os.name", "").toLowerCase().contains("win") ? "python" : "python3";
 
-    @Override
     /**
-     * Handles codeFileExtension.
-     * ??codeFileExtension?
+     * 处理 codeFileExtension 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of codeFileExtension with controlled input and output handling.
+     *
+     * @return 返回字符串结果；Returns a string result.
      */
+    @Override
     protected String codeFileExtension() {
         return ".py";
     }
 
-    @Override
     /**
-     * Handles buildProcess.
-     * ??buildProcess?
+     * 构建或转换 buildProcess 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildProcess with controlled input and output handling.
+     *
+     * @param tmpDir 输入参数；Input parameter.
+     * @return 返回 ProcessBuilder 类型结果；Returns a result of type ProcessBuilder.
      */
+    @Override
     protected ProcessBuilder buildProcess(File tmpDir) {
         return new ProcessBuilder(PYTHON_CMD, "bot.py");
     }
 }
-

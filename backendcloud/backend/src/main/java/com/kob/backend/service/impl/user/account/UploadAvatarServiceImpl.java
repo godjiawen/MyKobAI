@@ -32,14 +32,13 @@ public class UploadAvatarServiceImpl implements UploadAvatarService {
     private String uploadDir;
 
     /**
-     * Validates, stores the uploaded image file and updates the user's photo URL in the database.
-     * 校验并存储上传的图片文件，同时更新数据库中用户的头像URL。
+     * 处理 upload 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of upload with controlled input and output handling.
+     *
+     * @param file 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles upload.
-     * ??upload?
-     */
     public Map<String, String> upload(MultipartFile file) {
         Map<String, String> map = new HashMap<>();
 
@@ -102,4 +101,3 @@ public class UploadAvatarServiceImpl implements UploadAvatarService {
         return map;
     }
 }
-

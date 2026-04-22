@@ -25,12 +25,17 @@ public class FriendInviteServiceImpl implements FriendInviteService {
     @Autowired
     private FriendDomainService friendDomainService;
 
+    /**
+     * 发送或通知 send 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of send with controlled input and output handling.
+     *
+     * @param receiverId 标识参数；Identifier value.
+     * @param senderBotId 标识参数；Identifier value.
+     * @param gameMode 对局相关参数；Game-related parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
+     */
     @Override
     @Transactional
-    /**
-     * Handles send.
-     * ??send?
-     */
     public Map<String, Object> send(Integer receiverId, Integer senderBotId, String gameMode) {
         User currentUser = friendDomainService.currentUser();
         if (receiverId == null) return error("receiver_id is required");
@@ -67,12 +72,17 @@ public class FriendInviteServiceImpl implements FriendInviteService {
         return resp;
     }
 
+    /**
+     * 处理 respond 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of respond with controlled input and output handling.
+     *
+     * @param inviteId 标识参数；Identifier value.
+     * @param action 输入参数；Input parameter.
+     * @param receiverBotId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
+     */
     @Override
     @Transactional
-    /**
-     * Handles respond.
-     * ??respond?
-     */
     public Map<String, Object> respond(Integer inviteId, String action, Integer receiverBotId) {
         User currentUser = friendDomainService.currentUser();
         if (inviteId == null) return error("invite_id is required");
@@ -132,11 +142,13 @@ public class FriendInviteServiceImpl implements FriendInviteService {
         return error("invalid action");
     }
 
-    @Override
     /**
-     * Handles pending.
-     * ??pending?
+     * 处理 pending 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of pending with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @Override
     public Map<String, Object> pending() {
         User currentUser = friendDomainService.currentUser();
         friendDomainService.expirePendingInvitesForUser(currentUser.getId());
@@ -155,8 +167,11 @@ public class FriendInviteServiceImpl implements FriendInviteService {
     }
 
     /**
-     * Handles buildInviteOnlyResponse.
-     * ??buildInviteOnlyResponse?
+     * 构建或转换 buildInviteOnlyResponse 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildInviteOnlyResponse with controlled input and output handling.
+     *
+     * @param invite 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> buildInviteOnlyResponse(FriendInvite invite) {
         Map<String, Object> resp = success();
@@ -168,8 +183,10 @@ public class FriendInviteServiceImpl implements FriendInviteService {
     }
 
     /**
-     * Handles success.
-     * ??success?
+     * 处理 success 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of success with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> success() {
         Map<String, Object> resp = new LinkedHashMap<>();
@@ -178,8 +195,11 @@ public class FriendInviteServiceImpl implements FriendInviteService {
     }
 
     /**
-     * Handles error.
-     * ??error?
+     * 处理 error 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of error with controlled input and output handling.
+     *
+     * @param errorMessage 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> error(String errorMessage) {
         Map<String, Object> resp = new LinkedHashMap<>();

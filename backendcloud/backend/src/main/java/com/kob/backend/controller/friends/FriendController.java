@@ -25,11 +25,13 @@ public class FriendController {
         return friendService.list(page, pageSize, keyword, status, favoriteOnly, sortBy);
     }
 
-    @GetMapping("/api/friends/stats/")
     /**
-     * Handles stats.
-     * ??stats?
+     * 处理 stats 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of stats with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @GetMapping("/api/friends/stats/")
     public Map<String, Object> stats() {
         return friendService.stats();
     }
@@ -42,20 +44,26 @@ public class FriendController {
         return friendService.search(keyword, page, pageSize);
     }
 
-    @PostMapping("/api/friends/remove/")
     /**
-     * Handles remove.
-     * ??remove?
+     * 处理 RequestParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of RequestParam with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/friends/remove/")
     public Map<String, Object> remove(@RequestParam("friend_id") Integer friendId) {
         return friendService.remove(friendId);
     }
 
-    @PostMapping("/api/friends/favorite/toggle/")
     /**
-     * Handles toggleFavorite.
-     * ??toggleFavorite?
+     * 处理 RequestParam 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of RequestParam with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @PostMapping("/api/friends/favorite/toggle/")
     public Map<String, Object> toggleFavorite(@RequestParam("friend_id") Integer friendId) {
         return friendService.toggleFavorite(friendId);
     }

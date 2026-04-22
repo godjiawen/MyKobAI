@@ -88,24 +88,24 @@ const isUserMenuOpen = ref(false);
 const userMenuRef = ref(null);
 
 /**
- * Handles closeUserMenu.
- * ??closeUserMenu?
+ * 处理 closeUserMenu 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of closeUserMenu, including state updates, interaction orchestration, and error branches.
  */
 const closeUserMenu = () => {
   isUserMenuOpen.value = false;
 };
 
 /**
- * Handles toggleUserMenu.
- * ??toggleUserMenu?
+ * 处理 toggleUserMenu 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of toggleUserMenu, including state updates, interaction orchestration, and error branches.
  */
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
 };
 
 /**
- * Handles handleOutsideClick.
- * ??handleOutsideClick?
+ * 处理 handleOutsideClick 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of handleOutsideClick, including state updates, interaction orchestration, and error branches.
  */
 const handleOutsideClick = (event) => {
   if (!isUserMenuOpen.value) return;
@@ -114,11 +114,21 @@ const handleOutsideClick = (event) => {
   }
 };
 
+/**
+ * 处理 goMyBots 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of goMyBots with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const goMyBots = async () => {
   closeUserMenu();
   await router.push({ name: "user_bot_index" });
 };
 
+/**
+ * 处理 logout 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
+ * Handles the core frontend logic of logout with async flow control, including state updates, interaction orchestration, and error branches.
+ *
+ */
 const logout = async () => {
   closeUserMenu();
   await userStore.logout();

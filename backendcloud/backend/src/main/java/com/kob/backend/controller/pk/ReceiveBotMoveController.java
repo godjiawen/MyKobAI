@@ -18,11 +18,14 @@ public class ReceiveBotMoveController {
     @Autowired
     private ReceiveBotMoveService receiveBotMoveService;
 
-    @PostMapping("/pk/receive/bot/move/")
     /**
-     * Handles receiveBotMove.
-     * ??receiveBotMove?
+     * 处理 receiveBotMove 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of receiveBotMove with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回字符串结果；Returns a string result.
      */
+    @PostMapping("/pk/receive/bot/move/")
     public String receiveBotMove(@RequestParam MultiValueMap<String, String> data) {
         Integer userId = Integer.parseInt(Objects.requireNonNull(data.getFirst("user_id")));
         Integer direction = Integer.parseInt(Objects.requireNonNull(data.getFirst("direction")));

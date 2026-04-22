@@ -45,16 +45,22 @@ public class FriendDomainService {
     private FriendInviteMapper friendInviteMapper;
 
     /**
-     * Returns the currently authenticated user from the security context.
-     * 从安全上下文中返回当前已认证用户。
+     * 处理 currentUser 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of currentUser with controlled input and output handling.
+     *
+     * @return 返回 User 类型结果；Returns a result of type User.
      */
     public User currentUser() {
         return AuthUtil.getCurrentUser();
     }
 
     /**
-     * Retrieves the friend relation record from userId to friendId, or null if not friends.
-     * 查询userId到friendId的好友关系记录，不存在则返回null。
+     * 查询并返回 getRelation 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getRelation with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回 FriendRelation 类型结果；Returns a result of type FriendRelation.
      */
     public FriendRelation getRelation(Integer userId, Integer friendId) {
         QueryWrapper<FriendRelation> wrapper = new QueryWrapper<>();
@@ -63,16 +69,24 @@ public class FriendDomainService {
     }
 
     /**
-     * Returns true if a bidirectional friend relation exists between the two users.
-     * 若两用户之间存在好友关系则返回true。
+     * 处理 areFriends 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of areFriends with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回判断结果；Returns a boolean decision result.
      */
     public boolean areFriends(Integer userId, Integer friendId) {
         return getRelation(userId, friendId) != null;
     }
 
     /**
-     * Returns the pending friend request sent from senderId to receiverId, or null.
-     * 返回senderId向receiverId发送的待处理好友请求，不存在则返回null。
+     * 查询并返回 getPendingRequest 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getPendingRequest with controlled input and output handling.
+     *
+     * @param senderId 标识参数；Identifier value.
+     * @param receiverId 标识参数；Identifier value.
+     * @return 返回 FriendRequest 类型结果；Returns a result of type FriendRequest.
      */
     public FriendRequest getPendingRequest(Integer senderId, Integer receiverId) {
         QueryWrapper<FriendRequest> wrapper = new QueryWrapper<>();
@@ -85,8 +99,12 @@ public class FriendDomainService {
     }
 
     /**
-     * Returns the ID of any pending request between the two users in either direction, or null.
-     * 返回两用户之间任意方向待处理请求的ID，不存在则返回null。
+     * 查询并返回 getPendingRequestId 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getPendingRequestId with controlled input and output handling.
+     *
+     * @param currentUserId 标识参数；Identifier value.
+     * @param targetUserId 标识参数；Identifier value.
+     * @return 返回数值结果；Returns a numeric result.
      */
     public Integer getPendingRequestId(Integer currentUserId, Integer targetUserId) {
         FriendRequest sent = getPendingRequest(currentUserId, targetUserId);
@@ -96,8 +114,12 @@ public class FriendDomainService {
     }
 
     /**
-     * Returns the relation status string between currentUser and targetUser: self/friend/sent_pending/received_pending/none.
-     * 返回当前用户与目标用户之间的关系状态字符串：self/friend/sent_pending/received_pending/none。
+     * 查询并返回 getRelationStatus 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getRelationStatus with controlled input and output handling.
+     *
+     * @param currentUserId 标识参数；Identifier value.
+     * @param targetUserId 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
      */
     public String getRelationStatus(Integer currentUserId, Integer targetUserId) {
         if (currentUserId.equals(targetUserId)) return "self";
@@ -108,8 +130,12 @@ public class FriendDomainService {
     }
 
     /**
-     * Returns the latest pending game invite between two users, expiring it first if needed.
-     * 返回两用户之间最新的待处理游戏邀请，必要时先令其过期。
+     * 查询并返回 getPendingInviteBetween 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getPendingInviteBetween with controlled input and output handling.
+     *
+     * @param leftUserId 标识参数；Identifier value.
+     * @param rightUserId 标识参数；Identifier value.
+     * @return 返回 FriendInvite 类型结果；Returns a result of type FriendInvite.
      */
     public FriendInvite getPendingInviteBetween(Integer leftUserId, Integer rightUserId) {
         QueryWrapper<FriendInvite> wrapper = new QueryWrapper<>();
@@ -130,8 +156,10 @@ public class FriendDomainService {
     }
 
     /**
-     * Marks the given invite as expired if its expiry time has passed.
-     * 若邀请的过期时间已过，则将其标记为已过期。
+     * 处理 expireInviteIfNeeded 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of expireInviteIfNeeded with controlled input and output handling.
+     *
+     * @param invite 输入参数；Input parameter.
      */
     public void expireInviteIfNeeded(FriendInvite invite) {
         if (invite == null || invite.getExpiredAt() == null || !"pending".equals(invite.getStatus())) return;
@@ -142,8 +170,10 @@ public class FriendDomainService {
     }
 
     /**
-     * Expires all pending invites for a user that have passed their expiry time.
-     * 将指定用户所有已超期的待处理邀请标记为已过期。
+     * 处理 expirePendingInvitesForUser 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of expirePendingInvitesForUser with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
      */
     public void expirePendingInvitesForUser(Integer userId) {
         QueryWrapper<FriendInvite> wrapper = new QueryWrapper<>();
@@ -159,16 +189,23 @@ public class FriendDomainService {
     }
 
     /**
-     * Returns the online status of a user by querying the WebSocket server.
-     * 通过查询WebSocket服务器返回用户的在线状态。
+     * 查询并返回 getOnlineStatus 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getOnlineStatus with controlled input and output handling.
+     *
+     * @param userId 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
      */
     public String getOnlineStatus(Integer userId) {
         return WebSocketServer.getUserOnlineStatus(userId);
     }
 
     /**
-     * Builds a map view of a friend relation for API responses including stats and status.
-     * 构建好友关系的Map视图（含统计和状态）用于API响应。
+     * 构建或转换 buildFriendView 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildFriendView with controlled input and output handling.
+     *
+     * @param currentUserId 标识参数；Identifier value.
+     * @param relation 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     public Map<String, Object> buildFriendView(Integer currentUserId, FriendRelation relation) {
         User friend = userMapper.selectById(relation.getFriendId());
@@ -195,8 +232,11 @@ public class FriendDomainService {
     }
 
     /**
-     * Builds a map view of a friend request for API responses.
-     * 构建好友请求的Map视图用于API响应。
+     * 构建或转换 buildRequestView 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildRequestView with controlled input and output handling.
+     *
+     * @param request 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     public Map<String, Object> buildRequestView(FriendRequest request) {
         User sender = userMapper.selectById(request.getSenderId());
@@ -219,8 +259,11 @@ public class FriendDomainService {
     }
 
     /**
-     * Builds a map view of a game invite for API responses.
-     * 构建游戏邀请的Map视图用于API响应。
+     * 构建或转换 buildInviteView 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildInviteView with controlled input and output handling.
+     *
+     * @param invite 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     public Map<String, Object> buildInviteView(FriendInvite invite) {
         User sender = userMapper.selectById(invite.getSenderId());
@@ -246,8 +289,10 @@ public class FriendDomainService {
     }
 
     /**
-     * Sends a WebSocket event to the receiver notifying them of a new friend request.
-     * 向接收方发送WebSocket事件，通知其收到新的好友请求。
+     * 发送或通知 notifyFriendRequestReceived 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of notifyFriendRequestReceived with controlled input and output handling.
+     *
+     * @param request 输入参数；Input parameter.
      */
     public void notifyFriendRequestReceived(FriendRequest request) {
         JSONObject event = new JSONObject();
@@ -257,8 +302,10 @@ public class FriendDomainService {
     }
 
     /**
-     * Sends a WebSocket event to the sender notifying them that their request has been handled.
-     * 向发送方发送WebSocket事件，通知其好友请求已被处理。
+     * 发送或通知 notifyFriendRequestHandled 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of notifyFriendRequestHandled with controlled input and output handling.
+     *
+     * @param request 输入参数；Input parameter.
      */
     public void notifyFriendRequestHandled(FriendRequest request) {
         JSONObject event = new JSONObject();
@@ -269,8 +316,10 @@ public class FriendDomainService {
     }
 
     /**
-     * Sends a WebSocket event to the receiver notifying them of a new game invite.
-     * 向接收方发送WebSocket事件，通知其收到新的游戏邀请。
+     * 发送或通知 notifyInviteReceived 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of notifyInviteReceived with controlled input and output handling.
+     *
+     * @param invite 输入参数；Input parameter.
      */
     public void notifyInviteReceived(FriendInvite invite) {
         JSONObject event = new JSONObject();
@@ -280,8 +329,11 @@ public class FriendDomainService {
     }
 
     /**
-     * Sends a WebSocket event to the target user notifying them that a game invite was updated.
-     * 向目标用户发送WebSocket事件，通知其游戏邀请状态已更新。
+     * 发送或通知 notifyInviteUpdated 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of notifyInviteUpdated with controlled input and output handling.
+     *
+     * @param invite 输入参数；Input parameter.
+     * @param targetUserId 标识参数；Identifier value.
      */
     public void notifyInviteUpdated(FriendInvite invite, Integer targetUserId) {
         JSONObject event = new JSONObject();
@@ -291,10 +343,6 @@ public class FriendDomainService {
         WebSocketServer.sendEvent(targetUserId, event);
     }
 
-    /**
-     * Resolves the last active time of a friend: now if online, latest match time, or relation creation date.
-     * 解析好友的最后活跃时间：在线返回当前时间，否则为最近对局时间或建立好友关系时间。
-     */
     private Date resolveLastActiveAt(FriendRelation relation, Record latestRecord) {
         String status = getOnlineStatus(relation.getFriendId());
         if (!"offline".equals(status)) return new Date();
@@ -303,27 +351,23 @@ public class FriendDomainService {
     }
 
     /**
-     * Returns the total number of matches played between two users.
-     * 返回两用户之间总对局次数。
+     * 查询并返回 getMatchCount 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getMatchCount with controlled input and output handling.
+     *
+     * @param currentUserId 标识参数；Identifier value.
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回数值结果；Returns a numeric result.
      */
     private Long getMatchCount(Integer currentUserId, Integer friendId) {
         return recordMapper.selectCount(buildPairRecordWrapper(currentUserId, friendId));
     }
 
-    /**
-     * Returns the most recent game record between two users, or null if none exists.
-     * 返回两用户之间最近一场对局记录，不存在则返回null。
-     */
     private Record getLatestRecord(Integer currentUserId, Integer friendId) {
         QueryWrapper<Record> wrapper = buildPairRecordWrapper(currentUserId, friendId);
         wrapper.orderByDesc("createtime").last("limit 1");
         return recordMapper.selectOne(wrapper);
     }
 
-    /**
-     * Builds a query wrapper matching records where either user was player A or B.
-     * 构建查询包装器，匹配任意一方担任玩家A或B的对局记录。
-     */
     private QueryWrapper<Record> buildPairRecordWrapper(Integer leftUserId, Integer rightUserId) {
         QueryWrapper<Record> wrapper = new QueryWrapper<>();
         wrapper.and(query -> query

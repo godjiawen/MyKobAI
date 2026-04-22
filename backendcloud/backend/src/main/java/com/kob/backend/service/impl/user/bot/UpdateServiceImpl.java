@@ -25,14 +25,13 @@ public class UpdateServiceImpl implements UpdateService {
     private BotMapper botMapper;
 
     /**
-     * Validates the updated bot data, checks ownership and persists the changes.
-     * 校验更新的机器人数据，检查所有权并持久化更改。
+     * 更新 update 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of update with controlled input and output handling.
+     *
+     * @param data 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     @Override
-    /**
-     * Handles update.
-     * ??update?
-     */
     public Map<String, String> update(Map<String, String> data) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

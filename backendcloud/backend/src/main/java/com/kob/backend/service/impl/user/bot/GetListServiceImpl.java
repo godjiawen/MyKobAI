@@ -23,14 +23,12 @@ public class GetListServiceImpl implements GetListService {
     private BotMapper botMapper;
 
     /**
-     * Returns all bots belonging to the currently authenticated user.
-     * 返回当前已认证用户的所有机器人。
+     * 查询并返回 getList 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of getList with controlled input and output handling.
+     *
+     * @return 返回集合结果；Returns a collection result.
      */
     @Override
-    /**
-     * Handles getList.
-     * ??getList?
-     */
     public List<Bot> getList() {
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

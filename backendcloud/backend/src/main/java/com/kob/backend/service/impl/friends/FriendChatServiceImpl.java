@@ -36,11 +36,13 @@ public class FriendChatServiceImpl implements FriendChatService {
     @Autowired
     private FriendDomainService friendDomainService;
 
-    @Override
     /**
-     * Handles conversations.
-     * ??conversations?
+     * 处理 conversations 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of conversations with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @Override
     public Map<String, Object> conversations() {
         User currentUser = friendDomainService.currentUser();
         QueryWrapper<FriendRelation> relationWrapper = new QueryWrapper<>();
@@ -87,11 +89,16 @@ public class FriendChatServiceImpl implements FriendChatService {
         return resp;
     }
 
-    @Override
     /**
-     * Handles history.
-     * ??history?
+     * 处理 history 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of history with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @param page 分页参数；Pagination parameter.
+     * @param pageSize 分页参数；Pagination parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
+    @Override
     public Map<String, Object> history(Integer friendId, Integer page, Integer pageSize) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -118,12 +125,16 @@ public class FriendChatServiceImpl implements FriendChatService {
         return resp;
     }
 
+    /**
+     * 发送或通知 send 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of send with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @param content 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
+     */
     @Override
     @Transactional
-    /**
-     * Handles send.
-     * ??send?
-     */
     public Map<String, Object> send(Integer friendId, String content) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -151,12 +162,15 @@ public class FriendChatServiceImpl implements FriendChatService {
         return resp;
     }
 
+    /**
+     * 处理 read 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of read with controlled input and output handling.
+     *
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
+     */
     @Override
     @Transactional
-    /**
-     * Handles read.
-     * ??read?
-     */
     public Map<String, Object> read(Integer friendId) {
         User currentUser = friendDomainService.currentUser();
         if (friendId == null) return error("friend_id is required");
@@ -166,8 +180,12 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     /**
-     * Handles buildConversationWrapper.
-     * ??buildConversationWrapper?
+     * 构建或转换 buildConversationWrapper 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildConversationWrapper with controlled input and output handling.
+     *
+     * @param currentUserId 标识参数；Identifier value.
+     * @param friendId 标识参数；Identifier value.
+     * @return 返回 QueryWrapper<FriendChatMessage> 类型结果；Returns a result of type QueryWrapper<FriendChatMessage>.
      */
     private QueryWrapper<FriendChatMessage> buildConversationWrapper(Integer currentUserId, Integer friendId) {
         QueryWrapper<FriendChatMessage> wrapper = new QueryWrapper<>();
@@ -178,8 +196,11 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     /**
-     * Handles buildMessageView.
-     * ??buildMessageView?
+     * 构建或转换 buildMessageView 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildMessageView with controlled input and output handling.
+     *
+     * @param message 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> buildMessageView(FriendChatMessage message) {
         User sender = userMapper.selectById(message.getSenderId());
@@ -199,8 +220,11 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     /**
-     * Handles notifyChatMessage.
-     * ??notifyChatMessage?
+     * 发送或通知 notifyChatMessage 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of notifyChatMessage with controlled input and output handling.
+     *
+     * @param targetUserId 标识参数；Identifier value.
+     * @param message 输入参数；Input parameter.
      */
     private void notifyChatMessage(Integer targetUserId, Map<String, Object> message) {
         JSONObject event = new JSONObject();
@@ -210,8 +234,11 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     /**
-     * Handles markConversationAsRead.
-     * ??markConversationAsRead?
+     * 处理 markConversationAsRead 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of markConversationAsRead with controlled input and output handling.
+     *
+     * @param currentUserId 标识参数；Identifier value.
+     * @param friendId 标识参数；Identifier value.
      */
     private void markConversationAsRead(Integer currentUserId, Integer friendId) {
         UpdateWrapper<FriendChatMessage> wrapper = new UpdateWrapper<>();
@@ -223,8 +250,10 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     /**
-     * Handles success.
-     * ??success?
+     * 处理 success 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of success with controlled input and output handling.
+     *
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> success() {
         Map<String, Object> resp = new LinkedHashMap<>();
@@ -233,8 +262,11 @@ public class FriendChatServiceImpl implements FriendChatService {
     }
 
     /**
-     * Handles error.
-     * ??error?
+     * 处理 error 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of error with controlled input and output handling.
+     *
+     * @param errorMessage 输入参数；Input parameter.
+     * @return 返回键值映射结果；Returns a key-value mapping result.
      */
     private Map<String, Object> error(String errorMessage) {
         Map<String, Object> resp = new LinkedHashMap<>();

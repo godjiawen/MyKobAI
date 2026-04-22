@@ -20,8 +20,12 @@ public class JavaRunner implements LanguageRunner {
     private static final Pattern BOT_CLASS_PATTERN = Pattern.compile("\\bpublic\\s+class\\s+Bot\\b");
 
     /**
-     * Handles buildBotSource.
-     * ??buildBotSource?
+     * 构建或转换 buildBotSource 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildBotSource with controlled input and output handling.
+     *
+     * @param code 代码内容参数；Code content parameter.
+     * @param uid 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
      */
     private static String buildBotSource(String code, String uid) {
         Matcher matcher = BOT_CLASS_PATTERN.matcher(code);
@@ -39,18 +43,17 @@ public class JavaRunner implements LanguageRunner {
     }
 
     /**
-     * Handles buildWrapperSource.
-     * ??buildWrapperSource?
+     * 构建或转换 buildWrapperSource 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of buildWrapperSource with controlled input and output handling.
+     *
+     * @param uid 标识参数；Identifier value.
+     * @return 返回字符串结果；Returns a string result.
      */
     private static String buildWrapperSource(String uid) {
         return """
                 package %s;
 
                 public class RunnerMain {
-                    /**
-                     * Handles main.
-                     * ??main?
-                     */
                     public static void main(String[] args) {
                         System.out.println(new Bot%s().get());
                     }
@@ -59,8 +62,12 @@ public class JavaRunner implements LanguageRunner {
     }
 
     /**
-     * Handles readStream.
-     * ??readStream?
+     * 处理 readStream 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of readStream with controlled input and output handling.
+     *
+     * @param process 输入参数；Input parameter.
+     * @param buffer 输入参数；Input parameter.
+     * @param errorStream 输入参数；Input parameter.
      */
     private static void readStream(Process process, StringBuilder buffer, boolean errorStream) {
         Thread reader = new Thread(() -> {
@@ -83,8 +90,12 @@ public class JavaRunner implements LanguageRunner {
     }
 
     /**
-     * Handles parseDirection.
-     * ??parseDirection?
+     * 构建或转换 parseDirection 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of parseDirection with controlled input and output handling.
+     *
+     * @param output 输入参数；Input parameter.
+     * @param stderr 输入参数；Input parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
     private static Integer parseDirection(String output, String stderr) {
         String trimmed = output.trim();
@@ -107,11 +118,16 @@ public class JavaRunner implements LanguageRunner {
         }
     }
 
-    @Override
     /**
-     * Handles run.
-     * ??run?
+     * 执行或处理 run 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of run with controlled input and output handling.
+     *
+     * @param code 代码内容参数；Code content parameter.
+     * @param input 输入参数；Input parameter.
+     * @param timeoutMs 时间参数；Time parameter.
+     * @return 返回数值结果；Returns a numeric result.
      */
+    @Override
     public Integer run(String code, String input, long timeoutMs) {
         String uid = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
         File tmpDir = new File(System.getProperty("java.io.tmpdir"), "kob_java_bot_" + UUID.randomUUID());
@@ -178,8 +194,10 @@ public class JavaRunner implements LanguageRunner {
     }
 
     /**
-     * Handles deleteDir.
-     * ??deleteDir?
+     * 删除或清理 deleteDir 的核心业务逻辑，并对输入输出进行约束处理。
+     * Performs the core business logic of deleteDir with controlled input and output handling.
+     *
+     * @param dir 输入参数；Input parameter.
      */
     private void deleteDir(File dir) {
         if (dir == null || !dir.exists()) return;
