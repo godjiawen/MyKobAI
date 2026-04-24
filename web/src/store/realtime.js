@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { nextTick } from "vue";
 import { API_PATHS, buildWebSocketUrl } from "@/config/env";
 import { apiRequest } from "@/utils/http";
 import { usePkStore } from "@/store/pk";
@@ -56,6 +57,11 @@ const normalizeInvite = (invite = {}) => ({
   senderUsername: invite.sender_username || "閺堫亞鐓￠悳鈺侇啀",
   senderPhoto: invite.sender_photo || defaultAvatar,
   senderBotTitle: invite.sender_bot_title || "manual",
+  mapId: invite.map_id ?? null,
+  mapName: invite.map_name || "随机地图",
+  roomName: invite.room_name || "",
+  roundSeconds: invite.round_seconds || 15,
+  allowSpectator: Boolean(invite.allow_spectator ?? true),
   receiverId: invite.receiver_id,
   receiverUsername: invite.receiver_username || "閺堫亞鐓￠悳鈺侇啀",
   receiverPhoto: invite.receiver_photo || defaultAvatar,
@@ -405,7 +411,7 @@ export const useRealtimeStore = defineStore("realtime", {
      * 处理 handleSocketMessage 的核心前端逻辑，负责状态更新、交互调度与异常分支处理。
      * Handles the core frontend logic of handleSocketMessage, including state updates, interaction orchestration, and error branches.
      */
-    handleSocketMessage(raw) {
+    async handleSocketMessage(raw) {
       const data = JSON.parse(raw);
       const pkStore = usePkStore();
 
@@ -415,11 +421,15 @@ export const useRealtimeStore = defineStore("realtime", {
         this.clearInviteNotice();
         pkStore.updateResultVisible(false);
         pkStore.updateLoser("none");
+        // 清除上一局残留的暂离/暂停状态，防止旧状态渗入新局
+        pkStore.updateAwaySuspended(false, null, "");
+        pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
         pkStore.updateOpponent({
           username: data.opponent_username,
           photo: data.opponent_photo,
         });
         pkStore.updateRoomId(data.room_id || "");
+        pkStore.updateMatchMeta(data);
         setTimeout(() => {
           pkStore.updateStatus("playing");
         }, 200);
@@ -462,14 +472,28 @@ export const useRealtimeStore = defineStore("realtime", {
         return;
       }
 
-      // 閳光偓閳光偓 閺傤厾鍤庨柌宥堢箾閺傛澘顤冩禍瀣╂ 閳光偓閳光偓
+      // 閳光偓閳光偓 閺傤厾鍤庨柌宥堢箾閺傛澘顤冩禍瀣╂ 閳光偓閳光偓
       if (data.event === "game-resync") {
-        pkStore.updateGameSnapshot(data.snapshot);
-        // 婵″倹鐏?GameMap 瀹歌尙绮￠崚娑樼紦閿涘牏鏁ら幋鐤箲閸ョ偤銆夐棃銏℃閿涘绱濋棁鈧憰渚€鍣搁弬鐗堜划婢跺秷娉ч煬?
-        const gameObj = pkStore.gameObject;
-        if (gameObj && typeof gameObj.restoreFromSnapshot === "function") {
-          gameObj.restoreFromSnapshot();
+        const snapshot = data.snapshot;
+        const newGameId = snapshot?.game_id ?? snapshot?.gameId ?? "";
+        const currentGameId = pkStore.gameId;
+        // 若是不同游戏（断线后开了新局），必须强制 GameMap 卸载再重装，
+        // 否则旧 GameMap 实例的墙体/地图数据不会更新，导致新局跑在旧地图上。
+        const isNewGame = Boolean(newGameId && currentGameId && newGameId !== currentGameId);
+        if (isNewGame && pkStore.status === "playing") {
+          pkStore.updateStatus("matching"); // 触发 PlayGround/GameMap 卸载
+          await nextTick();                 // 等 Vue DOM 更新（GameMap.onUnmounted 执行）
         }
+        pkStore.updateGameSnapshot(snapshot);
+        if (!isNewGame) {
+          // 同一局内重连：直接在现有 GameMap 实例上恢复蛇身
+          const gameObj = pkStore.gameObject;
+          if (gameObj && typeof gameObj.restoreFromSnapshot === "function") {
+            gameObj.restoreFromSnapshot();
+          }
+        }
+        // isNewGame 时：updateGameSnapshot 已将 status 设回 "playing"，
+        // Vue 会重新挂载 PlayGround/GameMap，GameMap.start() 会从新快照数据初始化。
         return;
       }
 

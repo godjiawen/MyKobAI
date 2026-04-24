@@ -2,7 +2,10 @@ package com.kob.backend.service.impl.friends;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kob.backend.consumer.WebSocketServer;
+import com.kob.backend.consumer.utils.GameCreateOptions;
+import com.kob.backend.mapper.BotMapper;
 import com.kob.backend.mapper.FriendInviteMapper;
+import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.FriendInvite;
 import com.kob.backend.pojo.User;
 import com.kob.backend.service.friends.FriendInviteService;
@@ -24,6 +27,8 @@ public class FriendInviteServiceImpl implements FriendInviteService {
     private FriendInviteMapper friendInviteMapper;
     @Autowired
     private FriendDomainService friendDomainService;
+    @Autowired
+    private BotMapper botMapper;
 
     /**
      * 发送或通知 send 的核心业务逻辑，并对输入输出进行约束处理。
@@ -36,11 +41,20 @@ public class FriendInviteServiceImpl implements FriendInviteService {
      */
     @Override
     @Transactional
-    public Map<String, Object> send(Integer receiverId, Integer senderBotId, String gameMode) {
+    public Map<String, Object> send(
+            Integer receiverId,
+            Integer senderBotId,
+            String gameMode,
+            Integer mapId,
+            String roomName,
+            Integer roundSeconds,
+            Boolean allowSpectator) {
         User currentUser = friendDomainService.currentUser();
         if (receiverId == null) return error("receiver_id is required");
         if (!friendDomainService.areFriends(currentUser.getId(), receiverId)) return error("not your friend");
         if (currentUser.getId().equals(receiverId)) return error("cannot invite yourself");
+        Integer normalizedSenderBotId = senderBotId == null ? -1 : senderBotId;
+        if (!isBotOwnedBy(normalizedSenderBotId, currentUser.getId())) return error("sender bot not found");
 
         String receiverStatus = friendDomainService.getOnlineStatus(receiverId);
         if ("offline".equals(receiverStatus)) return error("friend is offline");
@@ -53,8 +67,12 @@ public class FriendInviteServiceImpl implements FriendInviteService {
                 currentUser.getId(),
                 receiverId,
                 gameMode == null || gameMode.isBlank() ? "pk" : gameMode,
-                senderBotId == null ? -1 : senderBotId,
+                normalizedSenderBotId,
                 null,
+                mapId,
+                normalizeRoomName(roomName),
+                normalizeRoundSeconds(roundSeconds),
+                allowSpectator == null || allowSpectator,
                 "pending",
                 now,
                 new Date(now.getTime() + INVITE_EXPIRE_MS),
@@ -96,13 +114,15 @@ public class FriendInviteServiceImpl implements FriendInviteService {
         String normalizedAction = action.trim().toLowerCase();
         if ("accept".equals(normalizedAction)) {
             if (!currentUser.getId().equals(invite.getReceiverId())) return error("no permission");
+            Integer normalizedReceiverBotId = receiverBotId == null ? -1 : receiverBotId;
+            if (!isBotOwnedBy(normalizedReceiverBotId, currentUser.getId())) return error("receiver bot not found");
             invite.setStatus("accepted");
-            invite.setReceiverBotId(receiverBotId == null ? -1 : receiverBotId);
+            invite.setReceiverBotId(normalizedReceiverBotId);
             invite.setHandledAt(new Date());
             friendInviteMapper.updateById(invite);
             friendDomainService.notifyInviteUpdated(invite, invite.getSenderId());
             friendDomainService.notifyInviteUpdated(invite, invite.getReceiverId());
-            WebSocketServer.startGame(invite.getSenderId(), invite.getSenderBotId(), invite.getReceiverId(), invite.getReceiverBotId());
+            WebSocketServer.startGame(invite.getSenderId(), invite.getSenderBotId(), invite.getReceiverId(), invite.getReceiverBotId(), buildGameOptions(invite));
 
             Map<String, Object> resp = success();
             Map<String, Object> inviteData = new LinkedHashMap<>();
@@ -115,6 +135,11 @@ public class FriendInviteServiceImpl implements FriendInviteService {
             match.put("a_bot_id", invite.getSenderBotId());
             match.put("b_id", invite.getReceiverId());
             match.put("b_bot_id", invite.getReceiverBotId());
+            match.put("match_type", "friend_private");
+            match.put("map_id", invite.getMapId());
+            match.put("map_name", buildMapName(invite.getMapId()));
+            match.put("round_seconds", normalizeRoundSeconds(invite.getRoundSeconds()));
+            match.put("allow_spectator", Boolean.TRUE.equals(invite.getAllowSpectator()));
             resp.put("match", match);
             return resp;
         }
@@ -205,5 +230,40 @@ public class FriendInviteServiceImpl implements FriendInviteService {
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("error_message", errorMessage);
         return resp;
+    }
+
+    private boolean isBotOwnedBy(Integer botId, Integer userId) {
+        if (botId == null || botId.equals(-1)) return true;
+        Bot bot = botMapper.selectById(botId);
+        return bot != null && bot.getUserId().equals(userId);
+    }
+
+    private String normalizeRoomName(String roomName) {
+        if (roomName == null) return "";
+        String normalized = roomName.trim();
+        return normalized.length() > 50 ? normalized.substring(0, 50) : normalized;
+    }
+
+    private Integer normalizeRoundSeconds(Integer roundSeconds) {
+        if (roundSeconds == null) return 15;
+        if (roundSeconds < 10) return 10;
+        if (roundSeconds > 30) return 30;
+        return roundSeconds;
+    }
+
+    private String buildMapName(Integer mapId) {
+        return mapId == null ? "随机地图" : "地图 #" + mapId;
+    }
+
+    private GameCreateOptions buildGameOptions(FriendInvite invite) {
+        GameCreateOptions options = new GameCreateOptions();
+        options.setMatchType("friend_private");
+        options.setMapId(invite.getMapId());
+        options.setMapName(buildMapName(invite.getMapId()));
+        options.setRoundSeconds(normalizeRoundSeconds(invite.getRoundSeconds()));
+        options.setAllowSpectator(invite.getAllowSpectator());
+        options.setSourceType("friend_invite");
+        options.setSourceId(invite.getId());
+        return options;
     }
 }

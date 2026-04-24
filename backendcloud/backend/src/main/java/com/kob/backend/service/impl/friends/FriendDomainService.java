@@ -282,6 +282,11 @@ public class FriendDomainService {
         item.put("game_mode", invite.getGameMode());
         item.put("sender_bot_id", invite.getSenderBotId());
         item.put("sender_bot_title", senderBot != null ? senderBot.getTitle() : "manual");
+        item.put("map_id", invite.getMapId());
+        item.put("map_name", invite.getMapId() == null ? "随机地图" : "地图 #" + invite.getMapId());
+        item.put("room_name", invite.getRoomName());
+        item.put("round_seconds", invite.getRoundSeconds());
+        item.put("allow_spectator", Boolean.TRUE.equals(invite.getAllowSpectator()));
         item.put("status", invite.getStatus());
         item.put("created_at", DateTimeUtil.format(invite.getCreatedAt()));
         item.put("expired_at", DateTimeUtil.format(invite.getExpiredAt()));

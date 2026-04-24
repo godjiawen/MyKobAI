@@ -26,6 +26,12 @@ export const usePkStore = defineStore("pk", {
     isPaused: false,
     pausedByUserId: null,
     selectedBotId: "-1",
+    matchType: "ranked",
+    mapId: null,
+    mapName: "随机地图",
+    allowSpectator: true,
+    roundSeconds: 15,
+    spectatorCount: 0,
     // 断线重连字段
     gameId: "",
     aSteps: "",
@@ -140,6 +146,17 @@ export const usePkStore = defineStore("pk", {
     updateSelectedBot(botId) {
       this.selectedBotId = String(botId ?? "-1");
     },
+    updateMatchMeta(meta = {}) {
+      this.matchType = meta.match_type ?? meta.matchType ?? "ranked";
+      this.mapId = meta.map_id ?? meta.mapId ?? null;
+      this.mapName = meta.map_name ?? meta.mapName ?? "随机地图";
+      this.allowSpectator = Boolean(meta.allow_spectator ?? meta.allowSpectator ?? true);
+      this.roundSeconds = Number(meta.round_seconds ?? meta.roundSeconds ?? 15);
+      this.spectatorCount = Number(meta.spectator_count ?? meta.spectatorCount ?? 0);
+    },
+    updateSpectatorCount(count) {
+      this.spectatorCount = Number(count) || 0;
+    },
     /**
      * 断线重连：从 Redis 快照更新全部状态
      */
@@ -169,6 +186,7 @@ export const usePkStore = defineStore("pk", {
       this.suspendedByUserId = this.normalizeUserId(snapshot.suspended_by ?? snapshot.suspendedBy ?? null);
       this.suspendedReason = snapshot.suspended_reason ?? snapshot.suspendedReason ?? "";
       this.lastSnapshotAt = snapshot.updated_at ?? snapshot.updatedAt ?? Date.now();
+      this.updateMatchMeta(snapshot);
       // 若快照状态是 playing，切换到对局页
       const status = snapshot.status;
       if (status && status !== "finished") {
@@ -196,6 +214,12 @@ export const usePkStore = defineStore("pk", {
       this.roomId = "";
       this.isPaused = false;
       this.pausedByUserId = null;
+      this.matchType = "ranked";
+      this.mapId = null;
+      this.mapName = "随机地图";
+      this.allowSpectator = true;
+      this.roundSeconds = 15;
+      this.spectatorCount = 0;
       this.gameId = "";
       this.aSteps = "";
       this.bSteps = "";
@@ -238,6 +262,10 @@ export const usePkStore = defineStore("pk", {
       this.isAwaySuspended = suspended;
       this.suspendedByUserId = this.normalizeUserId(suspendedBy);
       this.suspendedReason = reason || "";
+      // 恢复时同步清空离场列表，防止旧状态渗入新局
+      if (!suspended) {
+        this.awayUserIds = [];
+      }
     },
   },
 });

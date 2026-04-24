@@ -26,6 +26,13 @@ public class GameSnapshot {
     private String suspendedReason;
     private List<Integer> awayUserIds;
     private String roomId;
+    private String matchType;
+    private Integer mapId;
+    private String mapName;
+    private Integer roundSeconds;
+    private Boolean allowSpectator;
+    private String sourceType;
+    private Integer sourceId;
     private String loser;
     private long updatedAt;
     private long expireAt;
@@ -70,6 +77,20 @@ public class GameSnapshot {
     public void setAwayUserIds(List<Integer> awayUserIds) { this.awayUserIds = awayUserIds; }
     public String getRoomId() { return roomId; }
     public void setRoomId(String roomId) { this.roomId = roomId; }
+    public String getMatchType() { return matchType; }
+    public void setMatchType(String matchType) { this.matchType = matchType; }
+    public Integer getMapId() { return mapId; }
+    public void setMapId(Integer mapId) { this.mapId = mapId; }
+    public String getMapName() { return mapName; }
+    public void setMapName(String mapName) { this.mapName = mapName; }
+    public Integer getRoundSeconds() { return roundSeconds; }
+    public void setRoundSeconds(Integer roundSeconds) { this.roundSeconds = roundSeconds; }
+    public Boolean getAllowSpectator() { return allowSpectator; }
+    public void setAllowSpectator(Boolean allowSpectator) { this.allowSpectator = allowSpectator; }
+    public String getSourceType() { return sourceType; }
+    public void setSourceType(String sourceType) { this.sourceType = sourceType; }
+    public Integer getSourceId() { return sourceId; }
+    public void setSourceId(Integer sourceId) { this.sourceId = sourceId; }
     public String getLoser() { return loser; }
     public void setLoser(String loser) { this.loser = loser; }
     public long getUpdatedAt() { return updatedAt; }

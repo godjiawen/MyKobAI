@@ -18,8 +18,12 @@ public class FriendInviteController {
     public Map<String, Object> send(
             @RequestParam("receiver_id") Integer receiverId,
             @RequestParam(value = "sender_bot_id", defaultValue = "-1") Integer senderBotId,
-            @RequestParam(value = "game_mode", defaultValue = "pk") String gameMode) {
-        return friendInviteService.send(receiverId, senderBotId, gameMode);
+            @RequestParam(value = "game_mode", defaultValue = "pk") String gameMode,
+            @RequestParam(value = "map_id", required = false) Integer mapId,
+            @RequestParam(value = "room_name", defaultValue = "") String roomName,
+            @RequestParam(value = "round_seconds", defaultValue = "15") Integer roundSeconds,
+            @RequestParam(value = "allow_spectator", defaultValue = "true") Boolean allowSpectator) {
+        return friendInviteService.send(receiverId, senderBotId, gameMode, mapId, roomName, roundSeconds, allowSpectator);
     }
 
     @PostMapping("/api/friends/invite/respond/")

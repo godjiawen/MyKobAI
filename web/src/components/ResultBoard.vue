@@ -35,6 +35,9 @@ const restart = () => {
   pkStore.updateStatus("matching");
   pkStore.updateLoser("none");
   pkStore.updateResultVisible(false);
+  // 清除上一局残留的暂离/暂停状态，防止旧遮罩出现在新局
+  pkStore.updateAwaySuspended(false, null, "");
+  pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
   pkStore.updateOpponent({
     username: "匹配对手",
     photo: defaultAvatar,

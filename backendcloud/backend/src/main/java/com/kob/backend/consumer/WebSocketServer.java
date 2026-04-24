@@ -2,8 +2,10 @@ package com.kob.backend.consumer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kob.backend.consumer.utils.Game;
+import com.kob.backend.consumer.utils.GameCreateOptions;
 import com.kob.backend.consumer.utils.JwtAuthentication;
 import com.kob.backend.mapper.BotMapper;
+import com.kob.backend.mapper.RecordExtMapper;
 import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.Bot;
@@ -42,6 +44,7 @@ public class WebSocketServer {
 
     public static UserMapper userMapper;
     public static RecordMapper recordMapper;
+    public static RecordExtMapper recordExtMapper;
     private static BotMapper botMapper;
     public static RestTemplate restTemplate;
     private static GameSnapshotService gameSnapshotService;
@@ -69,6 +72,11 @@ public class WebSocketServer {
     @Autowired
     public void setRecordMapper(RecordMapper recordMapper) {
         WebSocketServer.recordMapper = recordMapper;
+    }
+
+    @Autowired
+    public void setRecordExtMapper(RecordExtMapper recordExtMapper) {
+        WebSocketServer.recordExtMapper = recordExtMapper;
     }
 
     /**
@@ -164,6 +172,11 @@ public class WebSocketServer {
      * @param bBotId 标识参数；Identifier value.
      */
     public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId) {
+        startGame(aId, aBotId, bId, bBotId, GameCreateOptions.ranked());
+    }
+
+    public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId, GameCreateOptions options) {
+        GameCreateOptions createOptions = options == null ? GameCreateOptions.ranked() : options;
         User a = userMapper.selectById(aId);
         User b = userMapper.selectById(bId);
         Bot botA = botMapper.selectById(aBotId);
@@ -172,7 +185,7 @@ public class WebSocketServer {
         String roomId = Math.min(aId, bId) + "_" + Math.max(aId, bId);
         String gameId = "game_" + aId + "_" + bId + "_" + System.currentTimeMillis();
 
-        Game game = new Game(13, 14, 20, a.getId(), botA, b.getId(), botB, gameId, roomId);
+        Game game = new Game(13, 14, 20, a.getId(), botA, b.getId(), botB, gameId, roomId, createOptions);
         game.createMap();
         activeGames.put(gameId, game);
         if (users.get(a.getId()) != null) users.get(a.getId()).game = game;
@@ -203,6 +216,7 @@ public class WebSocketServer {
         respA.put("opponent_photo", b.getPhoto());
         respA.put("game", respGame);
         respA.put("room_id", roomId);
+        appendGameMeta(respA, game);
         sendEvent(a.getId(), respA);
 
         JSONObject respB = new JSONObject();
@@ -211,7 +225,18 @@ public class WebSocketServer {
         respB.put("opponent_photo", a.getPhoto());
         respB.put("game", respGame);
         respB.put("room_id", roomId);
+        appendGameMeta(respB, game);
         sendEvent(b.getId(), respB);
+    }
+
+    private static void appendGameMeta(JSONObject payload, Game game) {
+        payload.put("match_type", game.getMatchType());
+        payload.put("map_id", game.getMapId());
+        payload.put("map_name", game.getMapName());
+        payload.put("round_seconds", game.getRoundSeconds());
+        payload.put("allow_spectator", game.getAllowSpectator());
+        payload.put("source_type", game.getSourceType());
+        payload.put("source_id", game.getSourceId());
     }
 
     /**
@@ -444,6 +469,13 @@ public class WebSocketServer {
         snap.put("suspended_reason", game.getSuspendedReason());
         snap.put("away_user_ids", new java.util.ArrayList<>(game.getAwayPlayers()));
         snap.put("room_id", game.getRoomId());
+        snap.put("match_type", game.getMatchType());
+        snap.put("map_id", game.getMapId());
+        snap.put("map_name", game.getMapName());
+        snap.put("round_seconds", game.getRoundSeconds());
+        snap.put("allow_spectator", game.getAllowSpectator());
+        snap.put("source_type", game.getSourceType());
+        snap.put("source_id", game.getSourceId());
         snap.put("loser", "");
         snap.put("updated_at", System.currentTimeMillis());
         return snap;
@@ -532,6 +564,13 @@ public class WebSocketServer {
             snapJson.put("suspended_reason", snap.getSuspendedReason());
             snapJson.put("away_user_ids", snap.getAwayUserIds());
             snapJson.put("room_id", snap.getRoomId());
+            snapJson.put("match_type", snap.getMatchType());
+            snapJson.put("map_id", snap.getMapId());
+            snapJson.put("map_name", snap.getMapName());
+            snapJson.put("round_seconds", snap.getRoundSeconds());
+            snapJson.put("allow_spectator", snap.getAllowSpectator());
+            snapJson.put("source_type", snap.getSourceType());
+            snapJson.put("source_id", snap.getSourceId());
             snapJson.put("loser", snap.getLoser());
             snapJson.put("updated_at", snap.getUpdatedAt());
             resp.put("snapshot", snapJson);

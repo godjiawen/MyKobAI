@@ -63,10 +63,49 @@
           </button>
         </div>
 
+        <div class="invite-dialog__custom">
+          <label class="invite-field">
+            <span>房间名</span>
+            <input
+              type="text"
+              class="form-control"
+              :value="roomName"
+              maxlength="50"
+              placeholder="默认好友私人局"
+              @input="$emit('update:roomName', $event.target.value)"
+            />
+          </label>
+
+          <label class="invite-field">
+            <span>地图</span>
+            <select class="form-select" :value="mapId ?? ''" @change="$emit('update:mapId', $event.target.value)">
+              <option value="">随机地图</option>
+            </select>
+          </label>
+
+          <label class="invite-field">
+            <span>回合时限</span>
+            <select class="form-select" :value="roundSeconds" @change="$emit('update:roundSeconds', $event.target.value)">
+              <option value="10">10 秒</option>
+              <option value="15">15 秒</option>
+              <option value="30">30 秒</option>
+            </select>
+          </label>
+
+          <label class="invite-toggle">
+            <input
+              type="checkbox"
+              :checked="allowSpectator"
+              @change="$emit('update:allowSpectator', $event.target.checked)"
+            />
+            <span>允许观战</span>
+          </label>
+        </div>
+
         <div class="invite-dialog__summary">
           <div>
             <span>当前配置</span>
-            <strong>{{ selectedBotLabel }}</strong>
+            <strong>{{ selectedBotLabel }} · {{ mapLabel }} · {{ roundSeconds }} 秒</strong>
           </div>
           <div>
             <span>发送对象</span>
@@ -130,14 +169,41 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  roomName: {
+    type: String,
+    default: "",
+  },
+  mapId: {
+    type: [String, Number],
+    default: null,
+  },
+  roundSeconds: {
+    type: Number,
+    default: 15,
+  },
+  allowSpectator: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-defineEmits(["update:modelValue", "update:selectedBotId", "confirm", "cancel-invite"]);
+defineEmits([
+  "update:modelValue",
+  "update:selectedBotId",
+  "update:roomName",
+  "update:mapId",
+  "update:roundSeconds",
+  "update:allowSpectator",
+  "confirm",
+  "cancel-invite",
+]);
 
 const selectedBotLabel = computed(() => {
   if (props.selectedBotId === "-1") return "手动操作";
   return props.bots.find((bot) => bot.id === props.selectedBotId)?.title || `Bot #${props.selectedBotId}`;
 });
+
+const mapLabel = computed(() => (props.mapId ? `地图 #${props.mapId}` : "随机地图"));
 </script>
 
 <style scoped>
@@ -357,6 +423,48 @@ const selectedBotLabel = computed(() => {
   gap: 12px;
 }
 
+.invite-dialog__custom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 0.72fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(90, 180, 255, 0.14);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.invite-field,
+.invite-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.invite-field span,
+.invite-toggle span {
+  color: var(--kob-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.invite-field .form-control,
+.invite-field .form-select {
+  min-height: 42px;
+  border-radius: 14px;
+}
+
+.invite-toggle {
+  min-height: 42px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(90, 180, 255, 0.16);
+  background: rgba(245, 250, 255, 0.9);
+}
+
 .invite-dialog__summary div {
   padding: 16px 18px;
   border-radius: 20px;
@@ -412,6 +520,7 @@ const selectedBotLabel = computed(() => {
   }
 
   .invite-dialog__grid,
+  .invite-dialog__custom,
   .invite-dialog__summary {
     grid-template-columns: 1fr;
   }

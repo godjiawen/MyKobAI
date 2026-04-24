@@ -13,28 +13,18 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("friend_invite")
-public class FriendInvite {
+@TableName("record_ext")
+public class RecordExt {
     @TableId(type = IdType.AUTO)
     private Integer id;
-
-    private Integer senderId;
-    private Integer receiverId;
-    private String gameMode;
-    private Integer senderBotId;
-    private Integer receiverBotId;
+    private Integer recordId;
+    private String matchType;
     private Integer mapId;
-    private String roomName;
-    private Integer roundSeconds;
+    private String mapName;
+    private Integer sourceId;
+    private String sourceType;
     private Boolean allowSpectator;
-    private String status;
 
     @TableField("created_at")
     private Date createdAt;
-
-    @TableField("expired_at")
-    private Date expiredAt;
-
-    @TableField("handled_at")
-    private Date handledAt;
 }

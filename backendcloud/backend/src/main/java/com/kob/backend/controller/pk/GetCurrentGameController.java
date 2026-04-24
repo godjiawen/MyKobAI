@@ -53,6 +53,13 @@ public class GetCurrentGameController {
                 snapJson.put("suspended_reason", snap.getSuspendedReason());
                 snapJson.put("away_user_ids", snap.getAwayUserIds());
                 snapJson.put("room_id", snap.getRoomId());
+                snapJson.put("match_type", snap.getMatchType());
+                snapJson.put("map_id", snap.getMapId());
+                snapJson.put("map_name", snap.getMapName());
+                snapJson.put("round_seconds", snap.getRoundSeconds());
+                snapJson.put("allow_spectator", snap.getAllowSpectator());
+                snapJson.put("source_type", snap.getSourceType());
+                snapJson.put("source_id", snap.getSourceId());
                 snapJson.put("updated_at", snap.getUpdatedAt());
                 resp.put("snapshot", snapJson);
             } else {

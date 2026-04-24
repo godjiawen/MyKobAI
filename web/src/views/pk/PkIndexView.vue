@@ -11,6 +11,10 @@
               对方出战设置：{{ incomingInvite.senderBotTitle }}
               <span>你将使用当前设置应战：{{ selectedBotLabel }}</span>
             </p>
+            <p class="invite-banner__meta">
+              {{ incomingInvite.mapName }} · {{ incomingInvite.roundSeconds }} 秒
+              <span>{{ incomingInvite.allowSpectator ? "允许观战" : "关闭观战" }}</span>
+            </p>
             <p class="invite-banner__meta">邀请有效期至 {{ incomingInvite.expiredAt || "稍后失效" }}</p>
           </div>
         </div>
@@ -43,6 +47,10 @@
             <p class="invite-banner__eyebrow">等待回应</p>
             <h3>已向 {{ outgoingInvite.receiverUsername }} 发出邀战</h3>
             <p class="invite-banner__meta">你的出战设置：{{ outgoingInvite.senderBotTitle }}</p>
+            <p class="invite-banner__meta">
+              {{ outgoingInvite.mapName }} · {{ outgoingInvite.roundSeconds }} 秒
+              <span>{{ outgoingInvite.allowSpectator ? "允许观战" : "关闭观战" }}</span>
+            </p>
             <p class="invite-banner__meta">邀请有效期至 {{ outgoingInvite.expiredAt || "稍后失效" }}</p>
           </div>
         </div>
@@ -77,6 +85,12 @@
     <PlayGround v-if="pkStore.status === 'playing'" />
     <MatchGround v-if="pkStore.status === 'matching'" />
     <ResultBoard v-if="pkStore.resultVisible" />
+    <div class="match-meta" v-if="pkStore.status === 'playing'" @mousedown.stop>
+      <span>{{ matchTypeLabel }}</span>
+      <span>{{ pkStore.mapName }}</span>
+      <span>{{ pkStore.roundSeconds }} 秒/回合</span>
+      <span>{{ pkStore.allowSpectator ? "可观战" : "不可观战" }}</span>
+    </div>
     <div class="user-color" v-if="isAPlayer" @mousedown.stop>你在左下角</div>
     <div class="user-color" v-if="isBPlayer" @mousedown.stop>你在右上角</div>
   </div>
@@ -108,6 +122,11 @@ const isBPlayer = computed(
   () => pkStore.status === "playing" && currentUserId.value === Number.parseInt(pkStore.b_id, 10)
 );
 const selectedBotLabel = computed(() => (pkStore.selectedBotId === "-1" ? "手动操作" : `Bot #${pkStore.selectedBotId}`));
+const matchTypeLabel = computed(() => {
+  if (pkStore.matchType === "friend_private") return "好友私人局";
+  if (pkStore.matchType === "tournament") return "锦标赛";
+  return "匹配对战";
+});
 
 const clearInviteNotice = () => realtimeStore.clearInviteNotice();
 const respondInvite = async (action) => realtimeStore.respondInvite(action);
@@ -119,6 +138,8 @@ onMounted(() => {
     pkStore.updateLoser("none");
     pkStore.updateResultVisible(false);
     pkStore.updatePaused({ isPaused: false, pausedByUserId: null });
+    // 非对局中时清除暂离状态，防止历史状态渗入新局
+    pkStore.updateAwaySuspended(false, null, "");
     if (!pkStore.opponent_username) {
       pkStore.updateOpponent({
         username: "匹配对手",
@@ -273,6 +294,28 @@ div.user-color {
   box-shadow: 0 10px 20px rgba(0, 50, 100, 0.1);
   backdrop-filter: blur(8px);
   animation: tag-in 240ms ease;
+}
+
+.match-meta {
+  width: min(1080px, 92vw);
+  margin: 10px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.match-meta span {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(90, 180, 255, 0.24);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--kob-text);
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .invite-slide-enter-active,

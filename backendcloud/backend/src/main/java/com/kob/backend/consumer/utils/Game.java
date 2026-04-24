@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.Record;
+import com.kob.backend.pojo.RecordExt;
 import com.kob.backend.pojo.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -43,6 +44,7 @@ public class Game extends Thread {
     // 鏂嚎閲嶈繛瀛楁
     private final String gameId;
     private final String roomId;
+    private final GameCreateOptions createOptions;
     private volatile boolean suspended = false;
     private volatile Integer suspendedBy = null;
     private volatile String suspendedReason = "";
@@ -75,12 +77,27 @@ public class Game extends Thread {
                 String gameId,
                 String roomId
     ) {
+        this(rows, cols, inner_walls_count, idA, botA, idB, botB, gameId, roomId, GameCreateOptions.ranked());
+    }
+
+    public Game(Integer rows,
+                Integer cols,
+                Integer inner_walls_count,
+                Integer idA,
+                Bot botA,
+                Integer idB,
+                Bot botB,
+                String gameId,
+                String roomId,
+                GameCreateOptions createOptions
+    ) {
         this.rows = rows;
         this.cols = cols;
         this.inner_walls_count = inner_walls_count;
         this.g = new int[rows][cols];
         this.gameId = gameId;
         this.roomId = roomId;
+        this.createOptions = createOptions == null ? GameCreateOptions.ranked() : createOptions;
 
         Integer botIdA = -1, botIdB = -1;
         String botCodeA = "", botCodeB = "";
@@ -155,6 +172,20 @@ public class Game extends Thread {
      * @return 返回房间 ID 字符串；Returns the room ID string.
      */
     public String getRoomId() { return roomId; }
+
+    public String getMatchType() { return createOptions.getMatchType(); }
+
+    public Integer getMapId() { return createOptions.getMapId(); }
+
+    public String getMapName() { return createOptions.getMapName(); }
+
+    public Integer getRoundSeconds() { return createOptions.getRoundSeconds(); }
+
+    public Boolean getAllowSpectator() { return createOptions.getAllowSpectator(); }
+
+    public String getSourceType() { return createOptions.getSourceType(); }
+
+    public Integer getSourceId() { return createOptions.getSourceId(); }
 
     /**
      * 校验或判断对局是否处于挂起状态。
@@ -562,22 +593,24 @@ public class Game extends Thread {
      *
      */
     private void saveToDatabase() {
-        Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
-        Integer ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
+        if ("ranked".equals(getMatchType())) {
+            Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
+            Integer ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
 
-        if ("A".equals(loser)) {
-            ratingA -= 2;
-            ratingB += 5;
-        } else if ("B".equals(loser)) {
-            ratingA += 5;
-            ratingB -= 2;
-        } else {
-            ratingA += 1;
-            ratingB += 1;
+            if ("A".equals(loser)) {
+                ratingA -= 2;
+                ratingB += 5;
+            } else if ("B".equals(loser)) {
+                ratingA += 5;
+                ratingB -= 2;
+            } else {
+                ratingA += 1;
+                ratingB += 1;
+            }
+
+            updateUserRating(playerA, ratingA);
+            updateUserRating(playerB, ratingB);
         }
-
-        updateUserRating(playerA, ratingA);
-        updateUserRating(playerB, ratingB);
 
         Record record = new Record(
                 null,
@@ -595,6 +628,20 @@ public class Game extends Thread {
         );
 
         WebSocketServer.recordMapper.insert(record);
+        if (WebSocketServer.recordExtMapper != null) {
+            RecordExt recordExt = new RecordExt(
+                    null,
+                    record.getId(),
+                    getMatchType(),
+                    getMapId(),
+                    getMapName(),
+                    getSourceId(),
+                    getSourceType(),
+                    getAllowSpectator(),
+                    new Date()
+            );
+            WebSocketServer.recordExtMapper.insert(recordExt);
+        }
     }
 
     /**

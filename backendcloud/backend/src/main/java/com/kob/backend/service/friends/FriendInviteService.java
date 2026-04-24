@@ -16,7 +16,14 @@ public interface FriendInviteService {
      * @param gameMode 对局相关参数；Game-related parameter.
      * @return 返回键值映射结果；Returns a key-value mapping result.
      */
-    Map<String, Object> send(Integer receiverId, Integer senderBotId, String gameMode);
+    Map<String, Object> send(
+            Integer receiverId,
+            Integer senderBotId,
+            String gameMode,
+            Integer mapId,
+            String roomName,
+            Integer roundSeconds,
+            Boolean allowSpectator);
 
     /**
      * 处理 respond 的核心业务逻辑，并对输入输出进行约束处理。

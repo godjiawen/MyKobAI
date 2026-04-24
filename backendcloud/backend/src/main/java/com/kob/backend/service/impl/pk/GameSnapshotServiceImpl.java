@@ -102,6 +102,13 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
         List<Integer> away = new ArrayList<>(game.getAwayPlayers());
         snap.setAwayUserIds(away);
         snap.setRoomId(game.getRoomId());
+        snap.setMatchType(game.getMatchType());
+        snap.setMapId(game.getMapId());
+        snap.setMapName(game.getMapName());
+        snap.setRoundSeconds(game.getRoundSeconds());
+        snap.setAllowSpectator(game.getAllowSpectator());
+        snap.setSourceType(game.getSourceType());
+        snap.setSourceId(game.getSourceId());
         snap.setLoser("");
         snap.setUpdatedAt(System.currentTimeMillis());
         long ttl = game.isSuspended() ? TTL_SUSPENDED_SEC : TTL_PLAYING_SEC;
@@ -121,8 +128,13 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
             long ttl = snap.isSuspended() ? TTL_SUSPENDED_SEC : TTL_PLAYING_SEC;
             String json = JSON.toJSONString(snap);
 
+            System.out.println("[Redis] WRITE snapshot key=" + snapshotKey(gameId)
+                    + " aId=" + snap.getAId() + " bId=" + snap.getBId()
+                    + " suspended=" + snap.isSuspended() + " ttl=" + ttl + "s");
             redisTemplate.opsForValue().set(snapshotKey(gameId), json, ttl, TimeUnit.SECONDS);
+            System.out.println("[Redis] WRITE user-game key=" + userGameKey(snap.getAId()) + " -> gameId=" + gameId);
             redisTemplate.opsForValue().set(userGameKey(snap.getAId()), gameId, ttl, TimeUnit.SECONDS);
+            System.out.println("[Redis] WRITE user-game key=" + userGameKey(snap.getBId()) + " -> gameId=" + gameId);
             redisTemplate.opsForValue().set(userGameKey(snap.getBId()), gameId, ttl, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.err.println("[Redis] writeSnapshot failed: " + e.getMessage());
@@ -139,39 +151,25 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
      */
     @Override
     public void saveInitial(Game game) {
+        System.out.println("[Redis] saveInitial triggered, gameId=" + game.getGameId());
         writeSnapshot(buildSnapshot(game));
     }
 
-    /**
-     * 创建或保存 saveStep 的核心业务逻辑，并对输入输出进行约束处理。
-     * Performs the core business logic of saveStep with controlled input and output handling.
-     *
-     * @param game 对局相关参数；Game-related parameter.
-     */
     @Override
     public void saveStep(Game game) {
+        System.out.println("[Redis] saveStep triggered, gameId=" + game.getGameId());
         writeSnapshot(buildSnapshot(game));
     }
 
-    /**
-     * 创建或保存 savePause 的核心业务逻辑，并对输入输出进行约束处理。
-     * Performs the core business logic of savePause with controlled input and output handling.
-     *
-     * @param game 对局相关参数；Game-related parameter.
-     */
     @Override
     public void savePause(Game game) {
+        System.out.println("[Redis] savePause triggered, gameId=" + game.getGameId() + " pausedBy=" + game.getPausedBy());
         writeSnapshot(buildSnapshot(game));
     }
 
-    /**
-     * 创建或保存 savePresence 的核心业务逻辑，并对输入输出进行约束处理。
-     * Performs the core business logic of savePresence with controlled input and output handling.
-     *
-     * @param game 对局相关参数；Game-related parameter.
-     */
     @Override
     public void savePresence(Game game) {
+        System.out.println("[Redis] savePresence triggered, gameId=" + game.getGameId() + " awayPlayers=" + game.getAwayPlayers());
         writeSnapshot(buildSnapshot(game));
     }
 
@@ -185,6 +183,8 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
     public void deleteGame(Game game) {
         try {
             String gameId = game.getGameId();
+            System.out.println("[Redis] DELETE snapshot key=" + snapshotKey(gameId)
+                    + " aId=" + game.getPlayerA().getId() + " bId=" + game.getPlayerB().getId());
             redisTemplate.delete(snapshotKey(gameId));
             redisTemplate.delete(userGameKey(game.getPlayerA().getId()));
             redisTemplate.delete(userGameKey(game.getPlayerB().getId()));
@@ -203,7 +203,10 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
     @Override
     public GameSnapshot getByUserId(Integer userId) {
         try {
-            String gameId = redisTemplate.opsForValue().get(userGameKey(userId));
+            String userKey = userGameKey(userId);
+            System.out.println("[Redis] READ user-game key=" + userKey + " userId=" + userId);
+            String gameId = redisTemplate.opsForValue().get(userKey);
+            System.out.println("[Redis] READ user-game result: gameId=" + gameId);
             if (gameId == null) return null;
             return getByGameId(gameId);
         } catch (Exception e) {
@@ -222,7 +225,10 @@ public class GameSnapshotServiceImpl implements GameSnapshotService {
     @Override
     public GameSnapshot getByGameId(String gameId) {
         try {
-            String json = redisTemplate.opsForValue().get(snapshotKey(gameId));
+            String snapKey = snapshotKey(gameId);
+            System.out.println("[Redis] READ snapshot key=" + snapKey + " gameId=" + gameId);
+            String json = redisTemplate.opsForValue().get(snapKey);
+            System.out.println("[Redis] READ snapshot result: " + (json == null ? "null (not found)" : "found, length=" + json.length()));
             if (json == null) return null;
             return JSON.parseObject(json, GameSnapshot.class);
         } catch (Exception e) {

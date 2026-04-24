@@ -29,6 +29,10 @@ CREATE TABLE IF NOT EXISTS friend_invite (
     game_mode VARCHAR(20) NOT NULL DEFAULT 'pk',
     sender_bot_id INT NOT NULL DEFAULT -1,
     receiver_bot_id INT NULL,
+    map_id INT NULL,
+    room_name VARCHAR(50) NOT NULL DEFAULT '',
+    round_seconds INT NOT NULL DEFAULT 15,
+    allow_spectator TINYINT(1) NOT NULL DEFAULT 1,
     status VARCHAR(20) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expired_at DATETIME NOT NULL,
@@ -49,4 +53,19 @@ CREATE TABLE IF NOT EXISTS friend_chat_message (
     KEY idx_friend_chat_sender (sender_id),
     KEY idx_friend_chat_receiver (receiver_id),
     KEY idx_friend_chat_created_at (created_at)
+);
+
+CREATE TABLE IF NOT EXISTS record_ext (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    record_id INT NOT NULL,
+    match_type VARCHAR(30) NOT NULL DEFAULT 'ranked',
+    map_id INT NULL,
+    map_name VARCHAR(50) NOT NULL DEFAULT '',
+    source_id INT NULL,
+    source_type VARCHAR(30) NOT NULL DEFAULT '',
+    allow_spectator TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_record_ext_record (record_id),
+    KEY idx_record_ext_type (match_type),
+    KEY idx_record_ext_source (source_type, source_id)
 );

@@ -245,6 +245,10 @@ export const useFriendStore = defineStore("friend", {
     inviteDialogVisible: false,
     inviteDialogFriendId: null,
     inviteDialogBotId: "-1",
+    inviteDialogRoomName: "",
+    inviteDialogMapId: null,
+    inviteDialogRoundSeconds: 15,
+    inviteDialogAllowSpectator: true,
     inviteDialogLoading: false,
     inviteDialogSubmitting: false,
     inviteBots: [],
@@ -686,6 +690,10 @@ export const useFriendStore = defineStore("friend", {
       this.inviteDialogFriendId = friendId;
       this.inviteDialogVisible = true;
       this.inviteDialogBotId = usePkStore().selectedBotId || "-1";
+      this.inviteDialogRoomName = "";
+      this.inviteDialogMapId = null;
+      this.inviteDialogRoundSeconds = 15;
+      this.inviteDialogAllowSpectator = true;
       try {
         await Promise.all([
           this.fetchInviteBots(),
@@ -715,6 +723,18 @@ export const useFriendStore = defineStore("friend", {
     setInviteDialogBot(botId) {
       this.inviteDialogBotId = String(botId ?? "-1");
     },
+    setInviteDialogRoomName(roomName) {
+      this.inviteDialogRoomName = roomName || "";
+    },
+    setInviteDialogMapId(mapId) {
+      this.inviteDialogMapId = mapId === null || mapId === undefined || mapId === "" ? null : Number.parseInt(mapId, 10);
+    },
+    setInviteDialogRoundSeconds(seconds) {
+      this.inviteDialogRoundSeconds = Number.parseInt(seconds, 10) || 15;
+    },
+    setInviteDialogAllowSpectator(allowSpectator) {
+      this.inviteDialogAllowSpectator = Boolean(allowSpectator);
+    },
     /**
      * 处理 submitInviteDialog 的核心前端逻辑，并包含异步流程控制，负责状态更新、交互调度与异常分支处理。
      * Handles the core frontend logic of submitInviteDialog with async flow control, including state updates, interaction orchestration, and error branches.
@@ -733,6 +753,10 @@ export const useFriendStore = defineStore("friend", {
               receiver_id: friend.id,
               sender_bot_id: Number.parseInt(this.inviteDialogBotId, 10),
               game_mode: "pk",
+              map_id: this.inviteDialogMapId,
+              room_name: this.inviteDialogRoomName,
+              round_seconds: this.inviteDialogRoundSeconds,
+              allow_spectator: this.inviteDialogAllowSpectator,
             },
           }),
           "Send invite failed"
